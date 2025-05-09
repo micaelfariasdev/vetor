@@ -18,7 +18,7 @@ function App() {
       {pagina === "med-receber" && <Comp.Man />}
       {pagina === "funcionarios" && <Comp.Man />}
       {pagina === "empresas" && <Comp.Man />}
-      {pagina === "desp-mes-mes" && <p>Despesas mês a mês</p>}
+      {pagina === "desp-mes-mes" && <Comp.DesMesMes />}
     </>
   )
 }
