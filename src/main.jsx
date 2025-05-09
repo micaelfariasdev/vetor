@@ -11,8 +11,14 @@ function App() {
     <>
       <Comp.Menu onNavigate={setPagina} />
       <Comp.MenuTop />
-      {pagina === "home" && <Comp.Home />}
-      {pagina === "obras" && <Comp.Obras />}
+      {pagina === "home" && <Comp.Man />}
+      {pagina === "obras" && <Comp.Man />}
+      {pagina === "titulo-pagar" && <Comp.Man />}
+      {pagina === "med-pagar" && <Comp.Man />}
+      {pagina === "med-receber" && <Comp.Man />}
+      {pagina === "funcionarios" && <Comp.Man />}
+      {pagina === "empresas" && <Comp.Man />}
+      {pagina === "desp-mes-mes" && <p>Despesas mês a mês</p>}
     </>
   )
 }
