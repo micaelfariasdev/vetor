@@ -86,7 +86,7 @@ export function Menu({ onNavigate }) {
 
   return (
     <>
-      <div className="h-screen bg-gray-100 min-w-[260px]  flex flex-col items-center p-2 pt-4 row-span-2">
+      <div className="h-screen bg-gray-100 min-w-[260px]  flex flex-col items-center p-2 pt-4 row-span-2 relative  z-10">
         <h1 className="font-bold text-[20px]">Vetor Construções</h1>
         <nav className="w-full flex flex-col gap-2 mt-4 text-left font-medium text-lg">
           <MenuItem
@@ -160,7 +160,7 @@ export function Menu({ onNavigate }) {
 
 export function MenuTop() {
   return (
-    <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200">
+    <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
       <a href="">Perfil</a>
       <a href="">Mensagems</a>
     </div>

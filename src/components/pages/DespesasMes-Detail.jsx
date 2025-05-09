@@ -3,7 +3,7 @@ import Paper from "@mui/material/Paper";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaCirclePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
+import { useParams } from 'react-router-dom';
 
 function CreateNew() {
   const [mes, setMes] = useState('1');
@@ -88,52 +88,34 @@ function CreateNew() {
   )
 }
 
-export function DesMesMes() {
+export function DesMesMesDetail() {
+  const { id } = useParams();
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/despesas/").then((response) => {
+    axios.get(`http://127.0.0.1:8000/api/despesas/${id}`).then((response) => {
       setData(response.data);
-      console.log(response.data);
     });
   }, []);
+  console.log(data.itens);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 10 },
-    { field: "username", headerName: "Usuario", flex: 6 },
-    {
-      field: "criado_em",
-      headerName: "Criado Em",
-      flex: 1,
+    { field: "empresa", headerName: "Fornecedor", flex: 4 },
+    { field: "data", headerName: "Data", flex: 1,
       valueGetter: (value, row) => {
-        return `${new Date(row.criado_em).toLocaleDateString("pt-BR")}`;
+        return `${new Date(row.data).toLocaleDateString('pt-BR')}`;
       },
-    },
-    {
-      field: "atualizado_em",
-      headerName: "Última Atualização",
-      flex: 1,
+     },
+    { field: "documento", headerName: "Documento", flex: 1 },
+    { field: "titulo", headerName: "Título", flex: 1 },
+    { field: "valor", headerName: "Valor", flex: 1,
       valueGetter: (value, row) => {
-        return `${new Date(row.atualizado_em).toLocaleDateString("pt-BR")}`;
+        return `R$ ${parseFloat(row.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       },
-    },
-    {
-      field: "referencia",
-      headerName: "Mês",
-      flex: 1,
-      valueGetter: (value, row) => {
-        return `${row.mes}/ ${row.ano}`;
-      },
-    },
-    {
-      field: "valor_total",
-      headerName: "Total (R$)",
-      flex: 2,
-      valueGetter: (value, row) => {
-        return `R$ ${row.itens.reduce((acc, item) => acc + parseFloat(item.valor), 0).toFixed(2)}`
-      }
-    },
+     },
+    { field: "descricao", headerName: "Descrição", flex:2 },
+
     {
       field: "acoes",
       headerName: "Ações",
@@ -141,34 +123,38 @@ export function DesMesMes() {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <div className="h-full w-full text-md flex items-center justify-center gap-2">
+        <div className="h-full w-full text-xl flex items-center justify-center gap-2">
           <a
             href={`/despesasmes/${params.row.id}`}
-            className="w-fit p-2 bg-cyan-500 text-white rounded-full hover:bg-cyan-200"
+            className="w-fit p-1 bg-cyan-500 text-white rounded-full hover:bg-cyan-200"
           >
-            <FaEdit className="" />
+            <FaCirclePlus className="" />
           </a>
         </div >
       ),
     }
   ];
 
-
+  const total = data.itens?.reduce((acc, item) => acc + parseFloat(item.valor), 0) || 0;
   const paginationModel = { page: 0, pageSize: 5 };
   return (
     <>{create && <CreateNew />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">Despesas Mês a Mês</h1>
+          <h1 className="font-bold text-3xl">Despesas de {data.mes}/{data.ano}</h1>
           <FaCirclePlus
             className="text-4xl text-cyan-500 hover:text-cyan-800 cursor-pointer active:scale-90"
             onClick={() => setCreate(true)} />
         </div>
         <hr className="col-span-2" />
-        <div className="col-span-2"></div>
+        <div className="col-span-2">
+          <h1 className="font-bold text-2xl">
+            Total: R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </h1>
+        </div>
         <Paper  >
           <DataGrid
-            rows={data}
+            rows={data.itens}
             columns={columns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10]}

@@ -2,23 +2,32 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import * as Comp from './components'
 import { useState } from 'react'
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
   const [pagina, setPagina] = useState("home")
+  const pageComponents = {
+    home: <Comp.Man />,
+    obras: <Comp.Man />,
+    'titulo-pagar': <Comp.Man />,
+    'med-pagar': <Comp.Man />,
+    'med-receber': <Comp.Man />,
+    funcionarios: <Comp.Man />,
+    empresas: <Comp.Man />,
+    'desp-mes-mes': <Comp.DesMesMes />,
+  }
 
   return (
     <>
-      <Comp.Menu onNavigate={setPagina} />
+      <Comp.Menu onNavigate={setPagina}/>
       <Comp.MenuTop />
-      {pagina === "home" && <Comp.Man />}
-      {pagina === "obras" && <Comp.Man />}
-      {pagina === "titulo-pagar" && <Comp.Man />}
-      {pagina === "med-pagar" && <Comp.Man />}
-      {pagina === "med-receber" && <Comp.Man />}
-      {pagina === "funcionarios" && <Comp.Man />}
-      {pagina === "empresas" && <Comp.Man />}
-      {pagina === "desp-mes-mes" && <Comp.DesMesMes />}
+
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={pageComponents[pagina] || <Comp.NotFound />} />
+          <Route path="/despesasmes/:id" element={<Comp.DesMesMesDetail />} />
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }
