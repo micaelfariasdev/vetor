@@ -21,13 +21,15 @@ function App() {
     <>
       <Comp.Menu onNavigate={setPagina}/>
       <Comp.MenuTop />
-
+      <div className='h-full overflow-y-scroll'>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={pageComponents[pagina] || <Comp.NotFound />} />
           <Route path="/despesasmes/:id" element={<Comp.DesMesMesDetail />} />
+          <Route path="/test" element={<Comp.PaginaParaPDF />} />
         </Routes>
       </BrowserRouter>
+      </div>
     </>
   )
 }
