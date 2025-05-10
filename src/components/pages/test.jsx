@@ -1,13 +1,7 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
-import { IoIosCloseCircle } from "react-icons/io";
-import Dialog from "@mui/material/Dialog";
 
 export function PaginaParaPDF() {
   const [data, setData] = useState([]);
@@ -24,36 +18,54 @@ export function PaginaParaPDF() {
     pdf.addImage(imgData, "PNG", 0, 0, largura, altura);
     pdf.save("pagina.pdf");
   };
+
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/despesas/1").then((response) => {
-      setData(response.data);
-    });
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/despesas/1/"
+        );
+        setData(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
     <div className="p-4">
       <div id="area-pdf" className="bg-white p-4 shadow-lg">
-        <table>
-          <thead>
-            <tr>
-                <th>Fornecedor</th>
-<th>Data</th>
-<th>Documento</th>
-<th>Título</th>
-<th>Valor</th>
-<th>Descrição</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map{(item) =>{
-                
-            }}}
-            <tr>
-              <td>asada</td>
-              <td>asada</td>
-            </tr>
-          </tbody>
-        </table>
+        {data.itens && data.itens.length > 0 ? (
+          <table className="table-auto w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="border-b p-2 text-left">Fornecedor</th>
+                <th className="border-b p-2 text-left">Data</th>
+                <th className="border-b p-2 text-left">Documento</th>
+                <th className="border-b p-2 text-left">Título</th>
+                <th className="border-b p-2 text-left">Valor</th>
+                <th className="border-b p-2 text-left">Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.itens.map((item) => (
+                <tr key={item.id}>
+                  <td className="border-b p-2">{item.empresa}</td>
+                  <td className="border-b p-2">{item.data}</td>
+                  <td className="border-b p-2">{item.documento}</td>
+                  <td className="border-b p-2">{item.titulo}</td>
+                  <td className="border-b p-2">{item.valor}</td>
+                  <td className="border-b p-2">{item.descricao}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Nenhum dado disponível.</p>
+        )}
       </div>
 
       <button
