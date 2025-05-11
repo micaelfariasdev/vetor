@@ -4,3 +4,27 @@
 :root{
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print, header, footer, nav, aside {
+    display: none !important;
+  }
+
+  #area-pdf {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+  }
+
+  html, body {
+    background: white !important;
+  }
+}
+
+

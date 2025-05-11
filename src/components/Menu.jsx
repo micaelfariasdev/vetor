@@ -7,78 +7,37 @@ import {
 } from "react-icons/io";
 import { MdMonetizationOn } from "react-icons/md";
 import { useState, useEffect } from "react";
-
-function MenuItem({ icon: Icon, label, send, current, onClick, many = false }) {
-  const active = current === send;
-
-  return (
-    <div
-      onClick={() => onClick(send)}
-      className={`w-full pl-5 py-2 gap-2 rounded-md cursor-pointer grid grid-cols-[24px_1fr_24px] grid-rows-1 items-center
-          ${active ? "bg-[#E2F4FF]" : "hover:bg-[#E2F4FF]"}`}
-      id={send}
-    >
-      <Icon className="w-full" />
-      <p className="self-start">{label}</p>
-      {many && (
-        <IoIosArrowForward className={active ? "rotate-90" : "rotate-0"} />
-      )}
-    </div>
-  );
-}
-
-function MenuItemSub({
-  icon: Icon,
-  label,
-  current,
-  onClick,
-  many = false,
-  itens = false,
-}) {
-  const [page, setiPage] = useState("");
-  const [hover, setHover] = useState(false);
-  const active = page === current;
-  return (
-    <div
-      className={`overflow-hidden w-full pl-5 py-2 gap-x-2 rounded-md cursor-pointer grid grid-cols-[24px_1fr_24px] grid-rows-1 items-center
-            ${active ? "bg-[#E2F4FF] gap-y-2" : "hover:bg-[#E2F4FF]"}`}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <Icon className="w-full" />
-      <p className="self-start">{label}</p>
-      {many && (
-        <IoIosArrowForward
-          className={hover || active ? "rotate-90" : "rotate-0"}
-        />
-      )}
-      {itens && <nav
-       className={`flex flex-col text-sm items-start not-only:gap-1 w-full col-start-2 col-span-2 transition-all duration-300 ease-in-out
-        ${hover || active ? "max-h-96" : "max-h-0"}
-      `}
-      >
-        {itens.map((i) => (
-          <button
-            key={i.label}
-            onClick={() => {
-              setiPage(i.send);
-              onClick(i.send);
-            }}
-            className={`gap-2 w-full pl-1 text-left rounded-md cursor-pointer overflow-hidden
-                ${hover || active ? "visible" : "hidden"}
-                ${current === i.send ? "bg-[#a6d4f0]" : "hover:bg-[#a6d4f0]"}
-                `}
-          >
-            {i.label}
-          </button>
-        ))}
-      </nav>}
-    </div>
-  );
-}
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import { IoCaretBackOutline } from "react-icons/io5";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
+import { IoIosMail } from "react-icons/io";
 
 export function Menu({ onNavigate }) {
   const [showPage, setPage] = useState("home");
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("indexPage");
+    if (stored) setOpen(Number(stored));
+  }, []);
+
+  const handleClick = (e) => {
+    if (open === e) {
+      setOpen("");
+      localStorage.removeItem("indexPage", e);
+    } else {
+      setOpen(e);
+      localStorage.setItem("indexPage", e);
+    }
+  };
 
   useEffect(() => {
     onNavigate(showPage);
@@ -86,83 +45,202 @@ export function Menu({ onNavigate }) {
 
   return (
     <>
-      <div className="h-screen bg-gray-100 min-w-[260px]  flex flex-col items-center p-2 pt-4 row-span-2 relative  z-10">
-        <h1 className="font-bold text-[20px]">Vetor Construções</h1>
-        <nav className="w-full flex flex-col gap-2 mt-4 text-left font-medium text-lg">
-          <MenuItem
-            icon={FaHome}
-            label="Home"
-            send="home"
-            current={showPage}
-            onClick={setPage}
-          />
-          <MenuItem
-            icon={FaHelmetSafety}
-            label="Obras"
-            send="obras"
-            current={showPage}
-            onClick={setPage}
-          />
-          <MenuItemSub
-            icon={MdMonetizationOn}
-            label="Financeiro"
-            current={showPage}
-            onClick={setPage}
-            many={true}
-            itens={[
-              {
-                label: "Títulos a Pagar",
-                send: "titulo-pagar",
-              },
-              {
-                label: "Medições a Pagar",
-                send: "med-pagar",
-              },
-              {
-                label: "Medições a Receber",
-                send: "med-receber",
-              },
-            ]}
-          />
-          <MenuItem
-            icon={FaPeopleGroup}
-            label="Funcionários"
-            send="funcionarios"
-            current={showPage}
-            onClick={setPage}
-          />
-          <MenuItem
-            icon={IoIosBusiness}
-            label="Empresas"
-            send="empresas"
-            current={showPage}
-            onClick={setPage}
-          />
-          <MenuItemSub
-            icon={IoIosConstruct}
-            label="Engenharia"
-            current={showPage}
-            onClick={setPage}
-            many={true}
-            itens={[
-                {
-                  label: "Despesas Mês a Mês",
-                  send: "desp-mes-mes",
-                },
-              
-              ]}
-          />
-        </nav>
-      </div>
+      <List
+        sx={{
+          width: "100%",
+          maxWidth: 360,
+          bgcolor: "background.paper",
+          "& .MuiListItemButton-root:hover": {
+            backgroundColor: "#E2F4FF",
+            color: "#0077b6",
+          },
+          "& .Mui-selected": {
+            backgroundColor: "#d0eaff",
+            color: "#0077b6",
+          },
+        }}
+        component="nav"
+        className="p-2 pt-4 row-span-2 relative z-10 border-r-2 border-gray-200"
+      >
+        <ListItemButton
+          onClick={() => {
+            handleClick(1);
+            window.location.href = `/home`;
+          }}
+          selected={open === 1}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <FaHome />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            handleClick(2);
+            window.location.href = `/obras`;
+          }}
+          selected={open === 2}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <FaHelmetSafety />
+          </ListItemIcon>
+          <ListItemText primary="Obras" />
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            handleClick(3);
+          }}
+          selected={open === 3}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <MdMonetizationOn />
+          </ListItemIcon>
+          <ListItemText primary="Financeiro" />
+          {open === 3 ? (
+            <IoIosArrowForward className={"rotate-90"} />
+          ) : (
+            <IoIosArrowForward className={"rotate-0"} />
+          )}
+        </ListItemButton>
+        <Collapse in={open === 3} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 3}
+              onClick={() => (window.location.href = `/titulopagar`)}
+            >
+              <ListItemText
+                primary="Títulos a Pagar"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 3}
+              onClick={() => (window.location.href = `/medpagar`)}
+            >
+              <ListItemText
+                primary="Medições a Pagar"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 3}
+              onClick={() => (window.location.href = `/medreceber`)}
+            >
+              <ListItemText
+                primary="Medições a Receber"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+          </List>
+        </Collapse>
+        <ListItemButton
+          onClick={() => {
+            handleClick(4);
+            window.location.href = `/funcionarios`;
+          }}
+          selected={open === 4}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <FaPeopleGroup />
+          </ListItemIcon>
+          <ListItemText primary="Funcionários" />
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            handleClick(5);
+            window.location.href = `/empresas`;
+          }}
+          selected={open === 5}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <IoIosBusiness />
+          </ListItemIcon>
+          <ListItemText primary="Empresas" />
+        </ListItemButton>
+        <ListItemButton
+          onClick={() => {
+            handleClick(6);
+          }}
+          selected={open === 6}
+        >
+          <ListItemIcon sx={{ fontSize: 25 }}>
+            <IoIosConstruct />
+          </ListItemIcon>
+          <ListItemText primary="Engenharia" />
+          {open === 6 ? (
+            <IoIosArrowForward className={"rotate-90"} />
+          ) : (
+            <IoIosArrowForward className={"rotate-0"} />
+          )}
+        </ListItemButton>
+        <Collapse in={open === 6} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 6}
+              onClick={() => {
+                window.location.href = `/desp-mes-mes`;
+              }}
+            >
+              <ListItemText
+                primary="Despesas Mês a Mês"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+          </List>
+        </Collapse>
+      </List>
     </>
   );
 }
 
 export function MenuTop() {
+  function stringAvatar(name) {
+    const hex = [...name]
+      .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
+      .join("")
+      .replace(/[^a-f0-9]/gi, "") 
+      .slice(0, 6);
+    return {
+      sx: {
+        bgcolor: `#${hex.padEnd(6, "0")}`,
+      },
+      children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
+    };
+  }
+
   return (
     <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
-      <a href="">Perfil</a>
-      <a href="">Mensagems</a>
+      <a href="#">
+        <ListItemAvatar>
+          <Avatar {...stringAvatar("Micael Farias")} />
+        </ListItemAvatar>
+      </a>
+      <a href="#">
+        <IconButton aria-label={"adsdasd"} color="info">
+          <Badge badgeContent={100} color="success">
+            <IoIosMail />
+          </Badge>
+        </IconButton>
+      </a>
+      {window.location.pathname.split(" /") != "/home" && (
+        <div className="w-full items-start">
+          <a
+            href={`/${window.location.pathname
+              .split("/")
+              .filter(Boolean)
+              .slice(0, -1)
+              .join("/")}`}
+          >
+            <Button variant="contained" startIcon={<IoCaretBackOutline />}>
+              Voltar
+            </Button>
+          </a>
+        </div>
+      )}
     </div>
   );
 }

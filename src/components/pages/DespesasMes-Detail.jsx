@@ -1,4 +1,8 @@
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbarQuickFilter,
+  GridToolbarContainer,
+} from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -6,12 +10,22 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { useParams } from "react-router-dom";
 import { IoIosCloseCircle } from "react-icons/io";
 import Dialog from "@mui/material/Dialog";
+import { ConvertMes } from "./DespesasMes";
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import { FaCloudUploadAlt } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { FaFileDownload } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
+import IconButton from "@mui/material/IconButton";
 
 export function DesMesMesDetail() {
   const { id } = useParams();
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState();
+  const [error, setError] = useState(false);
 
   function EditItem(item) {
     const [descricao, setDescricao] = useState("");
@@ -32,6 +46,7 @@ export function DesMesMesDetail() {
       const formData = new FormData();
 
       formData.append("descricao", descricao);
+      formData.append("Object", DataItem.despesas_mes);
 
       try {
         const response = await axios.patch(
@@ -127,10 +142,22 @@ export function DesMesMesDetail() {
 
   function CreateNew() {
     const [file, setFile] = useState();
+    const [loading, setLoading] = useState(false);
+    const [errors] = useState([]);
 
     const UpdateItens = async (e) => {
       e.preventDefault();
+      setLoading(true);
 
+      if (file) {
+        if (file.name.split(".").pop() !== "xlsx") {
+          errors.push("Formato de arquivo inválido. Use .xlsx");
+          console.log(errors);
+          setFile(null);
+          setLoading(false);
+          throw new Error("Formato de arquivo inválido. Use .xlsx");
+        }
+      }
       const formData = new FormData();
 
       formData.append("file", file);
@@ -149,13 +176,30 @@ export function DesMesMesDetail() {
 
         window.location.reload();
       } catch (error) {
-        console.error(error);
-        setError("Não foi possível criar. Verifique suas credenciais.");
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+        errors.push("Não foi possível criar. Verifique suas credenciais.");
+        console.log(errors);
+        setError(errors);
       }
     };
     const handleClose = () => {
       setCreate(false);
     };
+
+    const VisuallyHiddenInput = styled("input")({
+      clip: "rect(0 0 0 0)",
+      clipPath: "inset(50%)",
+      height: 1,
+      overflow: "hidden",
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      whiteSpace: "nowrap",
+      width: 1,
+    });
+
     return (
       <>
         <Dialog
@@ -181,18 +225,20 @@ export function DesMesMesDetail() {
               encType="multipart/form-data"
             >
               <div>
-                <label
-                  for="iupdate"
-                  className="block text-lg font-semibold text-gray-700"
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<FaCloudUploadAlt />}
                 >
-                  Arquivo:
-                </label>
-                <input
-                  type="file"
-                  name="update"
-                  id="iupdate"
-                  onChange={(e) => setFile(e.target.files[0])}
-                />
+                  Enviar Relatório
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    multiple
+                  />
+                </Button>
               </div>
               <button
                 type="submit"
@@ -201,6 +247,15 @@ export function DesMesMesDetail() {
                 Upload
               </button>
             </form>
+            {loading && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            {error &&
+              error.map((error, index) => (
+                <p className="text-red-400">{error}</p>
+              ))}
           </div>
         </Dialog>
       </>
@@ -214,13 +269,16 @@ export function DesMesMesDetail() {
   }, []);
 
   const columns = [
-    { field: "empresa", headerName: "Fornecedor", flex: 4 },
+    { field: "empresa", headerName: "Fornecedor", minWidth: 300, flex: 0 },
     {
       field: "data",
       headerName: "Data",
       flex: 1,
       valueGetter: (value, row) => {
-        return `${new Date(row.data).toLocaleDateString("pt-BR")}`;
+        return `${String(new Date(row.data).toLocaleDateString("pt-BR"))
+          .split("/")
+          .slice(0, 2)
+          .join("/")}`;
       },
     },
     { field: "documento", headerName: "Documento", flex: 1 },
@@ -246,20 +304,30 @@ export function DesMesMesDetail() {
 
     {
       field: "acoes",
-      headerName: "Ações",
-      width: 100,
+      headerName: "",
+      maxWidth: 50,
+      flex: 0,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
         <div className="h-full w-full text-xl flex items-center justify-center gap-2">
-          <button
+          <IconButton
+            sx={{
+              padding: 1,
+              backgroundColor: "info.main",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "info.dark",
+              },
+            }}
+            aria-label="deletar"
+            size="small"
             onClick={() => {
               setEdit(params.row.id);
             }}
-            className="w-fit p-1 bg-cyan-500 text-white rounded-full hover:bg-cyan-200"
           >
-            <FaCirclePlus className="" />
-          </button>
+            <FaEdit />
+          </IconButton>
         </div>
       ),
     },
@@ -267,7 +335,77 @@ export function DesMesMesDetail() {
 
   const total =
     data.itens?.reduce((acc, item) => acc + parseFloat(item.valor), 0) || 0;
-  const paginationModel = { page: 0, pageSize: 20 };
+  const paginationModel = { page: 0, pageSize: 10 };
+
+  const [search, setSearch] = useState("");
+
+  const filteredRows = (data.itens || []).filter(
+    (row) =>
+      row.empresa?.toLowerCase().includes(search.toLowerCase()) ||
+      row.descricao?.toLowerCase().includes(search.toLowerCase()) ||
+      row.documento?.toLowerCase().includes(search.toLowerCase()) ||
+      row.titulo?.toLowerCase().includes(search.toLowerCase())
+  );
+  function QuickSearchToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarQuickFilter
+          quickFilterParser={(searchInput) =>
+            searchInput
+              .split(",")
+              .map((value) => value.trim())
+              .filter((value) => value !== "")
+          }
+        />
+      </GridToolbarContainer>
+    );
+  }
+
+  function gerarPDF() {
+    if (!data || !data.itens) return;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text(
+      `Relatório de Despesas ${ConvertMes(data.mes)}/${data.ano}`,
+      14,
+      20
+    );
+
+    doc.setFontSize(12);
+    doc.text(
+      `Total: R$ ${data.itens
+        .reduce((acc, item) => acc + parseFloat(item.valor), 0)
+        .toLocaleString("pt-BR")}`,
+      14,
+      26.5
+    );
+
+    const rows = data.itens.map((item) => [
+      item.empresa,
+      new Date(item.data).toLocaleDateString("pt-BR"),
+      item.documento,
+      item.titulo,
+      parseFloat(item.valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }),
+      String(item.descricao).toUpperCase(),
+    ]);
+
+    autoTable(doc, {
+      head: [["Empresa", "Data", "Documento", "Título", "Valor", "Descrição"]],
+      body: rows,
+      startY: 30,
+      styles: {
+        fontSize: 8,
+      },
+    });
+
+    doc.save(`relatorio-${ConvertMes(data.mes)}-${data.ano}.pdf`);
+  }
+
   return (
     <>
       {create && <CreateNew />}
@@ -275,12 +413,43 @@ export function DesMesMesDetail() {
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">
-            Despesas de {data.mes}/{data.ano}
+            Despesas de {ConvertMes(data.mes)}/{data.ano}
           </h1>
-          <FaCirclePlus
-            className="text-4xl text-cyan-500 hover:text-cyan-800 cursor-pointer active:scale-90"
-            onClick={() => setCreate(true)}
-          />
+          <div className="flex flex-row gap-4">
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: "success.main",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "success.dark",
+                },
+              }}
+              aria-label="deletar"
+              size="small"
+              onClick={gerarPDF}
+            >
+              <FaFileDownload />
+            </IconButton>
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: "info.main",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "info.dark",
+                },
+              }}
+              aria-label="deletar"
+              size="small"
+              onClick={() => {
+                setCreate(true);
+                setError(false);
+              }}
+            >
+              <FaCirclePlus />
+            </IconButton>
+          </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2">
@@ -288,10 +457,17 @@ export function DesMesMesDetail() {
             Total: R${" "}
             {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
           </h1>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Buscar por nome"
+          />
         </div>
         <Paper>
           <DataGrid
-            rows={data.itens}
+            rows={filteredRows}
             columns={columns}
             initialState={{
               pagination: { paginationModel },
@@ -301,6 +477,7 @@ export function DesMesMesDetail() {
             }}
             pageSizeOptions={[5, 10]}
             sx={{ border: 0 }}
+            components={{ Toolbar: QuickSearchToolbar }}
           />
         </Paper>
       </div>
