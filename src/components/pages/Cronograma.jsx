@@ -58,7 +58,7 @@ export function ConvertMes(mes) {
   return meses[mes] || "";
 }
 
-export function DesMesMes() {
+export function Cronograma() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
   const [del, setDelete] = useState(false);
@@ -117,11 +117,6 @@ export function DesMesMes() {
   }
 
   function CreateNew() {
-    const anoAtual = new Date().getFullYear();
-    const mesAtual = new Date().getMonth();
-    const anos = Array.from({ length: 5 }, (_, i) => anoAtual - i);
-    const [mes, setMes] = useState(mesAtual);
-    const [ano, setAno] = useState(anoAtual);
     const [obra, setObra] = useState();
     const [arrayobra, setArrayObra] = useState([]);
 
@@ -141,12 +136,10 @@ export function DesMesMes() {
 
       formData.append("author", 1);
       formData.append("obra", obra);
-      formData.append("mes", mes);
-      formData.append("ano", ano);
 
       try {
         const response = await axios.post(
-          `https://vetor-api.micaelfarias.com/api/despesas/`,
+          `https://vetor-api.micaelfarias.com/api/cronograma/`,
           formData,
           {
             headers: {
@@ -214,43 +207,6 @@ export function DesMesMes() {
                     </Select>
                   </FormControl>
                 </div>
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Mês</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={mes}
-                    label="Mês"
-                    onChange={(e) => setMes(e.target.value)}
-                  >
-                    <MenuItem value={1}>Janeiro</MenuItem>
-                    <MenuItem value={2}>Fevereiro</MenuItem>
-                    <MenuItem value={3}>Março</MenuItem>
-                    <MenuItem value={4}>Abril</MenuItem>
-                    <MenuItem value={5}>Maio</MenuItem>
-                    <MenuItem value={6}>Junho</MenuItem>
-                    <MenuItem value={7}>Julho</MenuItem>
-                    <MenuItem value={8}>Agosto</MenuItem>
-                    <MenuItem value={9}>Setembro</MenuItem>
-                    <MenuItem value={10}>Outubro</MenuItem>
-                    <MenuItem value={11}>Novembro</MenuItem>
-                    <MenuItem value={12}>Dezembro</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Ano</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={ano}
-                    label="Ano"
-                    onChange={(e) => setAno(e.target.value)}
-                  >
-                    {anos.map((ano) => (
-                      <MenuItem value={ano}>{ano}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
                 <button
                   type="submit"
                   className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
@@ -266,14 +222,21 @@ export function DesMesMes() {
   }
 
   useEffect(() => {
-    axios.get("https://vetor-api.micaelfarias.com/api/despesas/").then((response) => {
+    axios.get("https://vetor-api.micaelfarias.com/api/cronograma/").then((response) => {
       setData(response.data);
     });
   }, []);
 
   const columns = [
     { field: "obra_name", headerName: "Obra", minWidth: 200, flex: 0 },
-    { field: "username", headerName: "Usuario", flex: 0 },
+    {
+      field: "final",
+      headerName: "Data Final da Obra",
+      flex: 1,
+      valueGetter: (value, row) => {
+        return `${new Date(row.criado_em).toLocaleDateString("pt-BR")}`;
+      },
+    },
     {
       field: "criado_em",
       headerName: "Criado Em",
@@ -290,32 +253,7 @@ export function DesMesMes() {
         return `${new Date(row.atualizado_em).toLocaleDateString("pt-BR")}`;
       },
     },
-    {
-      field: "referencia",
-      headerName: "Mês",
-      flex: 1,
-      valueGetter: (value, row) => {
-        return `${ConvertMes(row.mes)}/${row.ano}`;
-      },
-    },
-    {
-      field: "valor_total",
-      headerName: "Total (R$)",
-      flex: 2,
-      valueGetter: (value, row) => {
-        return `R$ ${parseFloat(
-          row.itens
-            .reduce((acc, item) => acc + parseFloat(item.valor), 0)
-            .toFixed(2)
-        ).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
-      },
-    },
-    {
-      field: "data_ordenacao",
-      hide: true,
-      valueGetter: (value, row) =>
-        `${row.ano}-${String(row.mes).padStart(2, "0")}`,
-    },
+    
     {
       field: "acoes",
       headerName: "Ações",
@@ -376,7 +314,7 @@ export function DesMesMes() {
       )}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">Despesas Mês a Mês</h1>
+          <h1 className="font-bold text-3xl">Cronograma</h1>
           <IconButton
             sx={{
               padding: 1,

@@ -58,7 +58,7 @@ export function PaginaParaPDF() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/api/despesas/2/"
+          "https://vetor-api.micaelfarias.com/api/despesas/2/"
         );
         setData(response.data);
       } catch (error) {

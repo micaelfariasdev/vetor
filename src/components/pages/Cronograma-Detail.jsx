@@ -20,7 +20,7 @@ import { FaFileDownload } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import IconButton from "@mui/material/IconButton";
 
-export function DesMesMesDetail() {
+export function CronogramaDetail() {
   const { id } = useParams();
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);

@@ -29,10 +29,15 @@ function App() {
                 <Route path="/medreceber" element={<Comp.Man />} />
                 <Route path="/funcionarios" element={<Comp.Man />} />
                 <Route path="/empresas" element={<Comp.Man />} />
+                <Route path="/cronograma" element={<Comp.Cronograma />} />
                 <Route path="/desp-mes-mes" element={<Comp.DesMesMes />} />
                 <Route
                   path="/desp-mes-mes/:id"
                   element={<Comp.DesMesMesDetail />}
+                />
+                <Route
+                  path="/cronograma/:id"
+                  element={<Comp.CronogramaDetail />}
                 />
               </Routes>
             </div>

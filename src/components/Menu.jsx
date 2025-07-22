@@ -190,6 +190,18 @@ export function Menu({ onNavigate }) {
                 primaryTypographyProps={{ fontSize: 15 }}
               />
             </ListItemButton>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 6}
+              onClick={() => {
+                window.location.href = `/cronograma`;
+              }}
+            >
+              <ListItemText
+                primary="Cronograma"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
           </List>
         </Collapse>
       </List>
