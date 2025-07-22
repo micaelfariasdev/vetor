@@ -23,319 +23,51 @@ import IconButton from "@mui/material/IconButton";
 export function CronogramaDetail() {
   const { id } = useParams();
   const [data, setData] = useState([]);
+  const [obra, setObra] = useState([]);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState();
   const [error, setError] = useState(false);
 
-  function EditItem(item) {
-    const [descricao, setDescricao] = useState("");
-    const [DataItem, setDataItem] = useState("");
 
-    useEffect(() => {
+  useEffect(() => {
       axios
-        .get(`https://vetor-api.micaelfarias.com/api/despesasitens/${item["item"]}/`)
+        .get(`https://vetor-api.micaelfarias.com/api/cronograma/${id}/`)
         .then((response) => {
-          setDataItem(response.data);
-          setDescricao(response.data.descricao);
+          setObra(response.data);
         });
     }, []);
 
-    const EditItemSave = async (e) => {
-      e.preventDefault();
-
-      const formData = new FormData();
-
-      formData.append("descricao", descricao);
-      formData.append("Object", DataItem.despesas_mes);
-
-      try {
-        const response = await axios.patch(
-          `https://vetor-api.micaelfarias.com/api/despesasitens/${item["item"]}/`,
-          formData
-        );
-
-        window.location.reload();
-      } catch (error) {
-        console.error(error);
-        setError("Não foi possível editar. Verifique suas credenciais.");
-      }
-    };
-    const handleClose = () => {
-      setEdit(false);
-    };
-    return (
-      <>
-        <Dialog
-          open={edit}
-          onClose={handleClose}
-          aria-describedby="alert-dialog-slide-description"
-          keepMounted
-        >
-          <div className="p-5 gap-4 flex flex-col">
-            <div className="w-full flex flex-row justify-between text-3xl">
-              <h1 className="block text-lg font-semibold text-gray-700">
-                Editar
-              </h1>
-              <IoIosCloseCircle
-                className="text-red-500 hover:text-red-200 cursor-pointer"
-                onClick={() => setEdit(false)}
-              />
-            </div>
-            <form
-              onSubmit={EditItemSave}
-              method="post"
-              className="flex flex-col gap-2"
-            >
-              <div>
-                <strong>Fornecedor</strong>
-                <p>{DataItem.empresa}</p>
-              </div>
-              <div>
-                <strong>Data</strong>
-                <p>{new Date(DataItem.data).toLocaleDateString("pt-BR")}</p>
-              </div>
-              <div>
-                <strong>Documento</strong>
-                <p>{DataItem.documento}</p>
-              </div>
-              <div>
-                <strong>Título</strong>
-                <p>{DataItem.titulo}</p>
-              </div>
-              <div>
-                <strong>Valor</strong>
-                <p>
-                  {parseFloat(DataItem.valor).toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-              <div>
-                <label
-                  for="idescricao"
-                  className="block text-lg font-semibold text-gray-700"
-                >
-                  Descrição
-                </label>
-                <input
-                  type="text"
-                  name="descricao"
-                  id="idescricao"
-                  defaultValue={DataItem.descricao}
-                  className="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  onChange={(e) => setDescricao(e.target.value)}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="bg-cyan-500 rounded-xl text-white p-2 cursor-pointer"
-              >
-                Editar
-              </button>
-            </form>
-          </div>
-        </Dialog>
-      </>
-    );
-  }
-
-  function CreateNew() {
-    const [file, setFile] = useState();
-    const [loading, setLoading] = useState(false);
-    const [errors] = useState([]);
-
-    const UpdateItens = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-
-      if (file) {
-        if (file.name.split(".").pop() !== "xlsx") {
-          errors.push("Formato de arquivo inválido. Use .xlsx");
-          console.log(errors);
-          setFile(null);
-          setLoading(false);
-          throw new Error("Formato de arquivo inválido. Use .xlsx");
-        }
-      }
-      const formData = new FormData();
-
-      formData.append("file", file);
-      formData.append("Object", id);
-
-      try {
-        const response = await axios.post(
-          `https://vetor-api.micaelfarias.com/api/excel/`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        window.location.reload();
-      } catch (error) {
-        setTimeout(() => {
-          setLoading(false);
-        }, 2000);
-        errors.push("Não foi possível criar. Verifique suas credenciais.");
-        console.log(errors);
-        setError(errors);
-      }
-    };
-    const handleClose = () => {
-      setCreate(false);
-    };
-
-    const VisuallyHiddenInput = styled("input")({
-      clip: "rect(0 0 0 0)",
-      clipPath: "inset(50%)",
-      height: 1,
-      overflow: "hidden",
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      whiteSpace: "nowrap",
-      width: 1,
-    });
-
-    return (
-      <>
-        <Dialog
-          open={create}
-          onClose={handleClose}
-          aria-describedby="alert-dialog-slide-description"
-          keepMounted
-        >
-          <div className="p-5 gap-4 flex flex-col">
-            <div className="w-full flex flex-row justify-between text-3xl">
-              <h1 className="block text-lg font-semibold text-gray-700">
-                Cadastrar
-              </h1>
-              <IoIosCloseCircle
-                className="text-red-500 hover:text-red-200 cursor-pointer"
-                onClick={() => setCreate(false)}
-              />
-            </div>
-            <form
-              onSubmit={UpdateItens}
-              method="post"
-              className="flex flex-col gap-2"
-              encType="multipart/form-data"
-            >
-              <div>
-                <Button
-                  component="label"
-                  role={undefined}
-                  variant="contained"
-                  tabIndex={-1}
-                  startIcon={<FaCloudUploadAlt />}
-                >
-                  Enviar Relatório
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    multiple
-                  />
-                </Button>
-              </div>
-              <button
-                type="submit"
-                className="bg-cyan-500 rounded-xl text-white p-2 cursor-pointer"
-              >
-                Upload
-              </button>
-            </form>
-            {loading && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-            {error &&
-              error.map((error, index) => (
-                <p className="text-red-400">{error}</p>
-              ))}
-          </div>
-        </Dialog>
-      </>
-    );
-  }
-
   useEffect(() => {
-    axios.get(`https://vetor-api.micaelfarias.com/api/despesas/${id}`).then((response) => {
+    axios.get(`https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`).then((response) => {
       setData(response.data);
+      console.log(response.data);
     });
   }, []);
 
   const columns = [
-    { field: "empresa", headerName: "Fornecedor", minWidth: 300, flex: 0 },
+    { field: "codigo", headerName: "Código", minWidth: 300, flex: 0 },
+    { field: "titulo", headerName: "Serviço", minWidth: 300, flex: 0 },
+    { field: "dias", headerName: "Dias de Serviço", flex: 1 },
     {
-      field: "data",
-      headerName: "Data",
+      field: "inicio",
+      headerName: "Inicio",
       flex: 1,
       valueGetter: (value, row) => {
-        return `${String(new Date(row.data).toLocaleDateString("pt-BR"))
-          .split("/")
-          .slice(0, 2)
-          .join("/")}`;
+        return `${String(new Date(row.inicio).toLocaleDateString("pt-BR"))}`;
       },
     },
-    { field: "documento", headerName: "Documento", flex: 1 },
-    { field: "titulo", headerName: "Título", flex: 1 },
     {
-      field: "valor",
-      headerName: "Valor",
+      field: "fim",
+      headerName: "Final do Serviço",
       flex: 1,
       valueGetter: (value, row) => {
-        return `R$ ${parseFloat(row.valor).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-        })}`;
+        return `${String(new Date(row.fim).toLocaleDateString("pt-BR"))}`;
       },
     },
-    {
-      field: "descricao",
-      headerName: "Descrição",
-      flex: 2,
-      valueGetter: (value, row) => {
-        return `${String(row.descricao).toUpperCase()}`;
-      },
-    },
-
-    {
-      field: "acoes",
-      headerName: "",
-      maxWidth: 50,
-      flex: 0,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <div className="h-full w-full text-xl flex items-center justify-center gap-2">
-          <IconButton
-            sx={{
-              padding: 1,
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
-              },
-            }}
-            aria-label="deletar"
-            size="small"
-            onClick={() => {
-              setEdit(params.row.id);
-            }}
-          >
-            <FaEdit />
-          </IconButton>
-        </div>
-      ),
-    },
+    { field: "progesso", headerName: "Progesso", flex: 1 },
   ];
 
-  const total =
-    data.itens?.reduce((acc, item) => acc + parseFloat(item.valor), 0) || 0;
-  const paginationModel = { page: 0, pageSize: 10 };
+
 
   const [search, setSearch] = useState("");
 
@@ -361,50 +93,6 @@ export function CronogramaDetail() {
     );
   }
 
-  function gerarPDF() {
-    if (!data || !data.itens) return;
-
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text(
-      `Relatório de Despesas ${ConvertMes(data.mes)}/${data.ano}`,
-      14,
-      20
-    );
-
-    doc.setFontSize(12);
-    doc.text(
-      `Total: R$ ${data.itens
-        .reduce((acc, item) => acc + parseFloat(item.valor), 0)
-        .toLocaleString("pt-BR")}`,
-      14,
-      26.5
-    );
-
-    const rows = data.itens.map((item) => [
-      item.empresa,
-      new Date(item.data).toLocaleDateString("pt-BR"),
-      item.documento,
-      item.titulo,
-      parseFloat(item.valor).toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }),
-      String(item.descricao).toUpperCase(),
-    ]);
-
-    autoTable(doc, {
-      head: [["Empresa", "Data", "Documento", "Título", "Valor", "Descrição"]],
-      body: rows,
-      startY: 30,
-      styles: {
-        fontSize: 8,
-      },
-    });
-
-    doc.save(`relatorio-${ConvertMes(data.mes)}-${data.ano}.pdf`);
-  }
 
   return (
     <>
@@ -413,50 +101,14 @@ export function CronogramaDetail() {
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">
-            Despesas de {ConvertMes(data.mes)}/{data.ano}
+            Cronograma da obra {obra.obra_name} - Finalizada em {obra.final}
           </h1>
           <div className="flex flex-row gap-4">
-            <IconButton
-              sx={{
-                padding: 1,
-                backgroundColor: "success.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "success.dark",
-                },
-              }}
-              aria-label="deletar"
-              size="small"
-              onClick={gerarPDF}
-            >
-              <FaFileDownload />
-            </IconButton>
-            <IconButton
-              sx={{
-                padding: 1,
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
-                },
-              }}
-              aria-label="deletar"
-              size="small"
-              onClick={() => {
-                setCreate(true);
-                setError(false);
-              }}
-            >
-              <FaCirclePlus />
-            </IconButton>
           </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2">
-          <h1 className="font-bold text-2xl">
-            Total: R${" "}
-            {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-          </h1>
+         
           <input
             type="text"
             value={search}
@@ -467,10 +119,9 @@ export function CronogramaDetail() {
         </div>
         <Paper>
           <DataGrid
-            rows={filteredRows}
+            rows={data}
             columns={columns}
             initialState={{
-              pagination: { paginationModel },
               sorting: {
                 sortModel: [{ field: "empresa", sort: "asc" }],
               },
