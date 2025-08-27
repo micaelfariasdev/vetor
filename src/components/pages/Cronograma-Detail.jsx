@@ -11,14 +11,9 @@ import { useParams } from "react-router-dom";
 import { IoReload } from "react-icons/io5";
 import { IoIosCloseCircle } from "react-icons/io";
 import Dialog from "@mui/material/Dialog";
-import { ConvertMes } from "./DespesasMes";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { FaFileDownload } from "react-icons/fa";
-import { FaEdit } from "react-icons/fa";
 import IconButton from "@mui/material/IconButton";
 
 export function CronogramaDetail() {

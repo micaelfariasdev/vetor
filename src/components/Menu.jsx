@@ -102,6 +102,7 @@ export function Menu({ onNavigate }) {
             <IoIosArrowForward className={"rotate-0"} />
           )}
         </ListItemButton>
+
         <Collapse in={open === 3} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             <ListItemButton
@@ -139,15 +140,46 @@ export function Menu({ onNavigate }) {
         <ListItemButton
           onClick={() => {
             handleClick(4);
-            window.location.href = `/funcionarios`;
           }}
-          selected={open === 4}
+          selected={open === 3}
         >
           <ListItemIcon sx={{ fontSize: 25 }}>
             <FaPeopleGroup />
           </ListItemIcon>
           <ListItemText primary="Funcionários" />
+          {open === 3 ? (
+            <IoIosArrowForward className={"rotate-90"} />
+          ) : (
+            <IoIosArrowForward className={"rotate-0"} />
+          )}
         </ListItemButton>
+        <Collapse in={open === 4} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 4}
+              onClick={() => (window.location.href = `/funcionarios`)}
+            >
+              <ListItemText
+                primary="Funcionários"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 4}
+              onClick={() => (window.location.href = `/ponto`)}
+            >
+              <ListItemText
+                primary="Ponto"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+
+          </List>
+        </Collapse>
+
         <ListItemButton
           onClick={() => {
             handleClick(5);
@@ -214,7 +246,7 @@ export function MenuTop() {
     const hex = [...name]
       .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
       .join("")
-      .replace(/[^a-f0-9]/gi, "") 
+      .replace(/[^a-f0-9]/gi, "")
       .slice(0, 6);
     return {
       sx: {

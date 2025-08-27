@@ -27,25 +27,21 @@ function App() {
                 <Route path="/titulopagar" element={<Comp.Man />} />
                 <Route path="/medpagar" element={<Comp.Man />} />
                 <Route path="/medreceber" element={<Comp.Man />} />
-                <Route path="/funcionarios" element={<Comp.Man />} />
+                <Route path="/funcionarios" element={<Comp.Funcionarios />} />
+                <Route path="/ponto" element={<Comp.Ponto />} />
+                <Route path="/ponto/:id" element={<Comp.PontoMes />} />
                 <Route path="/empresas" element={<Comp.Man />} />
                 <Route path="/cronograma" element={<Comp.Cronograma />} />
                 <Route path="/desp-mes-mes" element={<Comp.DesMesMes />} />
-                <Route
-                  path="/desp-mes-mes/:id"
-                  element={<Comp.DesMesMesDetail />}
-                />
-                <Route
-                  path="/cronograma/:id"
-                  element={<Comp.CronogramaDetail />}
-                />
+                <Route path="/desp-mes-mes/:id" element={<Comp.DesMesMesDetail />} />
+                <Route path="/cronograma/:id" element={<Comp.CronogramaDetail />} />
               </Routes>
             </div>
           </>
         )}
         <div className="col-span-2 row-span-2">
           <Routes>
-            <Route path="/test" element={<Comp.PaginaParaPDF />} />
+            <Route path="/test" element={<Comp.PontoMesMockup />} />
           </Routes>
         </div>
       </BrowserRouter>
