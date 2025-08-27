@@ -24,24 +24,22 @@ import { useMemo } from "react";
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
-  const dataInicial = new Date(ano, mes - 1, 1); // meses em JS vão de 0 a 11
-  const dataFinal = new Date(ano, mes, 0); // último dia do mês
+  const dataInicial = new Date(ano, mes - 1, 1); 
+  const dataFinal = new Date(ano, mes, 0); 
 
   for (let dia = 1; dia <= dataFinal.getDate(); dia++) {
     const data = new Date(ano, mes - 1, dia);
-    const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'long' }); // retorna "segunda-feira", etc.
+    const diaSemana = data.toLocaleDateString('pt-BR', { weekday: 'long' }); 
+    const idSemana = data.getDay()
     resultado.push({
-      data: data.toISOString().slice(8, 10), // YYYY-MM-DD
-      diaSemana: diaSemana
+      data: data.toISOString().slice(8, 10), 
+      diaSemana: diaSemana,
+      idSemana: idSemana
     });
   }
 
   return resultado;
 }
-
-// Exemplo de uso:
-const mesAgosto = gerarMesCompleto(8, 2025);
-console.log(mesAgosto);
 
 
 export function ConvertMes(mes) {
