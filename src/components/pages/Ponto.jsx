@@ -165,7 +165,7 @@ export function Ponto() {
             </div>
             <form onSubmit={NewFuncionario} className="grid grid-cols-2 gap-5 gap-x-4">
               <FormControl fullWidth >
-                
+
                 <InputLabel id="mes-label">Mês</InputLabel>
                 <Select
                   id="mes-select"
@@ -228,7 +228,7 @@ export function Ponto() {
       setData(response.data);
     });
   }, []);
-
+  console.log(data)
   const columns = [
     {
       field: "nome",
@@ -237,6 +237,18 @@ export function Ponto() {
       valueGetter: (value, row) => {
         return `${row.obra_name} - ${ConvertMes(row.mes)} / ${row.ano}`;
       },
+    },
+    {
+      field: 'ano',
+      headerName: 'Ano',
+      width: 100,
+      hide: true // Oculta a coluna de Ano
+    },
+    {
+      field: 'mes',
+      headerName: 'Mês',
+      width: 100,
+      hide: true // Oculta a coluna de Mês
     },
     {
       field: "acoes",
@@ -323,7 +335,11 @@ export function Ponto() {
             initialState={{
               pagination: { paginationModel },
               sorting: {
-                sortModel: [{ field: "nome", sort: "desc" }],
+                sortModel: [
+                  { field: "ano", sort: "desc" },
+                  { field: "mes", sort: "desc" },
+                  { field: "nome", sort: "asc" },
+                ],
               },
             }}
             pageSizeOptions={[5, 10]}
