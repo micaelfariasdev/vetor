@@ -147,7 +147,6 @@ export function PontoMes() {
       });
     }
 
-    console.log(registros);
     async function handleSalvar() {
       try {
         setLoading(true);

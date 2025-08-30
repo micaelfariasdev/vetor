@@ -54,6 +54,7 @@ export function ConvertMes(mes) {
 export function Funcionarios() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
+  const [edit, setEdit] = useState(false);
   const [del, setDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -106,6 +107,152 @@ export function Funcionarios() {
           </DialogActions>
         </Dialog>
       </>
+    );
+  }
+
+  function Edit({ IdItem }) {
+    const [nome, setNome] = useState('');
+    const [cargo, setCargo] = useState('');
+    const [situacao, setSituacao] = useState('');
+    const [obra, setObra] = useState('');
+    const [arrayobra, setArrayObra] = useState([]);
+    const [dadosFun, setDadosFun] = useState([]);
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+      axios
+        .get('https://vetor-api.micaelfarias.com/api/obras/')
+        .then((response) => {
+          setArrayObra(response.data);
+        });
+    }, []);
+
+    const editAPi = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+
+      try {
+        await axios.patch(
+          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`,
+          {
+            author: 1,
+            nome,
+            cargo,
+            situacao,
+            obra,
+          }
+        );
+        window.location.reload();
+      } catch (error) {
+        console.error(error);
+        setError('Não foi possível criar. Verifique os dados.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      axios
+        .get(`https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`)
+        .then((response) => {
+          setNome(response.data.nome);
+          setCargo(response.data.cargo);
+          setSituacao(response.data.situacao);
+          setObra(response.data.obra);
+        });
+    }, []);
+    //   {
+    //     "id": 2,
+    //     "obra_name": "Sky Residence 2",
+    //     "nome": "Micael Riquelme da Silva Farias",
+    //     "cargo": "Auxiliar de Engenharia",
+    //     "situacao": "ASSINADO",
+    //     "obra": 1
+    // }
+    const handleClose = () => {
+      setEdit(false);
+    };
+
+    return (
+      <Dialog open={edit} onClose={handleClose} keepMounted>
+        {loading && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+        {!loading && (
+          <div className="p-5 gap-4 flex flex-col w-100">
+            <div className="w-full flex flex-row justify-between text-3xl">
+              <h1 className="block text-lg font-semibold text-gray-700">
+                Cadastrar
+              </h1>
+              <IoIosCloseCircle
+                className="text-red-500 hover:text-red-200 cursor-pointer"
+                onClick={handleClose}
+              />
+            </div>
+            <form onSubmit={editAPi} className="grid grid-cols-2 gap-5 gap-x-4">
+              <FormControl fullWidth className="col-span-2">
+                <TextField
+                  id="nome"
+                  label="Nome"
+                  variant="outlined"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="obra-label">Obra</InputLabel>
+                <Select
+                  labelId="obra-label"
+                  id="obra-select"
+                  label="Obra"
+                  value={obra}
+                  onChange={(e) => setObra(e.target.value)}
+                >
+                  {arrayobra.map((item) => (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.nome}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="obra-label">Situação</InputLabel>
+                <Select
+                  labelId="obra-label"
+                  id="obra-select"
+                  label="Situação"
+                  value={situacao}
+                  onChange={(e) => setSituacao(e.target.value)}
+                >
+                  <MenuItem value="ASSINADO">Carteira</MenuItem>
+                  <MenuItem value="FREE">Freelancer</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth className="col-span-2">
+                <TextField
+                  id="cargo"
+                  label="Cargo"
+                  variant="outlined"
+                  value={cargo}
+                  onChange={(e) => setCargo(e.target.value)}
+                />
+              </FormControl>
+              <button
+                type="submit"
+                className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
+              >
+                Cadastrar
+              </button>
+            </form>
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </div>
+        )}
+      </Dialog>
     );
   }
 
@@ -260,43 +407,39 @@ export function Funcionarios() {
       filterable: false,
       renderCell: (params) => (
         <div className="h-full w-full text-md flex items-center justify-center gap-2">
-          <a href={`${window.location.pathname}/${params.row.id}`}>
-            <IconButton
-              aria-label="editar"
-              size="small"
-              sx={{
-                backgroundColor: 'info.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'info.dark',
-                },
-                padding: 1,
-              }}
-            >
-              <FaEdit />
-            </IconButton>
-          </a>
-          <a
+          <IconButton
+            aria-label="editar"
+            size="small"
+            sx={{
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
+              },
+              padding: 1,
+            }}
+            onClick={() => setEdit({ id: params.row.id })}
+          >
+            <FaEdit />
+          </IconButton>
+          <IconButton
+            sx={{
+              padding: 1,
+              backgroundColor: 'error.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'error.main',
+                opacity: 0.8,
+              },
+            }}
+            aria-label="deletar"
+            size="small"
             onClick={() =>
               setDelete({ id: params.row.id, nome: params.row.nome })
             }
           >
-            <IconButton
-              sx={{
-                padding: 1,
-                backgroundColor: 'error.main',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'error.main',
-                  opacity: 0.8,
-                },
-              }}
-              aria-label="deletar"
-              size="small"
-            >
-              <MdDelete />
-            </IconButton>
-          </a>
+            <MdDelete />
+          </IconButton>
         </div>
       ),
     },
@@ -321,12 +464,11 @@ export function Funcionarios() {
     const obras = data.map((func) => func.obra_name);
     return [...new Set(obras)].sort();
   }, [data]);
-  console.log(uniqueObras);
   return (
     <>
       {create && <CreateNew create={create} setCreate={setCreate} />}
-
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
+      {edit && <Edit IdItem={edit.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Funcionarios</h1>

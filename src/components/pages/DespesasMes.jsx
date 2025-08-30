@@ -65,7 +65,6 @@ export function DesMesMes() {
   const [loading, setLoading] = useState(false);
 
   function Delete({ IdItem, itemName }) {
-    console.log(IdItem);
 
     const deleteAPi = async (IdItem) => {
       setLoading(true);

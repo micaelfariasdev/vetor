@@ -233,7 +233,7 @@ export function Ponto() {
         setData(response.data);
       });
   }, []);
-  console.log(data);
+
   const columns = [
     {
       field: 'nome',
