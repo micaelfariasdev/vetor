@@ -2,19 +2,19 @@ import {
   DataGrid,
   GridToolbarQuickFilter,
   GridToolbarContainer,
-} from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { useParams } from "react-router-dom";
-import { IoReload } from "react-icons/io5";
-import { IoIosCloseCircle } from "react-icons/io";
-import Dialog from "@mui/material/Dialog";
-import { styled } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import IconButton from "@mui/material/IconButton";
+} from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaCirclePlus } from 'react-icons/fa6';
+import { useParams } from 'react-router-dom';
+import { IoReload } from 'react-icons/io5';
+import { IoIosCloseCircle } from 'react-icons/io';
+import Dialog from '@mui/material/Dialog';
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import { FaCloudUploadAlt } from 'react-icons/fa';
+import IconButton from '@mui/material/IconButton';
 
 export function CronogramaDetail() {
   const { id } = useParams();
@@ -34,18 +34,18 @@ export function CronogramaDetail() {
       setLoading(true);
 
       if (file) {
-        if (file.name.split(".").pop() !== "xml") {
-          errors.push("Formato de arquivo inválido. Use .xml");
+        if (file.name.split('.').pop() !== 'xml') {
+          errors.push('Formato de arquivo inválido. Use .xml');
           console.log(errors);
           setFile(null);
           setLoading(false);
-          throw new Error("Formato de arquivo inválido. Use .xml");
+          throw new Error('Formato de arquivo inválido. Use .xml');
         }
       }
       const formData = new FormData();
 
-      formData.append("file", file);
-      formData.append("cronograma", id);
+      formData.append('file', file);
+      formData.append('cronograma', id);
 
       try {
         const response = await axios.post(
@@ -53,17 +53,17 @@ export function CronogramaDetail() {
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
-        ReloadCronograma()
+        ReloadCronograma();
         window.location.reload();
       } catch (error) {
         setTimeout(() => {
           setLoading(false);
         }, 2000);
-        errors.push("Não foi possível criar. Verifique suas credenciais.");
+        errors.push('Não foi possível criar. Verifique suas credenciais.');
         console.log(errors);
         setError(errors);
       }
@@ -72,15 +72,15 @@ export function CronogramaDetail() {
       setCreate(false);
     };
 
-    const VisuallyHiddenInput = styled("input")({
-      clip: "rect(0 0 0 0)",
-      clipPath: "inset(50%)",
+    const VisuallyHiddenInput = styled('input')({
+      clip: 'rect(0 0 0 0)',
+      clipPath: 'inset(50%)',
       height: 1,
-      overflow: "hidden",
-      position: "absolute",
+      overflow: 'hidden',
+      position: 'absolute',
       bottom: 0,
       left: 0,
-      whiteSpace: "nowrap",
+      whiteSpace: 'nowrap',
       width: 1,
     });
 
@@ -155,9 +155,13 @@ export function CronogramaDetail() {
   }, []);
 
   useEffect(() => {
-    axios.get(`https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`).then((response) => {
-      setData(response.data);
-    });
+    axios
+      .get(
+        `https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`
+      )
+      .then((response) => {
+        setData(response.data);
+      });
   }, []);
 
   const handleRowUpdate = async (newRow, oldRow) => {
@@ -169,10 +173,10 @@ export function CronogramaDetail() {
           progresso: newRow.progresso,
         }
       );
-      ReloadCronograma()
+      ReloadCronograma();
       return response.data;
     } catch (error) {
-      console.error("Erro ao atualizar dados:", error);
+      console.error('Erro ao atualizar dados:', error);
       return oldRow;
     }
   };
@@ -182,7 +186,9 @@ export function CronogramaDetail() {
   const ReloadCronograma = async () => {
     setLoading(true);
     try {
-      await axios.post(`https://vetor-api.micaelfarias.com/api/cronograma/recalcular/${id}/`);
+      await axios.post(
+        `https://vetor-api.micaelfarias.com/api/cronograma/recalcular/${id}/`
+      );
 
       const servicosRes = await axios.get(
         `https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`
@@ -193,56 +199,44 @@ export function CronogramaDetail() {
         `https://vetor-api.micaelfarias.com/api/cronograma/${id}/`
       );
       setObra(obraRes.data);
-
     } catch (error) {
-      console.error("Erro ao recalcular cronograma:", error);
+      console.error('Erro ao recalcular cronograma:', error);
     } finally {
       setLoading(false);
     }
   };
 
-
-
-
   const columns = [
-    { field: "codigo", headerName: "Código", minWidth: 300, flex: 0 },
-    { field: "titulo", headerName: "Serviço", minWidth: 300, flex: 0 },
-    { field: "dias", headerName: "Dias de Serviço", flex: 1, editable: true },
+    { field: 'codigo', headerName: 'Código', minWidth: 300, flex: 0 },
+    { field: 'titulo', headerName: 'Serviço', minWidth: 300, flex: 0 },
+    { field: 'dias', headerName: 'Dias de Serviço', flex: 1, editable: true },
     {
-      field: "inicio",
-      headerName: "Inicio",
+      field: 'inicio',
+      headerName: 'Inicio',
       flex: 1,
       valueGetter: (value, row) => {
-        return `${String(new Date(row.inicio).toLocaleDateString("pt-BR"))}`;
+        return `${String(new Date(row.inicio).toLocaleDateString('pt-BR'))}`;
       },
     },
     {
-      field: "fim",
-      headerName: "Final do Serviço",
+      field: 'fim',
+      headerName: 'Final do Serviço',
       flex: 1,
       valueGetter: (value, row) => {
         const inicio = new Date(row.inicio);
         inicio.setDate(inicio.getDate() + row.dias);
-        return inicio.toLocaleDateString("pt-BR");
-      }
-
+        return inicio.toLocaleDateString('pt-BR');
+      },
     },
-    { field: "progresso", headerName: "Progesso", flex: 1, editable: true },
+    { field: 'progresso', headerName: 'Progesso', flex: 1, editable: true },
   ];
 
-
-
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const filteredRows = data.filter((row) =>
-    [
-      row.titulo,
-      row.codigo,
-    ]
+    [row.titulo, row.codigo]
       .filter(Boolean)
-      .some((field) =>
-        field.toLowerCase().includes(search.toLowerCase())
-      )
+      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
   );
 
   function QuickSearchToolbar() {
@@ -251,15 +245,14 @@ export function CronogramaDetail() {
         <GridToolbarQuickFilter
           quickFilterParser={(searchInput) =>
             searchInput
-              .split(",")
+              .split(',')
               .map((value) => value.trim())
-              .filter((value) => value !== "")
+              .filter((value) => value !== '')
           }
         />
       </GridToolbarContainer>
     );
   }
-
 
   return (
     <>
@@ -268,16 +261,17 @@ export function CronogramaDetail() {
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">
-            Cronograma da obra {obra.obra_name} - Fim em {new Date(obra.final).toLocaleDateString("pt-BR")}
+            Cronograma da obra {obra.obra_name} - Fim em{' '}
+            {new Date(obra.final).toLocaleDateString('pt-BR')}
           </h1>
           <div className="flex flex-row gap-4">
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
               }}
               aria-label="deletar"
@@ -292,10 +286,10 @@ export function CronogramaDetail() {
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
               }}
               aria-label="recarregar"
@@ -303,13 +297,12 @@ export function CronogramaDetail() {
               onClick={ReloadCronograma}
               disabled={loading}
             >
-              <IoReload className={loading ? "animate-spin" : ""} />
+              <IoReload className={loading ? 'animate-spin' : ''} />
             </IconButton>
           </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2">
-
           <input
             type="text"
             value={search}
@@ -322,10 +315,9 @@ export function CronogramaDetail() {
           <DataGrid
             initialState={{
               sorting: {
-                sortModel: [{ field: "codigo", sort: "asc" | "desc" }],
+                sortModel: [{ field: 'codigo', sort: 'asc' | 'desc' }],
               },
             }}
-
             rows={filteredRows}
             columns={columns}
             processRowUpdate={handleRowUpdate}
@@ -334,10 +326,8 @@ export function CronogramaDetail() {
             sx={{ border: 0 }}
             components={{ Toolbar: QuickSearchToolbar }}
           />
-
         </Paper>
       </div>
     </>
   );
-
 }

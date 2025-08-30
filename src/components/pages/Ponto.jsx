@@ -1,55 +1,54 @@
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
-import { IoIosCloseCircle } from "react-icons/io";
-import { MdDelete } from "react-icons/md";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaCirclePlus } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
+import { IoIosCloseCircle } from 'react-icons/io';
+import { MdDelete } from 'react-icons/md';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 
 export function ConvertMes(mes) {
   const meses = {
-    "01": "Janeiro",
-    "02": "Fevereiro",
-    "03": "Março",
-    "04": "Abril",
-    "05": "Maio",
-    "06": "Junho",
-    "07": "Julho",
-    "08": "Agosto",
-    "09": "Setembro",
-    "10": "Outubro",
-    "11": "Novembro",
-    "12": "Dezembro",
-    1: "Janeiro",
-    2: "Fevereiro",
-    3: "Março",
-    4: "Abril",
-    5: "Maio",
-    6: "Junho",
-    7: "Julho",
-    8: "Agosto",
-    9: "Setembro",
-    10: "Outubro",
-    11: "Novembro",
-    12: "Dezembro"
+    '01': 'Janeiro',
+    '02': 'Fevereiro',
+    '03': 'Março',
+    '04': 'Abril',
+    '05': 'Maio',
+    '06': 'Junho',
+    '07': 'Julho',
+    '08': 'Agosto',
+    '09': 'Setembro',
+    10: 'Outubro',
+    11: 'Novembro',
+    12: 'Dezembro',
+    1: 'Janeiro',
+    2: 'Fevereiro',
+    3: 'Março',
+    4: 'Abril',
+    5: 'Maio',
+    6: 'Junho',
+    7: 'Julho',
+    8: 'Agosto',
+    9: 'Setembro',
+    10: 'Outubro',
+    11: 'Novembro',
+    12: 'Dezembro',
   };
 
-  return meses[mes] || "";
+  return meses[mes] || '';
 }
-
 
 export function Ponto() {
   const [data, setData] = useState([]);
@@ -58,7 +57,6 @@ export function Ponto() {
   const [loading, setLoading] = useState(false);
 
   function Delete({ IdItem, itemName }) {
-
     const deleteAPi = async (IdItem) => {
       setLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -88,8 +86,8 @@ export function Ponto() {
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Tem certeza que deseja excluir {" "}
-              <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir <strong>{itemName}</strong>? Esta
+              ação não pode ser desfeita.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -109,18 +107,20 @@ export function Ponto() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [mes, setMes] = useState("");
-    const [ano, setAno] = useState("");
-    const [obra, setObra] = useState("");
+    const [mes, setMes] = useState('');
+    const [ano, setAno] = useState('');
+    const [obra, setObra] = useState('');
     const [arrayobra, setArrayObra] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState('');
 
     useEffect(() => {
-      axios.get("https://vetor-api.micaelfarias.com/api/obras/").then((response) => {
-        setArrayObra(response.data);
-      });
+      axios
+        .get('https://vetor-api.micaelfarias.com/api/obras/')
+        .then((response) => {
+          setArrayObra(response.data);
+        });
     }, []);
 
     const NewFuncionario = async (e) => {
@@ -128,7 +128,7 @@ export function Ponto() {
       setLoading(true);
 
       try {
-        await axios.post("https://vetor-api.micaelfarias.com/api/mes-ponto/", {
+        await axios.post('https://vetor-api.micaelfarias.com/api/mes-ponto/', {
           author: 1,
           mes,
           ano,
@@ -137,7 +137,7 @@ export function Ponto() {
         window.location.reload();
       } catch (error) {
         console.error(error);
-        setError("Não foi possível criar. Verifique os dados.");
+        setError('Não foi possível criar. Verifique os dados.');
       } finally {
         setLoading(false);
       }
@@ -157,15 +157,19 @@ export function Ponto() {
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
-              <h1 className="block text-lg font-semibold text-gray-700">Cadastrar</h1>
+              <h1 className="block text-lg font-semibold text-gray-700">
+                Cadastrar
+              </h1>
               <IoIosCloseCircle
                 className="text-red-500 hover:text-red-200 cursor-pointer"
                 onClick={handleClose}
               />
             </div>
-            <form onSubmit={NewFuncionario} className="grid grid-cols-2 gap-5 gap-x-4">
-              <FormControl fullWidth >
-
+            <form
+              onSubmit={NewFuncionario}
+              className="grid grid-cols-2 gap-5 gap-x-4"
+            >
+              <FormControl fullWidth>
                 <InputLabel id="mes-label">Mês</InputLabel>
                 <Select
                   id="mes-select"
@@ -178,10 +182,9 @@ export function Ponto() {
                       {ConvertMes(i)}
                     </MenuItem>
                   ))}
-
                 </Select>
               </FormControl>
-              <FormControl fullWidth >
+              <FormControl fullWidth>
                 <TextField
                   id="ano"
                   label="Ano"
@@ -191,7 +194,7 @@ export function Ponto() {
                 />
               </FormControl>
 
-              <FormControl fullWidth className="col-span-2" >
+              <FormControl fullWidth className="col-span-2">
                 <InputLabel id="obra-label">Obra</InputLabel>
                 <Select
                   labelId="obra-label"
@@ -224,15 +227,17 @@ export function Ponto() {
   }
 
   useEffect(() => {
-    axios.get("https://vetor-api.micaelfarias.com/api/mes-ponto/").then((response) => {
-      setData(response.data);
-    });
+    axios
+      .get('https://vetor-api.micaelfarias.com/api/mes-ponto/')
+      .then((response) => {
+        setData(response.data);
+      });
   }, []);
-  console.log(data)
+  console.log(data);
   const columns = [
     {
-      field: "nome",
-      headerName: "Ponto",
+      field: 'nome',
+      headerName: 'Ponto',
       flex: 1,
       valueGetter: (value, row) => {
         return `${row.obra_name} - ${ConvertMes(row.mes)} / ${row.ano}`;
@@ -242,17 +247,17 @@ export function Ponto() {
       field: 'ano',
       headerName: 'Ano',
       width: 100,
-      hide: true // Oculta a coluna de Ano
+      hide: true, // Oculta a coluna de Ano
     },
     {
       field: 'mes',
       headerName: 'Mês',
       width: 100,
-      hide: true // Oculta a coluna de Mês
+      hide: true, // Oculta a coluna de Mês
     },
     {
-      field: "acoes",
-      headerName: "Ações",
+      field: 'acoes',
+      headerName: 'Ações',
       width: 100,
       sortable: false,
       filterable: false,
@@ -263,10 +268,10 @@ export function Ponto() {
               aria-label="editar"
               size="small"
               sx={{
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
                 padding: 1,
               }}
@@ -274,14 +279,23 @@ export function Ponto() {
               <FaEdit />
             </IconButton>
           </a>
-          <a onClick={() => setDelete({ 'id': params.row.id, 'nome': `${params.row.obra_name} - ${ConvertMes(params.row.mes)} / ${params.row.ano}` })}>
+          <a
+            onClick={() =>
+              setDelete({
+                id: params.row.id,
+                nome: `${params.row.obra_name} - ${ConvertMes(
+                  params.row.mes
+                )} / ${params.row.ano}`,
+              })
+            }
+          >
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "error.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "error.main",
+                backgroundColor: 'error.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'error.main',
                   opacity: 0.8,
                 },
               }}
@@ -301,22 +315,17 @@ export function Ponto() {
     <>
       {create && <CreateNew create={create} setCreate={setCreate} />}
 
-      {del && (
-        <Delete
-          IdItem={del.id}
-          itemName={del.nome}
-        />
-      )}
+      {del && <Delete IdItem={del.id} itemName={del.nome} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Ponto</h1>
           <IconButton
             sx={{
               padding: 1,
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
               },
             }}
             aria-label="deletar"
@@ -336,9 +345,9 @@ export function Ponto() {
               pagination: { paginationModel },
               sorting: {
                 sortModel: [
-                  { field: "ano", sort: "desc" },
-                  { field: "mes", sort: "desc" },
-                  { field: "nome", sort: "asc" },
+                  { field: 'ano', sort: 'desc' },
+                  { field: 'mes', sort: 'desc' },
+                  { field: 'nome', sort: 'asc' },
                 ],
               },
             }}

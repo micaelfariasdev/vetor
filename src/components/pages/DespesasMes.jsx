@@ -1,61 +1,61 @@
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
-import { IoIosCloseCircle } from "react-icons/io";
-import { MdDelete } from "react-icons/md";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaCirclePlus } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
+import { IoIosCloseCircle } from 'react-icons/io';
+import { MdDelete } from 'react-icons/md';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
 
 export function ConvertMes(mes) {
   const meses = {
-    "01": "Janeiro",
-    1: "Janeiro",
-    1: "Janeiro",
-    "02": "Fevereiro",
-    2: "Fevereiro",
-    2: "Fevereiro",
-    "03": "Março",
-    3: "Março",
-    3: "Março",
-    "04": "Abril",
-    4: "Abril",
-    4: "Abril",
-    "05": "Maio",
-    5: "Maio",
-    5: "Maio",
-    "06": "Junho",
-    6: "Junho",
-    6: "Junho",
-    "07": "Julho",
-    7: "Julho",
-    7: "Julho",
-    "08": "Agosto",
-    8: "Agosto",
-    8: "Agosto",
-    "09": "Setembro",
-    9: "Setembro",
-    9: "Setembro",
-    10: "Outubro",
-    10: "Outubro",
-    11: "Novembro",
-    11: "Novembro",
-    12: "Dezembro",
-    12: "Dezembro",
+    '01': 'Janeiro',
+    1: 'Janeiro',
+    1: 'Janeiro',
+    '02': 'Fevereiro',
+    2: 'Fevereiro',
+    2: 'Fevereiro',
+    '03': 'Março',
+    3: 'Março',
+    3: 'Março',
+    '04': 'Abril',
+    4: 'Abril',
+    4: 'Abril',
+    '05': 'Maio',
+    5: 'Maio',
+    5: 'Maio',
+    '06': 'Junho',
+    6: 'Junho',
+    6: 'Junho',
+    '07': 'Julho',
+    7: 'Julho',
+    7: 'Julho',
+    '08': 'Agosto',
+    8: 'Agosto',
+    8: 'Agosto',
+    '09': 'Setembro',
+    9: 'Setembro',
+    9: 'Setembro',
+    10: 'Outubro',
+    10: 'Outubro',
+    11: 'Novembro',
+    11: 'Novembro',
+    12: 'Dezembro',
+    12: 'Dezembro',
   };
 
-  return meses[mes] || "";
+  return meses[mes] || '';
 }
 
 export function DesMesMes() {
@@ -96,7 +96,7 @@ export function DesMesMes() {
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Tem certeza que deseja excluir as Despesdas do mês de{" "}
+              Tem certeza que deseja excluir as Despesdas do mês de{' '}
               <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
             </DialogContentText>
           </DialogContent>
@@ -126,9 +126,11 @@ export function DesMesMes() {
     const [arrayobra, setArrayObra] = useState([]);
 
     useEffect(() => {
-      axios.get("https://vetor-api.micaelfarias.com/api/obras/").then((response) => {
-        setArrayObra(response.data);
-      });
+      axios
+        .get('https://vetor-api.micaelfarias.com/api/obras/')
+        .then((response) => {
+          setArrayObra(response.data);
+        });
     }, []);
 
     const NewDesMesMes = async (e) => {
@@ -139,10 +141,10 @@ export function DesMesMes() {
 
       const formData = new FormData();
 
-      formData.append("author", 1);
-      formData.append("obra", obra);
-      formData.append("mes", mes);
-      formData.append("ano", ano);
+      formData.append('author', 1);
+      formData.append('obra', obra);
+      formData.append('mes', mes);
+      formData.append('ano', ano);
 
       try {
         const response = await axios.post(
@@ -150,7 +152,7 @@ export function DesMesMes() {
           formData,
           {
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
           }
         );
@@ -160,7 +162,7 @@ export function DesMesMes() {
       } catch (error) {
         console.error(error);
         setLoading(false);
-        setError("Não foi possível criar. Verifique suas credenciais.");
+        setError('Não foi possível criar. Verifique suas credenciais.');
       }
     };
 
@@ -176,7 +178,7 @@ export function DesMesMes() {
           aria-describedby="alert-dialog-slide-description"
           keepMounted
         >
-          {" "}
+          {' '}
           {loading && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
               <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
@@ -266,59 +268,61 @@ export function DesMesMes() {
   }
 
   useEffect(() => {
-    axios.get("https://vetor-api.micaelfarias.com/api/despesas/").then((response) => {
-      setData(response.data);
-    });
+    axios
+      .get('https://vetor-api.micaelfarias.com/api/despesas/')
+      .then((response) => {
+        setData(response.data);
+      });
   }, []);
 
   const columns = [
-    { field: "obra_name", headerName: "Obra", minWidth: 200, flex: 0 },
-    { field: "username", headerName: "Usuario", flex: 0 },
+    { field: 'obra_name', headerName: 'Obra', minWidth: 200, flex: 0 },
+    { field: 'username', headerName: 'Usuario', flex: 0 },
     {
-      field: "criado_em",
-      headerName: "Criado Em",
+      field: 'criado_em',
+      headerName: 'Criado Em',
       flex: 1,
       valueGetter: (value, row) => {
-        return `${new Date(row.criado_em).toLocaleDateString("pt-BR")}`;
+        return `${new Date(row.criado_em).toLocaleDateString('pt-BR')}`;
       },
     },
     {
-      field: "atualizado_em",
-      headerName: "Última Atualização",
+      field: 'atualizado_em',
+      headerName: 'Última Atualização',
       flex: 1,
       valueGetter: (value, row) => {
-        return `${new Date(row.atualizado_em).toLocaleDateString("pt-BR")}`;
+        return `${new Date(row.atualizado_em).toLocaleDateString('pt-BR')}`;
       },
     },
     {
-      field: "referencia",
-      headerName: "Mês",
+      field: 'referencia',
+      headerName: 'Mês',
       flex: 1,
       valueGetter: (value, row) => {
         return `${ConvertMes(row.mes)}/${row.ano}`;
       },
     },
     {
-      field: "valor_total",
-      headerName: "Total (R$)",
+      field: 'valor_total',
+      headerName: 'Total (R$)',
       flex: 2,
       valueGetter: (value, row) => {
         return `R$ ${parseFloat(
           row.itens
             .reduce((acc, item) => acc + parseFloat(item.valor), 0)
             .toFixed(2)
-        ).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+        ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       },
     },
     {
-      field: "data_ordenacao",
+      field: 'data_ordenacao',
       hide: true,
       valueGetter: (value, row) =>
-        `${row.ano}-${String(row.mes).padStart(2, "0")}`,
+        `${row.ano}-${String(row.mes).padStart(2, '0')}`,
     },
     {
-      field: "acoes",
-      headerName: "Ações",
+      field: 'acoes',
+      headerName: 'Ações',
       width: 100,
       sortable: false,
       filterable: false,
@@ -329,10 +333,10 @@ export function DesMesMes() {
               aria-label="editar"
               size="small"
               sx={{
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
                 padding: 1,
               }}
@@ -344,10 +348,10 @@ export function DesMesMes() {
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "error.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "error.main",
+                backgroundColor: 'error.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'error.main',
                   opacity: 0.8,
                 },
               }}
@@ -380,10 +384,10 @@ export function DesMesMes() {
           <IconButton
             sx={{
               padding: 1,
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
               },
             }}
             aria-label="deletar"
@@ -405,7 +409,7 @@ export function DesMesMes() {
             initialState={{
               pagination: { paginationModel },
               sorting: {
-                sortModel: [{ field: "data_ordenacao", sort: "desc" }],
+                sortModel: [{ field: 'data_ordenacao', sort: 'desc' }],
               },
             }}
             pageSizeOptions={[5, 10]}

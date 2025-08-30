@@ -1,53 +1,54 @@
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { FaEdit } from "react-icons/fa";
-import { IoIosCloseCircle } from "react-icons/io";
-import { MdDelete } from "react-icons/md";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaCirclePlus } from 'react-icons/fa6';
+import { FaEdit } from 'react-icons/fa';
+import { IoIosCloseCircle } from 'react-icons/io';
+import { MdDelete } from 'react-icons/md';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import { useMemo } from 'react';
 
 export function ConvertMes(mes) {
   const meses = {
-    "01": "Janeiro",
-    1: "Janeiro",
-    "02": "Fevereiro",
-    2: "Fevereiro",
-    "03": "Março",
-    3: "Março",
-    "04": "Abril",
-    4: "Abril",
-    "05": "Maio",
-    5: "Maio",
-    "06": "Junho",
-    6: "Junho",
-    "07": "Julho",
-    7: "Julho",
-    "08": "Agosto",
-    8: "Agosto",
-    "09": "Setembro",
-    9: "Setembro",
-    10: "Outubro",
-    '10': "Outubro",
-    11: "Novembro",
-    '11': "Novembro",
-    12: "Dezembro",
-    '12': "Dezembro",
+    '01': 'Janeiro',
+    1: 'Janeiro',
+    '02': 'Fevereiro',
+    2: 'Fevereiro',
+    '03': 'Março',
+    3: 'Março',
+    '04': 'Abril',
+    4: 'Abril',
+    '05': 'Maio',
+    5: 'Maio',
+    '06': 'Junho',
+    6: 'Junho',
+    '07': 'Julho',
+    7: 'Julho',
+    '08': 'Agosto',
+    8: 'Agosto',
+    '09': 'Setembro',
+    9: 'Setembro',
+    10: 'Outubro',
+    10: 'Outubro',
+    11: 'Novembro',
+    11: 'Novembro',
+    12: 'Dezembro',
+    12: 'Dezembro',
   };
 
-  return meses[mes] || "";
+  return meses[mes] || '';
 }
 
 export function Funcionarios() {
@@ -55,9 +56,10 @@ export function Funcionarios() {
   const [create, setCreate] = useState(false);
   const [del, setDelete] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchObraQuery, setSearchObraQuery] = useState('');
 
   function Delete({ IdItem, itemName }) {
-
     const deleteAPi = async (IdItem) => {
       setLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -87,7 +89,7 @@ export function Funcionarios() {
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Tem certeza que deseja excluir o funcionario {" "}
+              Tem certeza que deseja excluir o funcionario{' '}
               <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
             </DialogContentText>
           </DialogContent>
@@ -108,19 +110,21 @@ export function Funcionarios() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [nome, setNome] = useState("");
-    const [cargo, setCargo] = useState("");
-    const [situacao, setSituacao] = useState("");
-    const [obra, setObra] = useState("");
+    const [nome, setNome] = useState('');
+    const [cargo, setCargo] = useState('');
+    const [situacao, setSituacao] = useState('');
+    const [obra, setObra] = useState('');
     const [arrayobra, setArrayObra] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState('');
 
     useEffect(() => {
-      axios.get("https://vetor-api.micaelfarias.com/api/obras/").then((response) => {
-        setArrayObra(response.data);
-      });
+      axios
+        .get('https://vetor-api.micaelfarias.com/api/obras/')
+        .then((response) => {
+          setArrayObra(response.data);
+        });
     }, []);
 
     const NewFuncionario = async (e) => {
@@ -128,17 +132,20 @@ export function Funcionarios() {
       setLoading(true);
 
       try {
-        await axios.post("https://vetor-api.micaelfarias.com/api/colaboradores/", {
-          author: 1,
-          nome,
-          cargo,
-          situacao,
-          obra,
-        });
+        await axios.post(
+          'https://vetor-api.micaelfarias.com/api/colaboradores/',
+          {
+            author: 1,
+            nome,
+            cargo,
+            situacao,
+            obra,
+          }
+        );
         window.location.reload();
       } catch (error) {
         console.error(error);
-        setError("Não foi possível criar. Verifique os dados.");
+        setError('Não foi possível criar. Verifique os dados.');
       } finally {
         setLoading(false);
       }
@@ -158,13 +165,18 @@ export function Funcionarios() {
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
-              <h1 className="block text-lg font-semibold text-gray-700">Cadastrar</h1>
+              <h1 className="block text-lg font-semibold text-gray-700">
+                Cadastrar
+              </h1>
               <IoIosCloseCircle
                 className="text-red-500 hover:text-red-200 cursor-pointer"
                 onClick={handleClose}
               />
             </div>
-            <form onSubmit={NewFuncionario} className="grid grid-cols-2 gap-5 gap-x-4">
+            <form
+              onSubmit={NewFuncionario}
+              className="grid grid-cols-2 gap-5 gap-x-4"
+            >
               <FormControl fullWidth className="col-span-2">
                 <TextField
                   id="nome"
@@ -174,12 +186,12 @@ export function Funcionarios() {
                   onChange={(e) => setNome(e.target.value)}
                 />
               </FormControl>
-              <FormControl fullWidth >
+              <FormControl fullWidth>
                 <InputLabel id="obra-label">Obra</InputLabel>
                 <Select
                   labelId="obra-label"
                   id="obra-select"
-                  label='Obra'
+                  label="Obra"
                   value={obra}
                   onChange={(e) => setObra(e.target.value)}
                 >
@@ -190,21 +202,17 @@ export function Funcionarios() {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth >
+              <FormControl fullWidth>
                 <InputLabel id="obra-label">Situação</InputLabel>
                 <Select
                   labelId="obra-label"
                   id="obra-select"
-                  label='Situação'
+                  label="Situação"
                   value={situacao}
                   onChange={(e) => setSituacao(e.target.value)}
                 >
-                    <MenuItem value='ASSINADO'>
-                      Carteira
-                    </MenuItem>
-                    <MenuItem value='FREE'>
-                      Freelancer
-                    </MenuItem>
+                  <MenuItem value="ASSINADO">Carteira</MenuItem>
+                  <MenuItem value="FREE">Freelancer</MenuItem>
                 </Select>
               </FormControl>
               <FormControl fullWidth className="col-span-2">
@@ -232,19 +240,21 @@ export function Funcionarios() {
   }
 
   useEffect(() => {
-    axios.get("https://vetor-api.micaelfarias.com/api/colaboradores/").then((response) => {
-      setData(response.data);
-    });
+    axios
+      .get('https://vetor-api.micaelfarias.com/api/colaboradores/')
+      .then((response) => {
+        setData(response.data);
+      });
   }, []);
 
   const columns = [
-    { field: "nome", headerName: "Funcionario", minWidth: 200, flex: 1 },
-    { field: "cargo", headerName: "Função",minWidth: 200, flex: 0 },
-    { field: "obra_name", headerName: "Obra",minWidth: 200, flex: 0 },
-    { field: "situacao", headerName: "Situação",minWidth: 150, flex: 0 },
+    { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
+    { field: 'cargo', headerName: 'Função', minWidth: 200, flex: 0 },
+    { field: 'obra_name', headerName: 'Obra', minWidth: 200, flex: 0 },
+    { field: 'situacao', headerName: 'Situação', minWidth: 150, flex: 0 },
     {
-      field: "acoes",
-      headerName: "Ações",
+      field: 'acoes',
+      headerName: 'Ações',
       width: 100,
       sortable: false,
       filterable: false,
@@ -255,10 +265,10 @@ export function Funcionarios() {
               aria-label="editar"
               size="small"
               sx={{
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
                 padding: 1,
               }}
@@ -266,14 +276,18 @@ export function Funcionarios() {
               <FaEdit />
             </IconButton>
           </a>
-          <a onClick={() => setDelete({ 'id': params.row.id, 'nome': params.row.nome })}>
+          <a
+            onClick={() =>
+              setDelete({ id: params.row.id, nome: params.row.nome })
+            }
+          >
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "error.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "error.main",
+                backgroundColor: 'error.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'error.main',
                   opacity: 0.8,
                 },
               }}
@@ -288,27 +302,41 @@ export function Funcionarios() {
     },
   ];
 
-  const paginationModel = { page: 0, pageSize: 10 };
+  const filteredFuncionarios = useMemo(() => {
+    if (!searchQuery && !searchObraQuery) {
+      return data;
+    }
+    return data.filter((func) => {
+      const nomeMatch = func.nome
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const obraMatch = func.obra_name
+        .toLowerCase()
+        .includes(searchObraQuery.toLowerCase());
+      return nomeMatch && obraMatch;
+    });
+  }, [data, searchQuery, searchObraQuery]);
+
+  const uniqueObras = useMemo(() => {
+    const obras = data.map((func) => func.obra_name);
+    return [...new Set(obras)].sort();
+  }, [data]);
+  console.log(uniqueObras);
   return (
     <>
       {create && <CreateNew create={create} setCreate={setCreate} />}
 
-      {del && (
-        <Delete
-          IdItem={del.id}
-          itemName={del.nome}
-        />
-      )}
+      {del && <Delete IdItem={del.id} itemName={del.nome} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Funcionarios</h1>
           <IconButton
             sx={{
               padding: 1,
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
               },
             }}
             aria-label="deletar"
@@ -319,15 +347,34 @@ export function Funcionarios() {
           </IconButton>
         </div>
         <hr className="col-span-2" />
-        <div className="col-span-2"></div>
+        <div className="col-span-2 flex gap-2 ">
+          <input
+            type="text"
+            placeholder="Pesquisar por nome..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 border rounded-md w-[50%]"
+          />
+          <select
+            value={searchObraQuery}
+            onChange={(e) => setSearchObraQuery(e.target.value)}
+            className="w-1/2 p-2 border rounded-md"
+          >
+            <option value="">Pesquisar por obra...</option>
+            {uniqueObras.map((obra, index) => (
+              <option key={index} value={obra}>
+                {obra}
+              </option>
+            ))}
+          </select>
+        </div>
         <Paper>
           <DataGrid
-            rows={data}
+            rows={filteredFuncionarios}
             columns={columns}
             initialState={{
-              pagination: { paginationModel },
               sorting: {
-                sortModel: [{ field: "nome", sort: "desc" }],
+                sortModel: [{ field: 'nome', sort: 'asc' }],
               },
             }}
             pageSizeOptions={[5, 10]}

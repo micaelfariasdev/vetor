@@ -1,23 +1,23 @@
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import * as Comp from "./components";
-import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import * as Comp from './components';
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 function App() {
-  const [pagina, setPagina] = useState("home");
+  const [pagina, setPagina] = useState('home');
 
   return (
     <>
       <BrowserRouter>
-        {window.location.pathname !== "/test" && (
+        {window.location.pathname !== '/test' && (
           <>
             <Comp.Menu onNavigate={setPagina} />
             <Comp.MenuTop />
           </>
         )}
-        {window.location.pathname !== "/test" && (
+        {window.location.pathname !== '/test' && (
           <>
             <div className="h-full overflow-y-scroll">
               <Routes>
@@ -33,8 +33,14 @@ function App() {
                 <Route path="/empresas" element={<Comp.Man />} />
                 <Route path="/cronograma" element={<Comp.Cronograma />} />
                 <Route path="/desp-mes-mes" element={<Comp.DesMesMes />} />
-                <Route path="/desp-mes-mes/:id" element={<Comp.DesMesMesDetail />} />
-                <Route path="/cronograma/:id" element={<Comp.CronogramaDetail />} />
+                <Route
+                  path="/desp-mes-mes/:id"
+                  element={<Comp.DesMesMesDetail />}
+                />
+                <Route
+                  path="/cronograma/:id"
+                  element={<Comp.CronogramaDetail />}
+                />
               </Routes>
             </div>
           </>
@@ -49,13 +55,13 @@ function App() {
   );
 }
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 if (root) {
   root.classList.add(
-    "grid",
-    "grid-cols-[minmax(260px,1fr)_7fr]",
-    "grid-rows-[60px_1fr]",
-    "h-screen"
+    'grid',
+    'grid-cols-[minmax(260px,1fr)_7fr]',
+    'grid-rows-[60px_1fr]',
+    'h-screen'
   );
   createRoot(root).render(<App />);
 }

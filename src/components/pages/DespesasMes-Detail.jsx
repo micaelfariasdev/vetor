@@ -2,23 +2,21 @@ import {
   DataGrid,
   GridToolbarQuickFilter,
   GridToolbarContainer,
-} from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { FaCirclePlus } from "react-icons/fa6";
-import { useParams } from "react-router-dom";
-import { IoIosCloseCircle } from "react-icons/io";
-import Dialog from "@mui/material/Dialog";
-import { ConvertMes } from "./DespesasMes";
-import { styled } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { FaFileDownload } from "react-icons/fa";
-import { FaEdit } from "react-icons/fa";
-import IconButton from "@mui/material/IconButton";
+} from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaCirclePlus } from 'react-icons/fa6';
+import { useParams } from 'react-router-dom';
+import { IoIosCloseCircle } from 'react-icons/io';
+import Dialog from '@mui/material/Dialog';
+import { ConvertMes } from './DespesasMes';
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import { FaCloudUploadAlt } from 'react-icons/fa';
+import { FaFileDownload } from 'react-icons/fa';
+import { FaEdit } from 'react-icons/fa';
+import IconButton from '@mui/material/IconButton';
 
 export function DesMesMesDetail() {
   const { id } = useParams();
@@ -28,12 +26,14 @@ export function DesMesMesDetail() {
   const [error, setError] = useState(false);
 
   function EditItem(item) {
-    const [descricao, setDescricao] = useState("");
-    const [DataItem, setDataItem] = useState("");
+    const [descricao, setDescricao] = useState('');
+    const [DataItem, setDataItem] = useState('');
 
     useEffect(() => {
       axios
-        .get(`https://vetor-api.micaelfarias.com/api/despesasitens/${item["item"]}/`)
+        .get(
+          `https://vetor-api.micaelfarias.com/api/despesasitens/${item['item']}/`
+        )
         .then((response) => {
           setDataItem(response.data);
           setDescricao(response.data.descricao);
@@ -45,19 +45,19 @@ export function DesMesMesDetail() {
 
       const formData = new FormData();
 
-      formData.append("descricao", descricao);
-      formData.append("Object", DataItem.despesas_mes);
+      formData.append('descricao', descricao);
+      formData.append('Object', DataItem.despesas_mes);
 
       try {
         const response = await axios.patch(
-          `https://vetor-api.micaelfarias.com/api/despesasitens/${item["item"]}/`,
+          `https://vetor-api.micaelfarias.com/api/despesasitens/${item['item']}/`,
           formData
         );
 
         window.location.reload();
       } catch (error) {
         console.error(error);
-        setError("Não foi possível editar. Verifique suas credenciais.");
+        setError('Não foi possível editar. Verifique suas credenciais.');
       }
     };
     const handleClose = () => {
@@ -92,7 +92,7 @@ export function DesMesMesDetail() {
               </div>
               <div>
                 <strong>Data</strong>
-                <p>{new Date(DataItem.data).toLocaleDateString("pt-BR")}</p>
+                <p>{new Date(DataItem.data).toLocaleDateString('pt-BR')}</p>
               </div>
               <div>
                 <strong>Documento</strong>
@@ -105,7 +105,7 @@ export function DesMesMesDetail() {
               <div>
                 <strong>Valor</strong>
                 <p>
-                  {parseFloat(DataItem.valor).toLocaleString("pt-BR", {
+                  {parseFloat(DataItem.valor).toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                   })}
                 </p>
@@ -150,18 +150,18 @@ export function DesMesMesDetail() {
       setLoading(true);
 
       if (file) {
-        if (file.name.split(".").pop() !== "xlsx") {
-          errors.push("Formato de arquivo inválido. Use .xlsx");
+        if (file.name.split('.').pop() !== 'xlsx') {
+          errors.push('Formato de arquivo inválido. Use .xlsx');
           console.log(errors);
           setFile(null);
           setLoading(false);
-          throw new Error("Formato de arquivo inválido. Use .xlsx");
+          throw new Error('Formato de arquivo inválido. Use .xlsx');
         }
       }
       const formData = new FormData();
 
-      formData.append("file", file);
-      formData.append("Object", id);
+      formData.append('file', file);
+      formData.append('Object', id);
 
       try {
         const response = await axios.post(
@@ -169,7 +169,7 @@ export function DesMesMesDetail() {
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
@@ -179,7 +179,7 @@ export function DesMesMesDetail() {
         setTimeout(() => {
           setLoading(false);
         }, 2000);
-        errors.push("Não foi possível criar. Verifique suas credenciais.");
+        errors.push('Não foi possível criar. Verifique suas credenciais.');
         console.log(errors);
         setError(errors);
       }
@@ -188,15 +188,15 @@ export function DesMesMesDetail() {
       setCreate(false);
     };
 
-    const VisuallyHiddenInput = styled("input")({
-      clip: "rect(0 0 0 0)",
-      clipPath: "inset(50%)",
+    const VisuallyHiddenInput = styled('input')({
+      clip: 'rect(0 0 0 0)',
+      clipPath: 'inset(50%)',
       height: 1,
-      overflow: "hidden",
-      position: "absolute",
+      overflow: 'hidden',
+      position: 'absolute',
       bottom: 0,
       left: 0,
-      whiteSpace: "nowrap",
+      whiteSpace: 'nowrap',
       width: 1,
     });
 
@@ -263,39 +263,41 @@ export function DesMesMesDetail() {
   }
 
   useEffect(() => {
-    axios.get(`https://vetor-api.micaelfarias.com/api/despesas/${id}`).then((response) => {
-      setData(response.data);
-    });
+    axios
+      .get(`https://vetor-api.micaelfarias.com/api/despesas/${id}`)
+      .then((response) => {
+        setData(response.data);
+      });
   }, []);
 
   const columns = [
-    { field: "empresa", headerName: "Fornecedor", minWidth: 300, flex: 0 },
+    { field: 'empresa', headerName: 'Fornecedor', minWidth: 300, flex: 0 },
     {
-      field: "data",
-      headerName: "Data",
+      field: 'data',
+      headerName: 'Data',
       flex: 1,
       valueGetter: (value, row) => {
-        return `${String(new Date(row.data).toLocaleDateString("pt-BR"))
-          .split("/")
+        return `${String(new Date(row.data).toLocaleDateString('pt-BR'))
+          .split('/')
           .slice(0, 2)
-          .join("/")}`;
+          .join('/')}`;
       },
     },
-    { field: "documento", headerName: "Documento", flex: 1 },
-    { field: "titulo", headerName: "Título", flex: 1 },
+    { field: 'documento', headerName: 'Documento', flex: 1 },
+    { field: 'titulo', headerName: 'Título', flex: 1 },
     {
-      field: "valor",
-      headerName: "Valor",
+      field: 'valor',
+      headerName: 'Valor',
       flex: 1,
       valueGetter: (value, row) => {
-        return `R$ ${parseFloat(row.valor).toLocaleString("pt-BR", {
+        return `R$ ${parseFloat(row.valor).toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
         })}`;
       },
     },
     {
-      field: "descricao",
-      headerName: "Descrição",
+      field: 'descricao',
+      headerName: 'Descrição',
       flex: 2,
       valueGetter: (value, row) => {
         return `${String(row.descricao).toUpperCase()}`;
@@ -303,8 +305,8 @@ export function DesMesMesDetail() {
     },
 
     {
-      field: "acoes",
-      headerName: "",
+      field: 'acoes',
+      headerName: '',
       maxWidth: 50,
       flex: 0,
       sortable: false,
@@ -314,10 +316,10 @@ export function DesMesMesDetail() {
           <IconButton
             sx={{
               padding: 1,
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
               },
             }}
             aria-label="deletar"
@@ -337,7 +339,7 @@ export function DesMesMesDetail() {
     data.itens?.reduce((acc, item) => acc + parseFloat(item.valor), 0) || 0;
   const paginationModel = { page: 0, pageSize: 10 };
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const filteredRows = (data.itens || []).filter(
     (row) =>
@@ -352,9 +354,9 @@ export function DesMesMesDetail() {
         <GridToolbarQuickFilter
           quickFilterParser={(searchInput) =>
             searchInput
-              .split(",")
+              .split(',')
               .map((value) => value.trim())
-              .filter((value) => value !== "")
+              .filter((value) => value !== '')
           }
         />
       </GridToolbarContainer>
@@ -377,25 +379,25 @@ export function DesMesMesDetail() {
     doc.text(
       `Total: R$ ${data.itens
         .reduce((acc, item) => acc + parseFloat(item.valor), 0)
-        .toLocaleString("pt-BR")}`,
+        .toLocaleString('pt-BR')}`,
       14,
       26.5
     );
 
     const rows = data.itens.map((item) => [
       item.empresa,
-      new Date(item.data).toLocaleDateString("pt-BR"),
+      new Date(item.data).toLocaleDateString('pt-BR'),
       item.documento,
       item.titulo,
-      parseFloat(item.valor).toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
+      parseFloat(item.valor).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
       }),
       String(item.descricao).toUpperCase(),
     ]);
 
     autoTable(doc, {
-      head: [["Empresa", "Data", "Documento", "Título", "Valor", "Descrição"]],
+      head: [['Empresa', 'Data', 'Documento', 'Título', 'Valor', 'Descrição']],
       body: rows,
       startY: 30,
       styles: {
@@ -419,10 +421,10 @@ export function DesMesMesDetail() {
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "success.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "success.dark",
+                backgroundColor: 'success.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'success.dark',
                 },
               }}
               aria-label="deletar"
@@ -434,10 +436,10 @@ export function DesMesMesDetail() {
             <IconButton
               sx={{
                 padding: 1,
-                backgroundColor: "info.main",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "info.dark",
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
                 },
               }}
               aria-label="deletar"
@@ -454,8 +456,8 @@ export function DesMesMesDetail() {
         <hr className="col-span-2" />
         <div className="col-span-2">
           <h1 className="font-bold text-2xl">
-            Total: R${" "}
-            {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            Total: R${' '}
+            {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </h1>
           <input
             type="text"
@@ -472,7 +474,7 @@ export function DesMesMesDetail() {
             initialState={{
               pagination: { paginationModel },
               sorting: {
-                sortModel: [{ field: "empresa", sort: "asc" }],
+                sortModel: [{ field: 'empresa', sort: 'asc' }],
               },
             }}
             pageSizeOptions={[5, 10]}

@@ -1,18 +1,17 @@
-import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { FaEdit } from "react-icons/fa";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import { useMemo } from "react";
-import { FaFileDownload } from "react-icons/fa";
-
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { FaEdit } from 'react-icons/fa';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import { useMemo } from 'react';
+import { FaFileDownload } from 'react-icons/fa';
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -23,13 +22,15 @@ function gerarMesCompleto(mes, ano) {
 
   const dataAtual = new Date(dataInicial);
   while (dataAtual <= dataFinal) {
-    const diaSemana = dataAtual.toLocaleDateString('pt-BR', { weekday: 'long' });
+    const diaSemana = dataAtual.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+    });
 
     resultado.push({
       data: dataAtual.toISOString().slice(8, 10),
       mes: dataAtual.toISOString().slice(5, 7),
       diaSemana: diaSemana,
-      dataCompleta: dataAtual.toISOString().slice(0, 10)
+      dataCompleta: dataAtual.toISOString().slice(0, 10),
     });
 
     dataAtual.setDate(dataAtual.getDate() + 1);
@@ -38,38 +39,36 @@ function gerarMesCompleto(mes, ano) {
   return resultado;
 }
 
-
 export function ConvertMes(mes) {
   const meses = {
-    "01": "Janeiro",
-    "02": "Fevereiro",
-    "03": "Março",
-    "04": "Abril",
-    "05": "Maio",
-    "06": "Junho",
-    "07": "Julho",
-    "08": "Agosto",
-    "09": "Setembro",
-    "10": "Outubro",
-    "11": "Novembro",
-    "12": "Dezembro",
-    1: "Janeiro",
-    2: "Fevereiro",
-    3: "Março",
-    4: "Abril",
-    5: "Maio",
-    6: "Junho",
-    7: "Julho",
-    8: "Agosto",
-    9: "Setembro",
-    10: "Outubro",
-    11: "Novembro",
-    12: "Dezembro"
+    '01': 'Janeiro',
+    '02': 'Fevereiro',
+    '03': 'Março',
+    '04': 'Abril',
+    '05': 'Maio',
+    '06': 'Junho',
+    '07': 'Julho',
+    '08': 'Agosto',
+    '09': 'Setembro',
+    10: 'Outubro',
+    11: 'Novembro',
+    12: 'Dezembro',
+    1: 'Janeiro',
+    2: 'Fevereiro',
+    3: 'Março',
+    4: 'Abril',
+    5: 'Maio',
+    6: 'Junho',
+    7: 'Julho',
+    8: 'Agosto',
+    9: 'Setembro',
+    10: 'Outubro',
+    11: 'Novembro',
+    12: 'Dezembro',
   };
 
-  return meses[mes] || "";
+  return meses[mes] || '';
 }
-
 
 export function PontoMes() {
   const { id } = useParams();
@@ -77,36 +76,43 @@ export function PontoMes() {
   const [funcionarios, setFuncionarios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editPonto, setEditPonto] = useState();
+  const [searchQuery, setSearchQuery] = useState('');
 
   function EditarPonto({ IdItem }) {
     const [colaborador, setColaborador] = useState([]);
     const [pontos, setPontos] = useState([]);
     const [registros, setRegistros] = useState([]);
-    const diasDoMes = useMemo(() => gerarMesCompleto(data.mes, data.ano), [data.mes, data.ano]);
+    const diasDoMes = useMemo(
+      () => gerarMesCompleto(data.mes, data.ano),
+      [data.mes, data.ano]
+    );
 
     useEffect(() => {
-      axios.get(`https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}`)
-        .then((response) => setColaborador(response.data));
-    }, [IdItem]);
-
-    useEffect(() => {
-      axios.get(`https://vetor-api.micaelfarias.com/api/ponto/?colaborador=${IdItem}`)
-        .then((response) => setPontos(response.data));
+      setLoading(true);
+      axios
+        .get(
+          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/`
+        )
+        .then((response) => {
+          setColaborador(response.data.dados);
+          setPontos(response.data.pontos);
+        });
+      setLoading(false);
     }, [IdItem]);
 
     useEffect(() => {
       if (diasDoMes.length) {
-        const inicial = diasDoMes.map(item => {
-          const ponto = pontos.find(p => p.data === item.dataCompleta);
+        const inicial = diasDoMes.map((item) => {
+          const ponto = pontos.find((p) => p.data === item.dataCompleta);
           return {
             data: item.dataCompleta,
             valores: [
-              ponto?.entrada_manha?.slice(0, 5) ?? "",
-              ponto?.saida_manha?.slice(0, 5) ?? "",
-              ponto?.entrada_tarde?.slice(0, 5) ?? "",
-              ponto?.saida_tarde?.slice(0, 5) ?? "",
-              ponto?.feriado ?? ""
-            ]
+              ponto?.entrada_manha?.slice(0, 5) ?? '',
+              ponto?.saida_manha?.slice(0, 5) ?? '',
+              ponto?.entrada_tarde?.slice(0, 5) ?? '',
+              ponto?.saida_tarde?.slice(0, 5) ?? '',
+              ponto?.feriado ?? '',
+            ],
           };
         });
 
@@ -115,7 +121,7 @@ export function PontoMes() {
     }, [diasDoMes, pontos]);
 
     function handleChange(index, campo, valor) {
-      setRegistros(prev => {
+      setRegistros((prev) => {
         const copia = [...prev];
         const mapaCampos = {
           entrada_manha: 0,
@@ -128,7 +134,7 @@ export function PontoMes() {
         if (!copia[index]) {
           copia[index] = {
             data: diasDoMes[index].data,
-            valores: ["", "", "", "", ""]
+            valores: ['', '', '', '', ''],
           };
         }
 
@@ -141,46 +147,61 @@ export function PontoMes() {
       });
     }
 
-    console.log(registros)
+    console.log(registros);
     async function handleSalvar() {
       try {
         setLoading(true);
         const registrosPreenchidos = registros
-          .filter(item => item.valores.some(valor => valor !== ""))
-          .map(item => ({
+          .filter((item) => item.valores.some((valor) => valor !== ''))
+          .map((item) => ({
             ...item,
-            data: item.data.split("-")[2],
-            mes: item.data.split("-")[1]
-          })
-          );
+            data: item.data.split('-')[2],
+            mes: item.data.split('-')[1],
+          }));
         const payload = {
           author: 1,
           colaborador_id: IdItem,
           mes: data.mes,
           ano: data.ano,
-          registros: registrosPreenchidos
+          registros: registrosPreenchidos,
         };
-        await axios.post(`https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`, payload);
+        await axios.post(
+          `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
+          payload
+        );
         setLoading(false);
         setEditPonto(false);
       } catch (err) {
         setLoading(false);
-        console.error("Erro ao salvar:", err);
+        console.error('Erro ao salvar:', err);
       }
     }
 
     return (
-      <Dialog open={editPonto} onClose={() => setEditPonto(false)} maxWidth="lg" fullWidth>
+      <Dialog
+        open={editPonto}
+        onClose={() => setEditPonto(false)}
+        maxWidth="lg"
+        fullWidth
+      >
         {loading && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
-        <DialogTitle>{colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}</DialogTitle>
+        <DialogTitle>
+          {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
+        </DialogTitle>
 
         <DialogContent>
-          <div style={{ display: "grid", gridTemplateColumns: "3fr 1fr repeat(4, 2fr)", gap: "8px" }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '3fr 1fr repeat(4, 2fr)',
+              gap: '8px',
+            }}
+          >
             <strong>Data</strong>
             <strong>Feriado?</strong>
             <strong>Entrada Manhã</strong>
@@ -190,25 +211,61 @@ export function PontoMes() {
           </div>
           {registros.map((item, index) => {
             const diaObj = diasDoMes[index];
-            const isDomingo = diaObj.diaSemana.toLowerCase() === "domingo";
-            const isSabado = diaObj.diaSemana.toLowerCase() === "sábado";
+            const isDomingo = diaObj.diaSemana.toLowerCase() === 'domingo';
+            const isSabado = diaObj.diaSemana.toLowerCase() === 'sábado';
             const linhaStyle = {
-              display: "grid",
-              gridTemplateColumns: "3fr 1fr repeat(4, 2fr)",
-              gap: "8px",
-              padding: "2px 0",
-              backgroundColor: isDomingo ? "#f28b82" : isSabado ? "#fff176" : "#fff",
+              display: 'grid',
+              gridTemplateColumns: '3fr 1fr repeat(4, 2fr)',
+              gap: '8px',
+              padding: '2px 0',
+              backgroundColor: isDomingo
+                ? '#f28b82'
+                : isSabado
+                ? '#fff176'
+                : '#fff',
               opacity: isDomingo ? 0.6 : 1,
-              pointerEvents: isDomingo ? "none" : "auto",
+              pointerEvents: isDomingo ? 'none' : 'auto',
             };
             return (
               <div key={item.data} style={linhaStyle}>
-                <div style={{ padding: "4px" }}>{diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}</div>
-                <input type="checkbox" checked={item.valores[4] === true} onChange={(e) => handleChange(index, "feriado", e.target.checked)} />
-                <input type="time" value={item.valores[0]} onChange={e => handleChange(index, "entrada_manha", e.target.value)} />
-                <input type="time" value={item.valores[1]} onChange={e => handleChange(index, "saida_manha", e.target.value)} />
-                <input type="time" value={item.valores[2]} onChange={e => handleChange(index, "entrada_tarde", e.target.value)} />
-                <input type="time" value={item.valores[3]} onChange={e => handleChange(index, "saida_tarde", e.target.value)} />
+                <div style={{ padding: '4px' }}>
+                  {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
+                </div>
+                <input
+                  type="checkbox"
+                  checked={item.valores[4] === true}
+                  onChange={(e) =>
+                    handleChange(index, 'feriado', e.target.checked)
+                  }
+                />
+                <input
+                  type="time"
+                  value={item.valores[0]}
+                  onChange={(e) =>
+                    handleChange(index, 'entrada_manha', e.target.value)
+                  }
+                />
+                <input
+                  type="time"
+                  value={item.valores[1]}
+                  onChange={(e) =>
+                    handleChange(index, 'saida_manha', e.target.value)
+                  }
+                />
+                <input
+                  type="time"
+                  value={item.valores[2]}
+                  onChange={(e) =>
+                    handleChange(index, 'entrada_tarde', e.target.value)
+                  }
+                />
+                <input
+                  type="time"
+                  value={item.valores[3]}
+                  onChange={(e) =>
+                    handleChange(index, 'saida_tarde', e.target.value)
+                  }
+                />
               </div>
             );
           })}
@@ -216,50 +273,48 @@ export function PontoMes() {
 
         <DialogActions>
           <Button onClick={() => setEditPonto(false)}>Cancelar</Button>
-          <Button color="primary" onClick={handleSalvar}>Salvar</Button>
+          <Button color="primary" onClick={handleSalvar}>
+            Salvar
+          </Button>
         </DialogActions>
       </Dialog>
     );
   }
 
-
-
   useEffect(() => {
-    if (!id) return;
     setLoading(true);
-    axios.get(`https://vetor-api.micaelfarias.com/api/mes-ponto/${id}`)
-      .then((res) => setData(res.data))
+    axios
+      .get(`https://vetor-api.micaelfarias.com/api/mes-ponto/${id}/relacao/`)
+      .then((res) => {
+        setFuncionarios(res.data.funcionarios);
+        setData(res.data.dados);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
-  useEffect(() => {
-    if (!data?.obra) return;
-    axios.get(`https://vetor-api.micaelfarias.com/api/colaboradores/?obra=${data.obra}`)
-      .then((res) => setFuncionarios(res.data));
-  }, [data?.obra]);
-
-
   const columns = [
-    { field: "nome", headerName: "Funcionario", minWidth: 200, flex: 1 },
-    { field: "cargo", headerName: "Função", minWidth: 200, flex: 0 },
-    { field: "obra_name", headerName: "Obra", minWidth: 200, flex: 0 },
+    { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
+    { field: 'cargo', headerName: 'Função', minWidth: 200, flex: 0 },
+    { field: 'obra_name', headerName: 'Obra', minWidth: 200, flex: 0 },
     {
-      field: "acoes",
-      headerName: "Ações",
+      field: 'acoes',
+      headerName: 'Ações',
       width: 100,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <div className="h-full w-full text-md flex items-center justify-center gap-2"
-          onClick={() => setEditPonto({ 'id': params.row.id })}>
+        <div
+          className="h-full w-full text-md flex items-center justify-center gap-2"
+          onClick={() => setEditPonto({ id: params.row.id })}
+        >
           <IconButton
             aria-label="editar"
             size="small"
             sx={{
-              backgroundColor: "info.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "info.dark",
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
               },
               padding: 1,
             }}
@@ -279,41 +334,61 @@ export function PontoMes() {
     window.open(url, nomeDaJanela, opcoes);
   }
 
+  const filteredFuncionarios = useMemo(() => {
+    if (!searchQuery) {
+      return funcionarios;
+    }
+    return funcionarios.filter((func) =>
+      func.nome.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [funcionarios, searchQuery]);
+
   return (
     <>
-      {editPonto && (
-        <EditarPonto
-          IdItem={editPonto.id}
-        />
-      )}
+      {editPonto && <EditarPonto IdItem={editPonto.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">{`${data.obra_name} - ${ConvertMes(data.mes)} / ${data.ano}`}</h1>
+          <h1 className="font-bold text-3xl">{`${data.obra_name} - ${ConvertMes(
+            data.mes
+          )} / ${data.ano}`}</h1>
           <IconButton
             sx={{
               padding: 1,
-              backgroundColor: "success.main",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "success.dark",
+              backgroundColor: 'success.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'success.dark',
               },
             }}
             aria-label="deletar"
             size="small"
-            onClick={() => abrirPopup(`https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`)}
+            onClick={() =>
+              abrirPopup(
+                `https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`
+              )
+            }
           >
             <FaFileDownload />
           </IconButton>
         </div>
+
         <hr className="col-span-2" />
-        <div className="col-span-2"></div>
+        <div className="col-span-2">
+          <input
+            type="text"
+            placeholder="Pesquisar por nome..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
         <Paper>
           <DataGrid
-            rows={funcionarios}
+            rows={filteredFuncionarios}
             columns={columns}
             initialState={{
               sorting: {
-                sortModel: [{ field: "nome", sort: "asc" }],
+                sortModel: [{ field: 'nome', sort: 'asc' }],
               },
             }}
             pageSizeOptions={[5, 10]}
