@@ -1,13 +1,20 @@
 export { Menu, MenuTop } from './Menu';
 export { Home } from './pages/Home';
-export { Obras } from './pages/Obras';
-export { Servicos } from './pages/Servicos';
-export { Funcionarios } from './pages/Funcionarios';
-export { Ponto } from './pages/Ponto';
-export { PontoMes } from './pages/PontoMes';
+
+export { Obras } from './pages/obras/Obras';
+export { Obras_detail } from './pages/obras/Obras_detail';
+export { Servicos } from './pages/obras/Servicos';
+
+export { Funcionarios } from './pages/ponto/Funcionarios';
+export { Ponto } from './pages/ponto/Ponto';
+export { PontoMes } from './pages/ponto/PontoMes';
+
 export { Man } from './pages/Man';
-export { Cronograma } from './pages/Cronograma';
-export { CronogramaDetail } from './pages/Cronograma-Detail';
-export { DesMesMes } from './pages/DespesasMes';
-export { DesMesMesDetail } from './pages/DespesasMes-Detail';
+
+export { Cronograma } from './pages/cronograma/Cronograma';
+export { CronogramaDetail } from './pages/cronograma/Cronograma-Detail';
+
+export { DesMesMes } from './pages/despesas/DespesasMes';
+export { DesMesMesDetail } from './pages/despesas/DespesasMes-Detail';
+
 export { PontoMesMockup } from './pages/test';
