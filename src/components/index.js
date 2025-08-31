@@ -1,6 +1,7 @@
 export { Menu, MenuTop } from './Menu';
 export { Home } from './pages/Home';
 export { Obras } from './pages/Obras';
+export { Servicos } from './pages/Servicos';
 export { Funcionarios } from './pages/Funcionarios';
 export { Ponto } from './pages/Ponto';
 export { PontoMes } from './pages/PontoMes';

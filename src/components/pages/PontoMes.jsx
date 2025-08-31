@@ -362,9 +362,10 @@ export function PontoMes() {
             aria-label="deletar"
             size="small"
             onClick={() =>
-              abrirPopup(
+              {const pop1 = abrirPopup(
                 `https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`
               )
+            }
             }
           >
             <FaFileDownload />

@@ -23,7 +23,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Comp.Man />} />
-                <Route path="/obras" element={<Comp.Man />} />
+                <Route path="/obras" element={<Comp.Obras />} />
+                <Route path="/servicos" element={<Comp.Servicos />} />
                 <Route path="/titulopagar" element={<Comp.Man />} />
                 <Route path="/medpagar" element={<Comp.Man />} />
                 <Route path="/medreceber" element={<Comp.Man />} />

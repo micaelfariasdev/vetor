@@ -12,53 +12,18 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
+import { TextField } from '@mui/material';
 import { useMemo } from 'react';
 
-export function ConvertMes(mes) {
-  const meses = {
-    '01': 'Janeiro',
-    1: 'Janeiro',
-    '02': 'Fevereiro',
-    2: 'Fevereiro',
-    '03': 'Março',
-    3: 'Março',
-    '04': 'Abril',
-    4: 'Abril',
-    '05': 'Maio',
-    5: 'Maio',
-    '06': 'Junho',
-    6: 'Junho',
-    '07': 'Julho',
-    7: 'Julho',
-    '08': 'Agosto',
-    8: 'Agosto',
-    '09': 'Setembro',
-    9: 'Setembro',
-    10: 'Outubro',
-    10: 'Outubro',
-    11: 'Novembro',
-    11: 'Novembro',
-    12: 'Dezembro',
-    12: 'Dezembro',
-  };
-
-  return meses[mes] || '';
-}
-
-export function Funcionarios() {
+export function Servicos() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
   const [del, setDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchObraQuery, setSearchObraQuery] = useState('');
 
   function Delete({ IdItem, itemName }) {
     const deleteAPi = async (IdItem) => {
@@ -67,7 +32,7 @@ export function Funcionarios() {
 
       try {
         const response = await axios.delete(
-          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`
+          `https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`
         );
         setDelete(false);
         setLoading(false);
@@ -111,23 +76,11 @@ export function Funcionarios() {
   }
 
   function Edit({ IdItem }) {
-    const [nome, setNome] = useState('');
-    const [cargo, setCargo] = useState('');
-    const [situacao, setSituacao] = useState('');
-    const [obra, setObra] = useState('');
-    const [arrayobra, setArrayObra] = useState([]);
-    const [dadosFun, setDadosFun] = useState([]);
+    const [titulo, setTitulo] = useState('');
+    const [desc, setDesc] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    useEffect(() => {
-      axios
-        .get('https://vetor-api.micaelfarias.com/api/obras/')
-        .then((response) => {
-          setArrayObra(response.data);
-        });
-    }, []);
 
     const editAPi = async (e) => {
       e.preventDefault();
@@ -135,13 +88,10 @@ export function Funcionarios() {
 
       try {
         await axios.patch(
-          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`,
+          `https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`,
           {
-            author: 1,
-            nome,
-            cargo,
-            situacao,
-            obra,
+            titulo: titulo,
+            descricao: desc,
           }
         );
         window.location.reload();
@@ -155,12 +105,10 @@ export function Funcionarios() {
 
     useEffect(() => {
       axios
-        .get(`https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`)
+        .get(`https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`)
         .then((response) => {
-          setNome(response.data.nome);
-          setCargo(response.data.cargo);
-          setSituacao(response.data.situacao);
-          setObra(response.data.obra);
+          setTitulo(response.data.titulo);
+          setDesc(response.data.descricao);
         });
     }, []);
 
@@ -189,49 +137,20 @@ export function Funcionarios() {
             <form onSubmit={editAPi} className="grid grid-cols-2 gap-5 gap-x-4">
               <FormControl fullWidth className="col-span-2">
                 <TextField
-                  id="nome"
-                  label="Nome"
+                  id="titulo"
+                  label="Título"
                   variant="outlined"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
                 />
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="obra-label">Obra</InputLabel>
-                <Select
-                  labelId="obra-label"
-                  id="obra-select"
-                  label="Obra"
-                  value={obra}
-                  onChange={(e) => setObra(e.target.value)}
-                >
-                  {arrayobra.map((item) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.nome}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="obra-label">Situação</InputLabel>
-                <Select
-                  labelId="obra-label"
-                  id="obra-select"
-                  label="Situação"
-                  value={situacao}
-                  onChange={(e) => setSituacao(e.target.value)}
-                >
-                  <MenuItem value="ASSINADO">Carteira</MenuItem>
-                  <MenuItem value="FREE">Freelancer</MenuItem>
-                </Select>
               </FormControl>
               <FormControl fullWidth className="col-span-2">
                 <TextField
-                  id="cargo"
-                  label="Cargo"
+                  id="desc"
+                  label="Descrição"
                   variant="outlined"
-                  value={cargo}
-                  onChange={(e) => setCargo(e.target.value)}
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
                 />
               </FormControl>
               <button
@@ -250,36 +169,22 @@ export function Funcionarios() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [nome, setNome] = useState('');
-    const [cargo, setCargo] = useState('');
-    const [situacao, setSituacao] = useState('');
-    const [obra, setObra] = useState('');
-    const [arrayobra, setArrayObra] = useState([]);
+    const [titulo, setTitulo] = useState('');
+    const [desc, setDesc] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-      axios
-        .get('https://vetor-api.micaelfarias.com/api/obras/')
-        .then((response) => {
-          setArrayObra(response.data);
-        });
-    }, []);
-
-    const NewFuncionario = async (e) => {
+    const NewObra = async (e) => {
       e.preventDefault();
       setLoading(true);
 
       try {
-        await axios.post(
-          'https://vetor-api.micaelfarias.com/api/colaboradores/',
+        const resp = await axios.post(
+          'https://vetor-api.micaelfarias.com/api/servico/',
           {
-            author: 1,
-            nome,
-            cargo,
-            situacao,
-            obra,
+            titulo: titulo,
+            descricao: desc,
           }
         );
         window.location.reload();
@@ -313,55 +218,23 @@ export function Funcionarios() {
                 onClick={handleClose}
               />
             </div>
-            <form
-              onSubmit={NewFuncionario}
-              className="grid grid-cols-2 gap-5 gap-x-4"
-            >
+            <form onSubmit={NewObra} className="grid grid-cols-2 gap-5 gap-x-4">
               <FormControl fullWidth className="col-span-2">
                 <TextField
-                  id="nome"
-                  label="Nome"
+                  id="titulo"
+                  label="Título"
                   variant="outlined"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
                 />
               </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="obra-label">Obra</InputLabel>
-                <Select
-                  labelId="obra-label"
-                  id="obra-select"
-                  label="Obra"
-                  value={obra}
-                  onChange={(e) => setObra(e.target.value)}
-                >
-                  {arrayobra.map((item) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.nome}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id="obra-label">Situação</InputLabel>
-                <Select
-                  labelId="obra-label"
-                  id="obra-select"
-                  label="Situação"
-                  value={situacao}
-                  onChange={(e) => setSituacao(e.target.value)}
-                >
-                  <MenuItem value="ASSINADO">Carteira</MenuItem>
-                  <MenuItem value="FREE">Freelancer</MenuItem>
-                </Select>
-              </FormControl>
               <FormControl fullWidth className="col-span-2">
                 <TextField
-                  id="cargo"
-                  label="Cargo"
+                  id="desc"
+                  label="Descrição"
                   variant="outlined"
-                  value={cargo}
-                  onChange={(e) => setCargo(e.target.value)}
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
                 />
               </FormControl>
               <button
@@ -381,23 +254,28 @@ export function Funcionarios() {
 
   useEffect(() => {
     axios
-      .get('https://vetor-api.micaelfarias.com/api/colaboradores/')
+      .get('https://vetor-api.micaelfarias.com/api/servico/')
       .then((response) => {
         setData(response.data);
       });
   }, []);
 
   const columns = [
-    { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
-    { field: 'cargo', headerName: 'Função', minWidth: 200, flex: 0 },
-    { field: 'obra_name', headerName: 'Obra', minWidth: 200, flex: 0 },
-    { field: 'situacao', headerName: 'Situação', minWidth: 150, flex: 0 },
+    { field: 'titulo', headerName: 'Serviço', minWidth: 200, flex: 3 },
+    {
+      field: 'descricao',
+      headerName: 'Descrição',
+      minWidth: 200,
+      flex: 3,
+      filterable: false,
+      sortable: false,
+    },
     {
       field: 'acoes',
       headerName: 'Ações',
       width: 100,
-      sortable: false,
       filterable: false,
+      sortable: false,
       renderCell: (params) => (
         <div className="h-full w-full text-md flex items-center justify-center gap-2">
           <IconButton
@@ -428,7 +306,7 @@ export function Funcionarios() {
             aria-label="deletar"
             size="small"
             onClick={() =>
-              setDelete({ id: params.row.id, nome: params.row.nome })
+              setDelete({ id: params.row.id, nome: params.row.titulo })
             }
           >
             <MdDelete />
@@ -438,25 +316,18 @@ export function Funcionarios() {
     },
   ];
 
-  const filteredFuncionarios = useMemo(() => {
-    if (!searchQuery && !searchObraQuery) {
+  const filterObra = useMemo(() => {
+    if (!searchQuery) {
       return data;
     }
     return data.filter((func) => {
       const nomeMatch = func.nome
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      const obraMatch = func.obra_name
-        .toLowerCase()
-        .includes(searchObraQuery.toLowerCase());
-      return nomeMatch && obraMatch;
+      return nomeMatch;
     });
-  }, [data, searchQuery, searchObraQuery]);
+  }, [data, searchQuery]);
 
-  const uniqueObras = useMemo(() => {
-    const obras = data.map((func) => func.obra_name);
-    return [...new Set(obras)].sort();
-  }, [data]);
   return (
     <>
       {create && <CreateNew create={create} setCreate={setCreate} />}
@@ -464,7 +335,7 @@ export function Funcionarios() {
       {edit && <Edit IdItem={edit.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">Funcionarios</h1>
+          <h1 className="font-bold text-3xl">Serviços</h1>
           <IconButton
             sx={{
               padding: 1,
@@ -490,22 +361,10 @@ export function Funcionarios() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="p-2 border rounded-md w-[50%]"
           />
-          <select
-            value={searchObraQuery}
-            onChange={(e) => setSearchObraQuery(e.target.value)}
-            className="w-1/2 p-2 border rounded-md"
-          >
-            <option value="">Pesquisar por obra...</option>
-            {uniqueObras.map((obra, index) => (
-              <option key={index} value={obra}>
-                {obra}
-              </option>
-            ))}
-          </select>
         </div>
         <Paper>
           <DataGrid
-            rows={filteredFuncionarios}
+            rows={filterObra}
             columns={columns}
             initialState={{
               sorting: {
@@ -520,5 +379,3 @@ export function Funcionarios() {
     </>
   );
 }
-
-export default ConvertMes;

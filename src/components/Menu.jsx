@@ -77,7 +77,6 @@ export function Menu({ onNavigate }) {
         <ListItemButton
           onClick={() => {
             handleClick(2);
-            window.location.href = `/obras`;
           }}
           selected={open === 2}
         >
@@ -85,7 +84,36 @@ export function Menu({ onNavigate }) {
             <FaHelmetSafety />
           </ListItemIcon>
           <ListItemText primary="Obras" />
+          {open === 2 ? (
+            <IoIosArrowForward className={'rotate-90'} />
+          ) : (
+            <IoIosArrowForward className={'rotate-0'} />
+          )}
         </ListItemButton>
+        <Collapse in={open === 2} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 2}
+              onClick={() => (window.location.href = `/obras`)}
+            >
+              <ListItemText
+                primary="Obras"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+            <ListItemButton
+              sx={{ pl: 10 }}
+              selected={open === 2}
+              onClick={() => (window.location.href = `/servicos`)}
+            >
+              <ListItemText
+                primary="Serviços"
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+          </List>
+        </Collapse>
         <ListItemButton
           onClick={() => {
             handleClick(3);
