@@ -25,6 +25,10 @@ export function Menu({ onNavigate }) {
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
+    console.log(window.location.href, window.location.origin)
+    if (window.location.href === `${window.location.origin}/home`) {
+      localStorage.setItem('indexPage', 1);
+    }
     const stored = localStorage.getItem('indexPage');
     if (stored) setOpen(Number(stored));
   }, []);
