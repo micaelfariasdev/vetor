@@ -227,10 +227,17 @@ export function Ponto() {
   }
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get('https://vetor-api.micaelfarias.com/api/mes-ponto/')
       .then((response) => {
         setData(response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar os dados:", error);
+      })
+      .finally(() => {
+        setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
   }, []);
 
@@ -313,6 +320,11 @@ export function Ponto() {
   const paginationModel = { page: 0, pageSize: 10 };
   return (
     <>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
       {create && <CreateNew create={create} setCreate={setCreate} />}
 
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
