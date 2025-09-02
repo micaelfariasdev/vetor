@@ -5,7 +5,6 @@ import {
   IoIosBusiness,
   IoIosArrowForward,
 } from 'react-icons/io';
-import { MdMonetizationOn } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -20,12 +19,107 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { IoIosMail } from 'react-icons/io';
 
+function ItemMenu({ label, link, icon, sorted, open }) {
+  return (
+    <>
+      <ListItemButton
+        onClick={() => {
+          window.location.href = `/${link}`;
+        }}
+        selected={open === sorted}
+      >
+        <ListItemIcon sx={{ fontSize: 25 }}>
+          {icon}
+        </ListItemIcon>
+        <ListItemText primary={label} />
+      </ListItemButton>
+    </>
+  );
+}
+
+function ListItems({ label, icon, handleClick, sorted, list, open }) {
+  return (
+    <>
+      <ListItemButton
+        onClick={() => {
+          handleClick(sorted);
+        }}
+        selected={open === sorted}
+      >
+        <ListItemIcon sx={{ fontSize: 25 }}>
+          {icon}
+        </ListItemIcon>
+        <ListItemText primary={label} />
+        {open === sorted ? (
+          <IoIosArrowForward className={'rotate-90'} />
+        ) : (
+          <IoIosArrowForward className={'rotate-0'} />
+        )}
+      </ListItemButton>
+      <Collapse in={open === sorted} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {list.map((item, index) => (
+            <ListItemButton
+              key={index}
+              sx={{ pl: 10 }}
+              selected={open === sorted}
+
+              onClick={() => (window.location.href = `/${item[0]}`)}
+            >
+              <ListItemText
+                primary={item[1]}
+                primaryTypographyProps={{ fontSize: 15 }}
+              />
+            </ListItemButton>
+          ))}
+        </List>
+      </Collapse>
+    </>
+  );
+}
+
+function MenuCreate({ list, handleClick, open }) {
+  return (
+    <>
+      {list.map((item, index) => {
+        if (item.type === 'buttom') {
+          return (
+            <ItemMenu
+              key={index}
+              label={item.label}
+              link={item.link}
+              icon={item.icon}
+              sorted={item.open}
+              open={open}
+            />
+          );
+        }
+
+        if (item.type === 'list') {
+          return (
+            <ListItems
+              key={index}
+              label={item.label}
+              icon={item.icon}
+              handleClick={handleClick}
+              sorted={item.open}
+              list={item.list}
+              open={open}
+            />
+          );
+        }
+        return null;
+      })}
+    </>
+  );
+}
+
 export function Menu({ onNavigate }) {
   const [showPage, setPage] = useState('home');
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState('');
 
   useEffect(() => {
-    console.log(window.location.href, window.location.origin)
+    console.log(window.location.href, window.location.origin);
     if (window.location.href === `${window.location.origin}/home`) {
       localStorage.setItem('indexPage', 1);
     }
@@ -36,7 +130,7 @@ export function Menu({ onNavigate }) {
   const handleClick = (e) => {
     if (open === e) {
       setOpen('');
-      localStorage.removeItem('indexPage', e);
+      localStorage.removeItem('indexPage');
     } else {
       setOpen(e);
       localStorage.setItem('indexPage', e);
@@ -66,211 +160,62 @@ export function Menu({ onNavigate }) {
         component="nav"
         className="p-2 pt-4 row-span-2 relative z-10 border-r-2 border-gray-200"
       >
-        <ListItemButton
-          onClick={() => {
-            handleClick(1);
-            window.location.href = `/home`;
-          }}
-          selected={open === 1}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <FaHome />
-          </ListItemIcon>
-          <ListItemText primary="Home" />
-        </ListItemButton>
-        <ListItemButton
-          onClick={() => {
-            handleClick(2);
-          }}
-          selected={open === 2}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <FaHelmetSafety />
-          </ListItemIcon>
-          <ListItemText primary="Obras" />
-          {open === 2 ? (
-            <IoIosArrowForward className={'rotate-90'} />
-          ) : (
-            <IoIosArrowForward className={'rotate-0'} />
-          )}
-        </ListItemButton>
-        <Collapse in={open === 2} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 2}
-              onClick={() => (window.location.href = `/obras`)}
-            >
-              <ListItemText
-                primary="Obras"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 2}
-              onClick={() => (window.location.href = `/servicos`)}
-            >
-              <ListItemText
-                primary="Serviços"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-          </List>
-        </Collapse>
-        <ListItemButton
-          onClick={() => {
-            handleClick(3);
-          }}
-          selected={open === 3}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <MdMonetizationOn />
-          </ListItemIcon>
-          <ListItemText primary="Financeiro" />
-          {open === 3 ? (
-            <IoIosArrowForward className={'rotate-90'} />
-          ) : (
-            <IoIosArrowForward className={'rotate-0'} />
-          )}
-        </ListItemButton>
-
-        <Collapse in={open === 3} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 3}
-              onClick={() => (window.location.href = `/titulopagar`)}
-            >
-              <ListItemText
-                primary="Títulos a Pagar"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 3}
-              onClick={() => (window.location.href = `/medpagar`)}
-            >
-              <ListItemText
-                primary="Medições a Pagar"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 3}
-              onClick={() => (window.location.href = `/medreceber`)}
-            >
-              <ListItemText
-                primary="Medições a Receber"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-          </List>
-        </Collapse>
-        <ListItemButton
-          onClick={() => {
-            handleClick(4);
-          }}
-          selected={open === 3}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <FaPeopleGroup />
-          </ListItemIcon>
-          <ListItemText primary="Funcionários" />
-          {open === 3 ? (
-            <IoIosArrowForward className={'rotate-90'} />
-          ) : (
-            <IoIosArrowForward className={'rotate-0'} />
-          )}
-        </ListItemButton>
-        <Collapse in={open === 4} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 4}
-              onClick={() => (window.location.href = `/funcionarios`)}
-            >
-              <ListItemText
-                primary="Funcionários"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 4}
-              onClick={() => (window.location.href = `/ponto`)}
-            >
-              <ListItemText
-                primary="Ponto"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-          </List>
-        </Collapse>
-
-        <ListItemButton
-          onClick={() => {
-            handleClick(5);
-            window.location.href = `/empresas`;
-          }}
-          selected={open === 5}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <IoIosBusiness />
-          </ListItemIcon>
-          <ListItemText primary="Empresas" />
-        </ListItemButton>
-        <ListItemButton
-          onClick={() => {
-            handleClick(6);
-          }}
-          selected={open === 6}
-        >
-          <ListItemIcon sx={{ fontSize: 25 }}>
-            <IoIosConstruct />
-          </ListItemIcon>
-          <ListItemText primary="Engenharia" />
-          {open === 6 ? (
-            <IoIosArrowForward className={'rotate-90'} />
-          ) : (
-            <IoIosArrowForward className={'rotate-0'} />
-          )}
-        </ListItemButton>
-        <Collapse in={open === 6} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 6}
-              onClick={() => {
-                window.location.href = `/desp-mes-mes`;
-              }}
-            >
-              <ListItemText
-                primary="Despesas Mês a Mês"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-            <ListItemButton
-              sx={{ pl: 10 }}
-              selected={open === 6}
-              onClick={() => {
-                window.location.href = `/cronograma`;
-              }}
-            >
-              <ListItemText
-                primary="Cronograma"
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-          </List>
-        </Collapse>
+        <MenuCreate
+          handleClick={handleClick}
+          open={open}
+          list={[
+            {
+              'type': 'buttom',
+              'label': 'Home',
+              'link': 'home',
+              'icon': <FaHome />,
+              'open': 1,
+            },
+            {
+              'type': 'list',
+              'label': 'Obras',
+              'icon': <FaHelmetSafety />,
+              'open': 2,
+              'list': [
+                ['obras', 'Obras'],
+                ['servicos', 'Serviços'],
+              ],
+            },
+            {
+              'type': 'list',
+              'label': 'Funcionários',
+              'icon': <FaPeopleGroup />,
+              'open': 3,
+              'list': [
+                ['funcionarios', 'Funcionários'],
+                ['ponto', 'Ponto'],
+              ],
+            },
+            {
+              'type': 'buttom',
+              'label': 'Empresas',
+              'link': 'empresas',
+              'icon': <IoIosBusiness />,
+              'open': 4,
+            },
+            {
+              'type': 'list',
+              'label': 'Engenharia',
+              'icon': <IoIosConstruct />,
+              'open': 5,
+              'list': [
+                ['desp-mes-mes', 'Despesas Mês a Mês'],
+                ['cronograma', 'Cronograma'],
+              ],
+            },
+          ]}
+        />
       </List>
     </>
   );
 }
 
+// O componente do menu superior
 export function MenuTop() {
   function stringAvatar(name) {
     const hex = [...name]
