@@ -45,6 +45,7 @@ export function Obras_detail() {
   const [search, setSearch] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`https://vetor-api.micaelfarias.com/api/obras/${id}/`)
       .then((response) => {
@@ -53,6 +54,12 @@ export function Obras_detail() {
         setCnpj(response.data.cnpj);
         setType(response.data.tipo_obra);
         setServ(response.data.servicos);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar os dados:", error);
+      })
+      .finally(() => {
+        setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
   }, []);
 
@@ -78,6 +85,7 @@ export function Obras_detail() {
       setLoading(false);
     }
   };
+
   const EditServicos = async (e) => {
     setLoading(true);
 
@@ -190,6 +198,11 @@ export function Obras_detail() {
 
   return (
     <>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
       {search && <SearchServ search={search} setSearch={setSearch} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
@@ -197,7 +210,7 @@ export function Obras_detail() {
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2 flex gap-2 ">
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', minWidth: '100%' }}>
             <Tabs
               value={value}
               onChange={handleChangee}
@@ -205,6 +218,7 @@ export function Obras_detail() {
             >
               <Tab label="Cadastro" {...a11yProps(0)} />
               <Tab label="Serviços" {...a11yProps(1)} />
+              <Tab label="Unidades" {...a11yProps(2)} />
             </Tabs>
           </Box>
         </div>
@@ -263,6 +277,7 @@ export function Obras_detail() {
             </button>
           </form>
         </Paper>
+
         <Paper
           hidden={value !== 1}
           className="grid grid-cols-1 gap-4 p-4 items-start"
@@ -301,6 +316,10 @@ export function Obras_detail() {
               Salvar
             </button>
           </Box>
+        </Paper>
+
+        <Paper hidden={value !== 2}>
+
         </Paper>
       </div>
     </>
