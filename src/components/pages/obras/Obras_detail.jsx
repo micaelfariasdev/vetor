@@ -1,30 +1,41 @@
-import Paper from '@mui/material/Paper';
+import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { IoIosCloseCircle } from 'react-icons/io';
+
+import Paper from '@mui/material/Paper';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import { TextField } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import * as React from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import {
-  Button,
   List,
   ListItem,
   ListItemText,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   IconButton,
 } from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Collapse from '@mui/material/Collapse';
+import { ThemeProvider } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { IoIosCloseCircle } from 'react-icons/io';
+
 
 function a11yProps(index) {
   return {
@@ -42,6 +53,9 @@ export function Obras_detail() {
   const [cnpj, setCnpj] = useState('');
   const [type, setType] = useState('');
   const [serv, setServ] = useState('');
+  const [edit, setEdit] = useState('');
+  const [unidades, setUnidades] = useState([]);
+  const [openAndar, setOpenAndar] = useState('');
   const [search, setSearch] = useState(false);
 
   useEffect(() => {
@@ -54,6 +68,9 @@ export function Obras_detail() {
         setCnpj(response.data.cnpj);
         setType(response.data.tipo_obra);
         setServ(response.data.servicos);
+        setUnidades(response.data.andares);
+        console.log(serv)
+
       })
       .catch((error) => {
         console.error("Erro ao buscar os dados:", error);
@@ -196,6 +213,54 @@ export function Obras_detail() {
     );
   }
 
+  function EditServicosUnidades({ idUni, obra }) {
+
+    useEffect(() => {
+      setLoading(true);
+      axios
+        .get(`https://vetor-api.micaelfarias.com/api/obras/${id}/`)
+        .then((response) => {
+
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar os dados:", error);
+        })
+        .finally(() => {
+          setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
+        });
+    }, []);
+
+    const handleClose = () => {
+      setEdit(false);
+    };
+
+    return (
+      <Dialog open={edit} onClose={handleClose} keepMounted>
+        <Box className="w-full h-full min-h-150 min-w-150 p-5">
+          <List>
+            {serv.map((item, index) => (
+              <ListItem key={index} divider>
+                <ListItemText primary={item.titulo} />
+                <TextField
+                  label="Progresso (%)"
+                  type="number"
+                  inputProps={{
+                    min: 0,
+                    max: 100,
+                  }}
+                  helperText="Digite um valor de 0 a 100"
+                />
+              </ListItem>
+            ))
+            }
+          </List>
+        </Box>
+
+      </Dialog>
+    );
+  }
+
+
   return (
     <>
       {loading && (
@@ -204,6 +269,7 @@ export function Obras_detail() {
         </div>
       )}
       {search && <SearchServ search={search} setSearch={setSearch} />}
+      {edit && <EditServicosUnidades idUni={edit} obra={id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Obras</h1>
@@ -319,7 +385,64 @@ export function Obras_detail() {
         </Paper>
 
         <Paper hidden={value !== 2}>
-
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Andar</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {unidades.map((row) => (
+                  <>
+                    <TableRow
+                      key={row.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row"
+                        onClick={() => setOpenAndar(row.id)}
+                        selected={openAndar === row.id}
+                      >
+                        {row.nome}
+                      </TableCell>
+                    </TableRow>
+                    <Collapse in={openAndar === row.id} timeout="auto" unmountOnExit>
+                      <div className='w-full flex gap-5 p-2 font-bold'>
+                        {row.unidades.map((item, index) => (
+                          <ThemeProvider
+                            theme={{
+                              palette: {
+                                primary: {
+                                  main: '#007FFF',
+                                  dark: '#0066CC',
+                                },
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                cursor: 'pointer',
+                                color: 'white',
+                                textAlign: 'center',
+                                width: 25,
+                                height: 25,
+                                borderRadius: 1,
+                                bgcolor: '#64b5f6',
+                                '&:hover': {
+                                  bgcolor: '#b3e5fc',
+                                },
+                              }}
+                              onClick={() => setEdit(item.id)}
+                            >{item.nome_ou_numero}</Box>
+                          </ThemeProvider>
+                        ))}
+                      </div>
+                    </Collapse>
+                  </>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Paper>
       </div>
     </>

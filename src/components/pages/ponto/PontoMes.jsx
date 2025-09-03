@@ -112,6 +112,7 @@ export function PontoMes() {
               ponto?.entrada_tarde?.slice(0, 5) ?? '',
               ponto?.saida_tarde?.slice(0, 5) ?? '',
               ponto?.feriado ?? '',
+              ponto?.atestado ?? '',
             ],
           };
         });
@@ -129,6 +130,7 @@ export function PontoMes() {
           entrada_tarde: 2,
           saida_tarde: 3,
           feriado: 4,
+          atestado: 5,
         };
 
         if (!copia[index]) {
@@ -139,6 +141,12 @@ export function PontoMes() {
         }
 
         if (campo === 'feriado') {
+          copia[index].valores[mapaCampos[campo]] = valor;
+        } else {
+          copia[index].valores[mapaCampos[campo]] = valor;
+        }
+
+        if (campo === 'atestado') {
           copia[index].valores[mapaCampos[campo]] = valor;
         } else {
           copia[index].valores[mapaCampos[campo]] = valor;
@@ -164,6 +172,7 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
+        console.log(registrosPreenchidos)
         await axios.post(
           `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
           payload
@@ -197,11 +206,13 @@ export function PontoMes() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '2fr 1fr 1fr repeat(4, 2fr)',
+              justifyItems: 'center',
               gap: '8px',
             }}
           >
             <strong>Data</strong>
+            <strong>Atestado?</strong>
             <strong>Feriado?</strong>
             <strong>Entrada Manhã</strong>
             <strong>Saída Manhã</strong>
@@ -214,22 +225,33 @@ export function PontoMes() {
             const isSabado = diaObj.diaSemana.toLowerCase() === 'sábado';
             const linhaStyle = {
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '2fr 1fr 1fr repeat(4, 2fr)',
+              justifyItems: 'center',
               gap: '8px',
               padding: '2px 0',
               backgroundColor: isDomingo
                 ? '#f28b82'
                 : isSabado
-                ? '#fff176'
-                : '#fff',
+                  ? '#fff176'
+                  : '#fff',
               opacity: isDomingo ? 0.6 : 1,
               pointerEvents: isDomingo ? 'none' : 'auto',
             };
             return (
               <div key={item.data} style={linhaStyle}>
-                <div style={{ padding: '4px' }}>
+                <div style={{
+                  padding: '4px',
+                  justifySelf: 'left',
+                }}>
                   {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
                 </div>
+                <input
+                  type="checkbox"
+                  checked={item.valores[5] === true}
+                  onChange={(e) =>
+                    handleChange(index, 'atestado', e.target.checked)
+                  }
+                />
                 <input
                   type="checkbox"
                   checked={item.valores[4] === true}
@@ -366,8 +388,8 @@ export function PontoMes() {
             }}
             aria-label="deletar"
             size="small"
-            onClick={() =>
-              {const pop1 = abrirPopup(
+            onClick={() => {
+              const pop1 = abrirPopup(
                 `https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`
               )
             }
