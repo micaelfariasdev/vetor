@@ -12,6 +12,8 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
+
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -113,6 +115,7 @@ export function PontoMes() {
               ponto?.saida_tarde?.slice(0, 5) ?? '',
               ponto?.feriado ?? '',
               ponto?.atestado ?? '',
+              ponto?.delete ?? false,
             ],
           };
         });
@@ -131,6 +134,7 @@ export function PontoMes() {
           saida_tarde: 3,
           feriado: 4,
           atestado: 5,
+          delete: 6,
         };
 
         if (!copia[index]) {
@@ -151,6 +155,14 @@ export function PontoMes() {
         } else {
           copia[index].valores[mapaCampos[campo]] = valor;
         }
+
+        if (campo === 'delete') {
+          copia[index].valores[mapaCampos[campo]] = valor;
+        } else {
+          copia[index].valores[mapaCampos[campo]] = valor;
+        }
+
+        console.log(copia)
         return copia;
       });
     }
@@ -206,7 +218,7 @@ export function PontoMes() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '3fr 1fr 1fr repeat(4, 2fr) 1fr',
               justifyItems: 'center',
               gap: '8px',
             }}
@@ -218,75 +230,105 @@ export function PontoMes() {
             <strong>Saída Manhã</strong>
             <strong>Entrada Tarde</strong>
             <strong>Saída Tarde</strong>
+            <strong>Delete</strong>
           </div>
           {registros.map((item, index) => {
             const diaObj = diasDoMes[index];
-            const isDomingo = diaObj.diaSemana.toLowerCase() === 'domingo';
-            const isSabado = diaObj.diaSemana.toLowerCase() === 'sábado';
+            const isDelete = item.valores[6];
+            const isSabado = ['sábado', 'domingo'].includes(diaObj.diaSemana.toLowerCase());
+
             const linhaStyle = {
               display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '3fr 1fr 1fr repeat(4, 2fr)',
               justifyItems: 'center',
               gap: '8px',
               padding: '2px 0',
-              backgroundColor: isDomingo
+              backgroundColor: isDelete
                 ? '#f28b82'
                 : isSabado
                   ? '#fff176'
                   : '#fff',
-              opacity: isDomingo ? 0.6 : 1,
-              pointerEvents: isDomingo ? 'none' : 'auto',
+              opacity: isDelete ? 0.6 : 1,
+              pointerEvents: isDelete ? 'none' : 'auto',
             };
             return (
-              <div key={item.data} style={linhaStyle}>
-                <div style={{
-                  padding: '4px',
-                  justifySelf: 'left',
-                }}>
-                  {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
+              <div key={item.data} style={
+                {
+                  display: 'grid',
+                  gridTemplateColumns: '13fr 1fr',
+                }
+              }>
+                <div style={linhaStyle}>
+                  <div style={{
+                    padding: '4px',
+                    justifySelf: 'left',
+                  }}>
+                    {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={item.valores[5] === true}
+                    onChange={(e) =>
+                      handleChange(index, 'atestado', e.target.checked)
+                    }
+                  />
+                  <input
+                    type="checkbox"
+                    checked={item.valores[4] === true}
+                    onChange={(e) =>
+                      handleChange(index, 'feriado', e.target.checked)
+                    }
+                  />
+                  <input
+                    type="time"
+                    value={item.valores[0]}
+                    onChange={(e) =>
+                      handleChange(index, 'entrada_manha', e.target.value)
+                    }
+                  />
+                  <input
+                    type="time"
+                    value={item.valores[1]}
+                    onChange={(e) =>
+                      handleChange(index, 'saida_manha', e.target.value)
+                    }
+                  />
+                  <input
+                    type="time"
+                    value={item.valores[2]}
+                    onChange={(e) =>
+                      handleChange(index, 'entrada_tarde', e.target.value)
+                    }
+                  />
+                  <input
+                    type="time"
+                    value={item.valores[3]}
+                    onChange={(e) =>
+                      handleChange(index, 'saida_tarde', e.target.value)
+                    }
+                  />
                 </div>
-                <input
-                  type="checkbox"
-                  checked={item.valores[5] === true}
-                  onChange={(e) =>
-                    handleChange(index, 'atestado', e.target.checked)
-                  }
-                />
-                <input
-                  type="checkbox"
-                  checked={item.valores[4] === true}
-                  onChange={(e) =>
-                    handleChange(index, 'feriado', e.target.checked)
-                  }
-                />
-                <input
-                  type="time"
-                  value={item.valores[0]}
-                  onChange={(e) =>
-                    handleChange(index, 'entrada_manha', e.target.value)
-                  }
-                />
-                <input
-                  type="time"
-                  value={item.valores[1]}
-                  onChange={(e) =>
-                    handleChange(index, 'saida_manha', e.target.value)
-                  }
-                />
-                <input
-                  type="time"
-                  value={item.valores[2]}
-                  onChange={(e) =>
-                    handleChange(index, 'entrada_tarde', e.target.value)
-                  }
-                />
-                <input
-                  type="time"
-                  value={item.valores[3]}
-                  onChange={(e) =>
-                    handleChange(index, 'saida_tarde', e.target.value)
-                  }
-                />
+                <IconButton
+                  sx={{
+                    height: '30px',
+                    aspectRatio: '1/1',
+                    padding: 1,
+                    backgroundColor: 'error.main',
+                    color: 'white',
+                    justifySelf: 'center',
+                    alignSelf: 'center',
+                    '&:hover': {
+                      backgroundColor: 'error.main',
+                      opacity: 0.8,
+                    },
+                  }}
+                  aria-label="deletar"
+                  size="small"
+                  // Corrigido: chama a função com o valor oposto ao atual
+                  onClick={() => handleChange(index, 'delete', !isDelete)}
+                >
+                  <MdDelete />
+                </IconButton>
               </div>
             );
           })}
@@ -316,7 +358,6 @@ export function PontoMes() {
   const columns = [
     { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
     { field: 'cargo', headerName: 'Função', minWidth: 200, flex: 0 },
-    { field: 'obra_name', headerName: 'Obra', minWidth: 200, flex: 0 },
     {
       field: 'acoes',
       headerName: 'Ações',
