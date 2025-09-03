@@ -214,25 +214,34 @@ export function Obras_detail() {
   }
 
   function EditServicosUnidades({ idUni, obra }) {
-
-    useEffect(() => {
-      setLoading(true);
-      axios
-        .get(`https://vetor-api.micaelfarias.com/api/obras/${id}/`)
-        .then((response) => {
-
-        })
-        .catch((error) => {
-          console.error("Erro ao buscar os dados:", error);
-        })
-        .finally(() => {
-          setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
-        });
-    }, []);
+    const [editServ, setEditServ] = useState([])
 
     const handleClose = () => {
       setEdit(false);
     };
+
+    const handleChange = ({ ServId, Value }) => {
+      const RegEdit = {
+        ServId: {
+          'obra': obra,
+          'unidade': idUni,
+          'valor': Value
+        }
+      }
+      setEditServ(prevEditServ => {
+        const index = prevEditServ.findIndex(item => item.ServId === ServId);
+
+        if (index > -1) {
+          const novoArray = [...prevEditServ];
+          novoArray[index] = { ...novoArray[index], valor: Value };
+          return novoArray;
+        } else {
+          return [...prevEditServ, novoReg];
+        }
+      });
+
+      console.log(editServ)
+    }
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
@@ -248,6 +257,7 @@ export function Obras_detail() {
                     min: 0,
                     max: 100,
                   }}
+                  onChange={(e) => handleChange({ ServId: item.id, Value: e.target.value })}
                   helperText="Digite um valor de 0 a 100"
                 />
               </ListItem>
