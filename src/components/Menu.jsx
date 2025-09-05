@@ -119,7 +119,6 @@ export function Menu({ onNavigate }) {
   const [open, setOpen] = useState('');
 
   useEffect(() => {
-    console.log(window.location.href, window.location.origin);
     if (window.location.href === `${window.location.origin}/home`) {
       localStorage.setItem('indexPage', 1);
     }
@@ -210,6 +209,22 @@ export function Menu({ onNavigate }) {
             },
           ]}
         />
+        <amp-ad width="100vw" height="320"
+          type="adsense"
+          data-ad-client="ca-pub-7361302895831275"
+          data-ad-slot="8161032099"
+          data-auto-format="rspv"
+          data-full-width="">
+          <div overflow=""></div>
+        </amp-ad>
+        <amp-ad width="100vw" height="320"
+          type="adsense"
+          data-ad-client="ca-pub-7361302895831275"
+          data-ad-slot="3411306280"
+          data-auto-format="mcrspv"
+          data-full-width="">
+          <div overflow=""></div>
+        </amp-ad>
       </List>
     </>
   );

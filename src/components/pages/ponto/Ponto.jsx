@@ -67,7 +67,6 @@ export function Ponto() {
         );
         setDelete(false);
         setLoading(false);
-        window.location.reload();
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -128,13 +127,15 @@ export function Ponto() {
       setLoading(true);
 
       try {
-        await axios.post('https://vetor-api.micaelfarias.com/api/mes-ponto/', {
+        const resp = await axios.post('https://vetor-api.micaelfarias.com/api/mes-ponto/', {
           author: 1,
           mes,
           ano,
           obra,
         });
-        window.location.reload();
+        window.location.href = `ponto/${resp.data.id}`
+
+        // window.location.reload();
       } catch (error) {
         console.error(error);
         setError('Não foi possível criar. Verifique os dados.');
@@ -239,7 +240,7 @@ export function Ponto() {
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
-  }, []);
+  }, [del]);
 
   const columns = [
     {
@@ -255,12 +256,18 @@ export function Ponto() {
       headerName: 'Ano',
       width: 100,
       hide: true, // Oculta a coluna de Ano
+      valueGetter: (value, row) => {
+        return Number(row.ano);
+      },
     },
     {
       field: 'mes',
       headerName: 'Mês',
       width: 100,
       hide: true, // Oculta a coluna de Mês
+      valueGetter: (value, row) => {
+        return Number(row.mes);
+      },
     },
     {
       field: 'acoes',

@@ -69,7 +69,6 @@ export function Obras_detail() {
         setType(response.data.tipo_obra);
         setServ(response.data.servicos);
         setUnidades(response.data.andares);
-        console.log(serv)
 
       })
       .catch((error) => {
@@ -221,28 +220,20 @@ export function Obras_detail() {
     };
 
     const handleChange = ({ ServId, Value }) => {
-      const RegEdit = {
-        ServId: {
-          'obra': obra,
-          'unidade': idUni,
-          'valor': Value
+      setEditServ((prev) => {
+        const mapaCampos = {
+          obra: obra,
+          unidade: idUni,
+          valor: Value,
         }
-      }
-      setEditServ(prevEditServ => {
-        const index = prevEditServ.findIndex(item => item.ServId === ServId);
+        const copia = prev;
+        const edit = {}
 
-        if (index > -1) {
-          const novoArray = [...prevEditServ];
-          novoArray[index] = { ...novoArray[index], valor: Value };
-          return novoArray;
-        } else {
-          return [...prevEditServ, novoReg];
-        }
+        edit[ServId] = mapaCampos
+
+        return { ...copia, ...edit };
       });
-
-      console.log(editServ)
     }
-
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
         <Box className="w-full h-full min-h-150 min-w-150 p-5">

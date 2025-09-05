@@ -17,10 +17,21 @@ import { MdDelete } from 'react-icons/md';
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
+  let mesini = mes;
+  let mesfini = mes;
+  let anoini = ano;
 
-  const dataInicial = new Date(ano, mes - 2, 26);
+  if (mes === 1) {
+    mesini = 11;
+    mesfini = 0;
+    anoini -= 1
+  } else {
+    mesini = mes - 2;
+    mesfini = mes - 1;
+  }
 
-  const dataFinal = new Date(ano, mes - 1, 25);
+  const dataInicial = new Date(anoini, mesini, 26);
+  const dataFinal = new Date(ano, mesfini, 25);
 
   const dataAtual = new Date(dataInicial);
   while (dataAtual <= dataFinal) {
@@ -79,15 +90,29 @@ export function PontoMes() {
   const [loading, setLoading] = useState(false);
   const [editPonto, setEditPonto] = useState();
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(false);
+  const [calculos, setCalculos] = useState({
+    horasExtra: '00:00',
+    horasPremium: '00:00',
+    horasFaltantes: '00:00',
+    diasDeFalta: 0
+  });
+
 
   function EditarPonto({ IdItem }) {
     const [colaborador, setColaborador] = useState([]);
     const [pontos, setPontos] = useState([]);
     const [registros, setRegistros] = useState([]);
+
     const diasDoMes = useMemo(
       () => gerarMesCompleto(data.mes, data.ano),
       [data.mes, data.ano]
     );
+
+
+
+
+
 
     useEffect(() => {
       setLoading(true);
@@ -113,14 +138,16 @@ export function PontoMes() {
               ponto?.saida_manha?.slice(0, 5) ?? '',
               ponto?.entrada_tarde?.slice(0, 5) ?? '',
               ponto?.saida_tarde?.slice(0, 5) ?? '',
-              ponto?.feriado ?? '',
-              ponto?.atestado ?? '',
+              ponto?.feriado ?? false,
+              ponto?.atestado ?? false,
               ponto?.delete ?? false,
+              ponto?.falta ?? false,
             ],
           };
         });
 
         setRegistros(inicial);
+
       }
     }, [diasDoMes, pontos]);
 
@@ -135,34 +162,21 @@ export function PontoMes() {
           feriado: 4,
           atestado: 5,
           delete: 6,
+          falta: 7,
         };
 
         if (!copia[index]) {
           copia[index] = {
             data: diasDoMes[index].data,
-            valores: ['', '', '', '', ''],
+            valores: ['', '', '', '', '', '', '', ''],
           };
         }
 
-        if (campo === 'feriado') {
-          copia[index].valores[mapaCampos[campo]] = valor;
-        } else {
-          copia[index].valores[mapaCampos[campo]] = valor;
+        const indiceCampo = mapaCampos[campo];
+        if (indiceCampo !== undefined) {
+          copia[index].valores[indiceCampo] = valor;
         }
 
-        if (campo === 'atestado') {
-          copia[index].valores[mapaCampos[campo]] = valor;
-        } else {
-          copia[index].valores[mapaCampos[campo]] = valor;
-        }
-
-        if (campo === 'delete') {
-          copia[index].valores[mapaCampos[campo]] = valor;
-        } else {
-          copia[index].valores[mapaCampos[campo]] = valor;
-        }
-
-        console.log(copia)
         return copia;
       });
     }
@@ -170,8 +184,9 @@ export function PontoMes() {
     async function handleSalvar() {
       try {
         setLoading(true);
+
         const registrosPreenchidos = registros
-          .filter((item) => item.valores.some((valor) => valor !== ''))
+          .filter((item) => item.valores.slice(0, 3).some((valor) => valor !== '') || item.valores.slice(4, 8).some((valor) => valor !== false))
           .map((item) => ({
             ...item,
             data: item.data.split('-')[2],
@@ -184,7 +199,7 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
-        console.log(registrosPreenchidos)
+        console.log(payload)
         await axios.post(
           `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
           payload
@@ -193,6 +208,7 @@ export function PontoMes() {
         setEditPonto(false);
       } catch (err) {
         setLoading(false);
+        setError('Erro ao salvar:', err)
         console.error('Erro ao salvar:', err);
       }
     }
@@ -212,13 +228,15 @@ export function PontoMes() {
 
         <DialogTitle>
           {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
+          <br />
+          {/* {`Faltas - ${calculos.diasDeFalta} | Horas Faltantes ${calculos.horasFaltantes} | Horas Extras ${calculos.horasExtra} | Horas Feriado/Domingo ${calculos.horasPremium}`} */}
         </DialogTitle>
 
         <DialogContent>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr 1fr repeat(4, 2fr) 1fr',
+              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(4, 2fr) 1fr',
               justifyItems: 'center',
               gap: '8px',
             }}
@@ -226,6 +244,7 @@ export function PontoMes() {
             <strong>Data</strong>
             <strong>Atestado?</strong>
             <strong>Feriado?</strong>
+            <strong>Falta?</strong>
             <strong>Entrada Manhã</strong>
             <strong>Saída Manhã</strong>
             <strong>Entrada Tarde</strong>
@@ -239,7 +258,7 @@ export function PontoMes() {
 
             const linhaStyle = {
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(4, 2fr)',
               justifyItems: 'center',
               gap: '8px',
               padding: '2px 0',
@@ -257,7 +276,8 @@ export function PontoMes() {
                   display: 'grid',
                   gridTemplateColumns: '13fr 1fr',
                 }
-              }>
+              }
+              >
                 <div style={linhaStyle}>
                   <div style={{
                     padding: '4px',
@@ -280,33 +300,49 @@ export function PontoMes() {
                     }
                   />
                   <input
-                    type="time"
-                    value={item.valores[0]}
+                    type="checkbox"
+                    checked={item.valores[7] === true}
                     onChange={(e) =>
-                      handleChange(index, 'entrada_manha', e.target.value)
+                      handleChange(index, 'falta', e.target.checked)
                     }
                   />
-                  <input
-                    type="time"
-                    value={item.valores[1]}
-                    onChange={(e) =>
-                      handleChange(index, 'saida_manha', e.target.value)
-                    }
-                  />
-                  <input
-                    type="time"
-                    value={item.valores[2]}
-                    onChange={(e) =>
-                      handleChange(index, 'entrada_tarde', e.target.value)
-                    }
-                  />
-                  <input
-                    type="time"
-                    value={item.valores[3]}
-                    onChange={(e) =>
-                      handleChange(index, 'saida_tarde', e.target.value)
-                    }
-                  />
+                  {!item.valores[7] ? (
+                    <>
+                      <input
+                        type="time"
+                        value={item.valores[0]}
+                        onChange={(e) =>
+                          handleChange(index, 'entrada_manha', e.target.value)
+                        }
+                      />
+                      <input
+                        type="time"
+                        value={item.valores[1]}
+                        onChange={(e) =>
+                          handleChange(index, 'saida_manha', e.target.value)
+                        }
+                      />
+                      <input
+                        type="time"
+                        value={item.valores[2]}
+                        onChange={(e) =>
+                          handleChange(index, 'entrada_tarde', e.target.value)
+                        }
+                      />
+                      <input
+                        type="time"
+                        value={item.valores[3]}
+                        onChange={(e) =>
+                          handleChange(index, 'saida_tarde', e.target.value)
+                        }
+                      />
+                    </>
+                  ) : (
+                    <div
+                      className='col-span-4 bg-red-700 text-white font-bold w-full text-center flex justify-center '>
+                      <p className='self-center'> FALTA </p>
+                    </div>
+                  )}
                 </div>
                 <IconButton
                   sx={{
@@ -324,7 +360,6 @@ export function PontoMes() {
                   }}
                   aria-label="deletar"
                   size="small"
-                  // Corrigido: chama a função com o valor oposto ao atual
                   onClick={() => handleChange(index, 'delete', !isDelete)}
                 >
                   <MdDelete />
@@ -340,6 +375,7 @@ export function PontoMes() {
             Salvar
           </Button>
         </DialogActions>
+
       </Dialog>
     );
   }
