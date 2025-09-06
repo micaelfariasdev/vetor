@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit } from 'react-icons/fa';
+import {
+  Grid,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -14,7 +22,6 @@ import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 
-
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
   let mesini = mes;
@@ -24,7 +31,7 @@ function gerarMesCompleto(mes, ano) {
   if (mes === 1) {
     mesini = 11;
     mesfini = 0;
-    anoini -= 1
+    anoini -= 1;
   } else {
     mesini = mes - 2;
     mesfini = mes - 1;
@@ -95,9 +102,8 @@ export function PontoMes() {
     horasExtra: '00:00',
     horasPremium: '00:00',
     horasFaltantes: '00:00',
-    diasDeFalta: 0
+    diasDeFalta: 0,
   });
-
 
   function EditarPonto({ IdItem }) {
     const [colaborador, setColaborador] = useState([]);
@@ -109,16 +115,11 @@ export function PontoMes() {
       [data.mes, data.ano]
     );
 
-
-
-
-
-
     useEffect(() => {
       setLoading(true);
       axios
         .get(
-          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/`
+          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/${id}`
         )
         .then((response) => {
           setColaborador(response.data.dados);
@@ -147,7 +148,6 @@ export function PontoMes() {
         });
 
         setRegistros(inicial);
-
       }
     }, [diasDoMes, pontos]);
 
@@ -186,7 +186,11 @@ export function PontoMes() {
         setLoading(true);
 
         const registrosPreenchidos = registros
-          .filter((item) => item.valores.slice(0, 3).some((valor) => valor !== '') || item.valores.slice(4, 8).some((valor) => valor !== false))
+          .filter(
+            (item) =>
+              item.valores.slice(0, 3).some((valor) => valor !== '') ||
+              item.valores.slice(4, 8).some((valor) => valor !== false)
+          )
           .map((item) => ({
             ...item,
             data: item.data.split('-')[2],
@@ -199,7 +203,7 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
-        console.log(payload)
+        console.log(payload);
         await axios.post(
           `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
           payload
@@ -208,7 +212,7 @@ export function PontoMes() {
         setEditPonto(false);
       } catch (err) {
         setLoading(false);
-        setError('Erro ao salvar:', err)
+        setError('Erro ao salvar:', err);
         console.error('Erro ao salvar:', err);
       }
     }
@@ -227,9 +231,48 @@ export function PontoMes() {
         )}
 
         <DialogTitle>
-          {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
-          <br />
-          {/* {`Faltas - ${calculos.diasDeFalta} | Horas Faltantes ${calculos.horasFaltantes} | Horas Extras ${calculos.horasExtra} | Horas Feriado/Domingo ${calculos.horasPremium}`} */}
+          <Grid item xs={6}>
+            <Typography variant="h4">
+              {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
+            </Typography>
+
+            <Grid item xs={6}>
+              <Table size="small" sx={{ border: '1px solid #e0e0e0' }}>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>❌ Faltas</TableCell>
+                    <TableCell
+                      sx={{ borderRight: '1px solid #e0e0e0' }}
+                      align="right"
+                    >
+                      {colaborador.falta}
+                    </TableCell>
+                    <TableCell>⏳ Faltantes</TableCell>
+                    <TableCell
+                      sx={{ borderRight: '1px solid #e0e0e0' }}
+                      align="right"
+                    >
+                      {colaborador['horas-faltando']}
+                    </TableCell>
+                    <TableCell>⏫ Extras</TableCell>
+                    <TableCell
+                      sx={{ borderRight: '1px solid #e0e0e0' }}
+                      align="right"
+                    >
+                      {colaborador['horas-extras']}
+                    </TableCell>
+                    <TableCell>📅 Feriado/Domingo</TableCell>
+                    <TableCell
+                      sx={{ borderRight: '1px solid #e0e0e0' }}
+                      align="right"
+                    >
+                      {colaborador['horas-feriado-domingo']}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Grid>
+          </Grid>
         </DialogTitle>
 
         <DialogContent>
@@ -254,7 +297,9 @@ export function PontoMes() {
           {registros.map((item, index) => {
             const diaObj = diasDoMes[index];
             const isDelete = item.valores[6];
-            const isSabado = ['sábado', 'domingo'].includes(diaObj.diaSemana.toLowerCase());
+            const isSabado = ['sábado', 'domingo'].includes(
+              diaObj.diaSemana.toLowerCase()
+            );
 
             const linhaStyle = {
               display: 'grid',
@@ -265,24 +310,26 @@ export function PontoMes() {
               backgroundColor: isDelete
                 ? '#f28b82'
                 : isSabado
-                  ? '#fff176'
-                  : '#fff',
+                ? '#fff176'
+                : '#fff',
               opacity: isDelete ? 0.6 : 1,
               pointerEvents: isDelete ? 'none' : 'auto',
             };
             return (
-              <div key={item.data} style={
-                {
+              <div
+                key={item.data}
+                style={{
                   display: 'grid',
                   gridTemplateColumns: '13fr 1fr',
-                }
-              }
+                }}
               >
                 <div style={linhaStyle}>
-                  <div style={{
-                    padding: '4px',
-                    justifySelf: 'left',
-                  }}>
+                  <div
+                    style={{
+                      padding: '4px',
+                      justifySelf: 'left',
+                    }}
+                  >
                     {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
                   </div>
                   <input
@@ -338,9 +385,8 @@ export function PontoMes() {
                       />
                     </>
                   ) : (
-                    <div
-                      className='col-span-4 bg-red-700 text-white font-bold w-full text-center flex justify-center '>
-                      <p className='self-center'> FALTA </p>
+                    <div className="col-span-4 bg-red-700 text-white font-bold w-full text-center flex justify-center ">
+                      <p className="self-center"> FALTA </p>
                     </div>
                   )}
                 </div>
@@ -375,7 +421,6 @@ export function PontoMes() {
             Salvar
           </Button>
         </DialogActions>
-
       </Dialog>
     );
   }
@@ -468,9 +513,8 @@ export function PontoMes() {
             onClick={() => {
               const pop1 = abrirPopup(
                 `https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`
-              )
-            }
-            }
+              );
+            }}
           >
             <FaFileDownload />
           </IconButton>
