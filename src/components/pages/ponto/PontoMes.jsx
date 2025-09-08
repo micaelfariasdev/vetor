@@ -307,6 +307,7 @@ export function PontoMes() {
               display: 'grid',
               gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(4, 2fr)',
               justifyItems: 'center',
+              height: '35px',
               gap: '8px',
               padding: '2px 0',
               backgroundColor: isDelete
@@ -314,8 +315,6 @@ export function PontoMes() {
                 : isSabado
                   ? '#fff176'
                   : '#fff',
-              opacity: isDelete ? 0.6 : 1,
-              pointerEvents: isDelete ? 'none' : 'auto',
             };
             return (
               <div
@@ -325,81 +324,101 @@ export function PontoMes() {
                   gridTemplateColumns: '13fr 1fr',
                 }}
               >
-                <div style={linhaStyle}>
-                  <div
-                    style={{
-                      padding: '4px',
-                      justifySelf: 'left',
-                    }}
-                  >
-                    {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
-                  </div>
-                  <select
-                    value={
-                      item.valores[5] ? "atestado" : item.valores[8] ? "ferias" : "normal"
-                    }
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      handleChange(index, "atestado", v === "atestado");
-                      handleChange(index, "ferias", v === "ferias");
-                    }}
-                  >
-                    <option value="normal">-</option>
-                    <option value="atestado">Atestado</option>
-                    <option value="ferias">Férias</option>
-                  </select>
-
-                  <input
-                    type="checkbox"
-                    checked={item.valores[4] === true}
-                    onChange={(e) =>
-                      handleChange(index, 'feriado', e.target.checked)
-                    }
-                  />
-                  <input
-                    type="checkbox"
-                    checked={item.valores[7] === true}
-                    onChange={(e) =>
-                      handleChange(index, 'falta', e.target.checked)
-                    }
-                  />
-                  {!item.valores[7] ? (
-                    <>
-                      <input
-                        type="time"
-                        value={item.valores[0]}
-                        onChange={(e) =>
-                          handleChange(index, 'entrada_manha', e.target.value)
-                        }
-                      />
-                      <input
-                        type="time"
-                        value={item.valores[1]}
-                        onChange={(e) =>
-                          handleChange(index, 'saida_manha', e.target.value)
-                        }
-                      />
-                      <input
-                        type="time"
-                        value={item.valores[2]}
-                        onChange={(e) =>
-                          handleChange(index, 'entrada_tarde', e.target.value)
-                        }
-                      />
-                      <input
-                        type="time"
-                        value={item.valores[3]}
-                        onChange={(e) =>
-                          handleChange(index, 'saida_tarde', e.target.value)
-                        }
-                      />
-                    </>
-                  ) : (
-                    <div className="col-span-4 bg-red-700 text-white font-bold w-full text-center flex justify-center ">
-                      <p className="self-center"> FALTA </p>
+                {isDelete ? <div style={{
+                  width: '100%',
+                  height: '35px',
+                  backgroundColor: '#f28b82',
+                  opacity: 0.6,
+                  pointerEvents: 'none',
+                  textAlign: 'center',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }
+                }> <p className="self-center">DELETAR DIA {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}</p> </div> :
+                  <div style={linhaStyle}>
+                    <div
+                      style={{
+                        padding: '4px',
+                        justifySelf: 'left',
+                      }}
+                    >
+                      {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
                     </div>
-                  )}
-                </div>
+                    <select
+                      value={
+                        item.valores[5] ? "atestado" : item.valores[8] ? "ferias" : "normal"
+                      }
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        handleChange(index, "atestado", v === "atestado");
+                        handleChange(index, "ferias", v === "ferias");
+                      }}
+                    >
+                      <option value="normal">-</option>
+                      <option value="atestado">Atestado</option>
+                      <option value="ferias">Férias</option>
+                    </select>
+
+                    <input
+                      type="checkbox"
+                      checked={item.valores[4] === true}
+                      onChange={(e) =>
+                        handleChange(index, 'feriado', e.target.checked)
+                      }
+                    />
+                    <input
+                      type="checkbox"
+                      checked={item.valores[7] === true}
+                      onChange={(e) =>
+                        handleChange(index, 'falta', e.target.checked)
+                      }
+                    />
+                    {item.valores[7] ? (
+                      <div className="col-span-4 bg-red-200 text-red-900 font-bold w-full text-center flex justify-center ">
+                        <p className="self-center"> FALTA </p>
+                      </div>
+                    ) : item.valores[5] ? (
+                      <div className="col-span-4 bg-blue-200 text-blue-800 font-bold w-full text-center flex justify-center ">
+                        <p className="self-center"> ATESTADO </p>
+                      </div>
+                    ) : item.valores[8] ? (
+                      <div className="col-span-4 bg-green-200 text-green-800 font-bold w-full text-center flex justify-center ">
+                        <p className="self-center"> FERIAS </p>
+                      </div>
+                    ) : (
+                      <>
+                        <input
+                          type="time"
+                          value={item.valores[0]}
+                          onChange={(e) =>
+                            handleChange(index, 'entrada_manha', e.target.value)
+                          }
+                        />
+                        <input
+                          type="time"
+                          value={item.valores[1]}
+                          onChange={(e) =>
+                            handleChange(index, 'saida_manha', e.target.value)
+                          }
+                        />
+                        <input
+                          type="time"
+                          value={item.valores[2]}
+                          onChange={(e) =>
+                            handleChange(index, 'entrada_tarde', e.target.value)
+                          }
+                        />
+                        <input
+                          type="time"
+                          value={item.valores[3]}
+                          onChange={(e) =>
+                            handleChange(index, 'saida_tarde', e.target.value)
+                          }
+                        />
+                      </>
+                    )
+                    }
+                  </div>}
                 <IconButton
                   sx={{
                     height: '30px',
