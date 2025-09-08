@@ -143,6 +143,7 @@ export function PontoMes() {
               ponto?.atestado ?? false,
               ponto?.delete ?? false,
               ponto?.falta ?? false,
+              ponto?.ferias ?? false,
             ],
           };
         });
@@ -163,12 +164,13 @@ export function PontoMes() {
           atestado: 5,
           delete: 6,
           falta: 7,
+          ferias: 8,
         };
 
         if (!copia[index]) {
           copia[index] = {
             data: diasDoMes[index].data,
-            valores: ['', '', '', '', '', '', '', ''],
+            valores: ['', '', '', '', '', '', '', '', ''],
           };
         }
 
@@ -189,7 +191,7 @@ export function PontoMes() {
           .filter(
             (item) =>
               item.valores.slice(0, 3).some((valor) => valor !== '') ||
-              item.valores.slice(4, 8).some((valor) => valor !== false)
+              item.valores.slice(4, 9).some((valor) => valor !== false)
           )
           .map((item) => ({
             ...item,
@@ -285,7 +287,7 @@ export function PontoMes() {
             }}
           >
             <strong>Data</strong>
-            <strong>Atestado?</strong>
+            <strong>Situação</strong>
             <strong>Feriado?</strong>
             <strong>Falta?</strong>
             <strong>Entrada Manhã</strong>
@@ -310,8 +312,8 @@ export function PontoMes() {
               backgroundColor: isDelete
                 ? '#f28b82'
                 : isSabado
-                ? '#fff176'
-                : '#fff',
+                  ? '#fff176'
+                  : '#fff',
               opacity: isDelete ? 0.6 : 1,
               pointerEvents: isDelete ? 'none' : 'auto',
             };
@@ -332,13 +334,21 @@ export function PontoMes() {
                   >
                     {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={item.valores[5] === true}
-                    onChange={(e) =>
-                      handleChange(index, 'atestado', e.target.checked)
+                  <select
+                    value={
+                      item.valores[5] ? "atestado" : item.valores[8] ? "ferias" : "normal"
                     }
-                  />
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      handleChange(index, "atestado", v === "atestado");
+                      handleChange(index, "ferias", v === "ferias");
+                    }}
+                  >
+                    <option value="normal">-</option>
+                    <option value="atestado">Atestado</option>
+                    <option value="ferias">Férias</option>
+                  </select>
+
                   <input
                     type="checkbox"
                     checked={item.valores[4] === true}
