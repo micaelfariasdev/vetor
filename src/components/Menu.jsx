@@ -231,7 +231,8 @@ export function Menu({ onNavigate }) {
 }
 
 // O componente do menu superior
-export function MenuTop() {
+export function MenuTop({ user }) {
+  const username = user.username
   function stringAvatar(name) {
     const hex = [...name]
       .map((char) => char.charCodeAt(0).toString(16).padStart(2, '0'))
@@ -250,7 +251,7 @@ export function MenuTop() {
     <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
       <a href="#">
         <ListItemAvatar>
-          <Avatar {...stringAvatar('Micael Farias')} />
+          <Avatar {...stringAvatar(`${username} 324`)} />
         </ListItemAvatar>
       </a>
       <a href="#">

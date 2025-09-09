@@ -20,6 +20,10 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import { useMemo } from 'react';
 
+import { default as api } from '../auth/auth';
+
+
+
 export function ConvertMes(mes) {
   const meses = {
     '01': 'Janeiro',
@@ -54,8 +58,9 @@ export function ConvertMes(mes) {
 export function Funcionarios() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
-  const [edit, setEdit] = useState(false);
-  const [del, setDelete] = useState(false);
+  const [edit, setEdit] = useState(null);
+  const [del, setDelete] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
@@ -71,7 +76,7 @@ export function Funcionarios() {
         );
         setDelete(false);
         setLoading(false);
-        window.location.reload();
+        setData(prev => prev.filter(f => f.id !== IdItem));
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -81,11 +86,6 @@ export function Funcionarios() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
 
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
@@ -134,17 +134,16 @@ export function Funcionarios() {
       setLoading(true);
 
       try {
-        await axios.patch(
+        const response = await axios.patch(
           `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`,
           {
-            author: 1,
             nome,
             cargo,
             situacao,
             obra,
           }
         );
-        window.location.reload();
+        setData(prev => prev.map(f => f.id === IdItem ? response.data : f));
       } catch (error) {
         console.error(error);
         setError('Não foi possível criar. Verifique os dados.');
@@ -170,11 +169,7 @@ export function Funcionarios() {
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
@@ -264,7 +259,7 @@ export function Funcionarios() {
         .get('https://vetor-api.micaelfarias.com/api/obras/')
         .then((response) => {
           setArrayObra(response.data);
-        });
+        })
     }, []);
 
     const NewFuncionario = async (e) => {
@@ -272,17 +267,17 @@ export function Funcionarios() {
       setLoading(true);
 
       try {
-        await axios.post(
+        const response = await axios.post(
           'https://vetor-api.micaelfarias.com/api/colaboradores/',
           {
-            author: 1,
             nome,
             cargo,
             situacao,
             obra,
           }
         );
-        window.location.reload();
+        setData(prev => [...prev, response.data]);
+
       } catch (error) {
         console.error(error);
         setError('Não foi possível criar. Verifique os dados.');
@@ -297,11 +292,7 @@ export function Funcionarios() {
 
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
@@ -379,22 +370,24 @@ export function Funcionarios() {
     );
   }
 
-
-
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get('https://vetor-api.micaelfarias.com/api/colaboradores/')
-      .then((response) => {
-        setData(response.data);
-      })
-      .catch((error) => {
+    let isMounted = true;
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get('https://vetor-api.micaelfarias.com/api/colaboradores/');
+        if (isMounted) setData(response.data);
+      } catch (error) {
         console.error("Erro ao buscar os dados:", error);
-      })
-      .finally(() => {
-        setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
-      });
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchData();
+
+    return () => { isMounted = false; };
   }, []);
+
 
   const columns = [
     { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
@@ -455,8 +448,7 @@ export function Funcionarios() {
       const nomeMatch = func.nome
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      const obraMatch = func.obra_name
-        .toLowerCase()
+      const obraMatch = (func.obra_name || '').toLowerCase()
         .includes(searchObraQuery.toLowerCase());
       return nomeMatch && obraMatch;
     });
@@ -535,4 +527,4 @@ export function Funcionarios() {
   );
 }
 
-export default ConvertMes;
+export default Funcionarios;

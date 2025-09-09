@@ -18,3 +18,12 @@ export { DesMesMes } from './pages/despesas/DespesasMes';
 export { DesMesMesDetail } from './pages/despesas/DespesasMes-Detail';
 
 export { PontoMesMockup } from './pages/test';
+
+export { default as Login } from './pages/auth/login';
+
+export { default as api } from './pages/auth/auth';
+
+
+
+
+

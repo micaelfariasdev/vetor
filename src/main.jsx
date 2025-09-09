@@ -1,12 +1,30 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import * as Comp from './components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
 function App() {
   const [pagina, setPagina] = useState('home');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Comp.api.get("/me/")
+      .then(res => { setUser(res.data); console.log(res.data) })
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, [user]);
+  ;
+
+  if (loading) return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+  </div>;
+  if (!user) return <Comp.Login onLogin={setUser}
+  />;
+
+
 
   return (
     <>
@@ -14,7 +32,7 @@ function App() {
         {window.location.pathname !== '/test' && (
           <>
             <Comp.Menu onNavigate={setPagina} />
-            <Comp.MenuTop />
+            <Comp.MenuTop user={user} />
           </>
         )}
         {window.location.pathname !== '/test' && (
@@ -22,6 +40,7 @@ function App() {
             <div className="h-full overflow-y-scroll">
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/login" element={<Comp.Login />} />
                 <Route path="/home" element={<Comp.Man />} />
                 <Route path="/obras" element={<Comp.Obras />} />
                 <Route path="/obras/:id" element={<Comp.Obras_detail />} />
