@@ -7,40 +7,22 @@ import { Navigate } from 'react-router-dom';
 
 function App() {
   const [pagina, setPagina] = useState('home');
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Comp.api.get("/me/")
-      .then(res => { setUser(res.data); console.log(res.data) })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, [user]);
-  ;
-
-  if (loading) return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-  </div>;
-  if (!user) return <Comp.Login onLogin={setUser}
-  />;
-
-
 
   return (
     <>
       <BrowserRouter>
-        {window.location.pathname !== '/test' && (
+        {window.location.pathname !== '/login' && (
           <>
             <Comp.Menu onNavigate={setPagina} />
-            <Comp.MenuTop user={user} />
+            <Comp.MenuTop />
           </>
         )}
         {window.location.pathname !== '/test' && (
           <>
             <div className="h-full overflow-y-scroll">
               <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/login" element={<Comp.Login />} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Comp.Man />} />
                 <Route path="/obras" element={<Comp.Obras />} />
                 <Route path="/obras/:id" element={<Comp.Obras_detail />} />
@@ -76,13 +58,17 @@ function App() {
   );
 }
 
+
 const root = document.getElementById('root');
 if (root) {
-  root.classList.add(
-    'grid',
-    'grid-cols-[minmax(260px,1fr)_7fr]',
-    'grid-rows-[60px_1fr]',
-    'h-screen'
-  );
+  {
+    window.location.pathname !== '/login' &&
+      root.classList.add(
+        'grid',
+        'grid-cols-[minmax(260px,1fr)_7fr]',
+        'grid-rows-[60px_1fr]',
+        'h-screen'
+      );
+  }
   createRoot(root).render(<App />);
 }

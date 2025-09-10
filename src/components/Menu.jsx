@@ -18,6 +18,8 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { IoIosMail } from 'react-icons/io';
+import { logout as logoutApi } from './pages/auth/auth';
+
 
 function ItemMenu({ label, link, icon, sorted, open }) {
   return (
@@ -230,9 +232,44 @@ export function Menu({ onNavigate }) {
   );
 }
 
+import { default as api } from './pages/auth/auth';
+
+
+
 // O componente do menu superior
-export function MenuTop({ user }) {
-  const username = user.username
+export function MenuTop() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const userResp = await api.get("me/")
+          .then(res => {
+            localStorage.setItem(
+              "auth",
+              res.data ? JSON.stringify(res.data) : null
+            );
+            setUser(res.data);
+            console.log(user);
+            return res; // mantém compatibilidade com o await
+          });
+      } catch {
+        console.error('Faça o login novamente')
+        window.location.href = '/login'
+        setUser(null);
+      }
+    }
+    fetchUser();
+  }, []);
+
+
+
+  let username = `Sem usuário`;
+  if (user) {
+    console.log(user);
+    username = `${user.username} ${user.username}`;
+  }
+
   function stringAvatar(name) {
     const hex = [...name]
       .map((char) => char.charCodeAt(0).toString(16).padStart(2, '0'))
@@ -249,9 +286,12 @@ export function MenuTop({ user }) {
 
   return (
     <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
+      <Button variant="contained" startIcon={<IoCaretBackOutline />} onClick={() => { logoutApi(); window.location.reload() }}>
+        Sair
+      </Button>
       <a href="#">
         <ListItemAvatar>
-          <Avatar {...stringAvatar(`${username} 324`)} />
+          <Avatar {...stringAvatar(`${username}`)} />
         </ListItemAvatar>
       </a>
       <a href="#">

@@ -1,79 +1,116 @@
 import axios from "axios";
 
-const baseURL =
-    import.meta.env.MODE === 'development'
-        ? '/api/' // dev com proxy
-        : 'https://vetor-api.micaelfarias.com/api/'; // produção
-
 const api = axios.create({
-    baseURL,
+    baseURL: "https://vetor-api.micaelfarias.com/api/",
 });
 
-// Função auxiliar para pegar o valor de um cookie
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-// Interceptor para adicionar o token de acesso no cabeçalho
-api.interceptors.request.use(
-    config => {
-        const accessToken = getCookie('access');
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+// refresh isolado
+const refreshApi = axios.create({
+    baseURL: "https://vetor-api.micaelfarias.com/api/",
+});
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
         }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
+    });
+    failedQueue = [];
+};
 
-// Interceptor de refresh automático
+// request interceptor
+api.interceptors.request.use((config) => {
+    const token = getCookie("access");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+// response interceptor
 api.interceptors.response.use(
-    res => res,
-    async err => {
+    (res) => res,
+    async (err) => {
         const originalRequest = err.config;
-        if (err.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                // Pega o refresh token do cookie
-                const refreshToken = getCookie('refresh');
 
-                // Envia a requisição de refresh com o refresh token
-                const resp = await api.post("/token/refresh/", { refresh: refreshToken });
-                document.cookie = `access=${resp.data.access}; path=/; max-age=3600;`;
-                // Tenta a requisição original novamente
+        if (originalRequest.url.includes("/token/refresh/")) {
+            return Promise.reject(err);
+        }
+
+        if (err.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise(function (resolve, reject) {
+                    failedQueue.push({ resolve, reject });
+                })
+                    .then((token) => {
+                        originalRequest.headers.Authorization = "Bearer " + token;
+                        return api(originalRequest);
+                    })
+                    .catch((err) => Promise.reject(err));
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const refreshToken = getCookie("refresh");
+                const resp = await refreshApi.post("/token/refresh/", {
+                    refresh: refreshToken,
+                });
+
+                const newAccess = resp.data.access;
+                document.cookie = `access=${newAccess}; path=/; max-age=3600;`;
+
+                api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
+                processQueue(null, newAccess);
+
+                originalRequest.headers.Authorization = `Bearer ${newAccess}`;
                 return api(originalRequest);
-            } catch {
-                // Falha no refresh, rejeita o erro para a aplicação
-                return Promise.reject(err);
+            } catch (error) {
+                processQueue(error, null);
+                document.cookie = "access=; path=/; max-age=0";
+                document.cookie = "refresh=; path=/; max-age=0";
+                // 🔴 não redireciona aqui
+                return Promise.reject(error);
+            } finally {
+                isRefreshing = false;
             }
         }
+
         return Promise.reject(err);
     }
 );
 
 export async function login(username, password) {
-    try {
-        const resp = await api.post("token/", { username, password });
-        console.log(resp.data);
+    const resp = await api.post("token/", { username, password });
 
-        // Salva os cookies manualmente
-        document.cookie = `access=${resp.data.access}; path=/; max-age=3600;`; // 1 hora
-        document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=86400;`; // 24 horas
+    document.cookie = `access=${resp.data.access}; path=/; max-age=3600;`;
+    document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=86400;`;
 
-    } catch (error) {
-        console.error("Erro no login:", error.response?.data || error);
-        throw error;
-    }
+    api.defaults.headers.common["Authorization"] = `Bearer ${resp.data.access}`;
+
+    return resp.data; // só retorna os tokens
 }
 
-
-export function logout() {
-    // Você não precisa mais do `document.cookie` para deletar, o backend pode fazer isso
-    // com uma requisição para a sua view `LogoutView`
+export async function logout() {
+    try {
+        await api.post("logout/");
+    } catch (error) {
+        console.error("Erro no logout:", error.response?.data || error);
+    } finally {
+        document.cookie = "access=; path=/; max-age=0";
+        document.cookie = "refresh=; path=/; max-age=0";
+        // 🔴 não dá reload nem redirect
+    }
 }
 
 export default api;

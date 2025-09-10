@@ -116,17 +116,22 @@ export function PontoMes() {
     );
 
     useEffect(() => {
-      setLoading(true);
-      axios
-        .get(
-          `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/${id}`
-        )
-        .then((response) => {
-          setColaborador(response.data.dados);
-          setPontos(response.data.pontos);
-        });
-      setLoading(false);
-    }, [IdItem]);
+      // Verifica se IdItem existe para evitar requisições desnecessárias
+      if (IdItem) {
+        axios
+          .get(
+            `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/${id}`
+          )
+          .then((response) => {
+            setColaborador(response.data.dados);
+            setPontos(response.data.pontos);
+          })
+          .catch((error) => {
+            console.error("Erro ao buscar dados do colaborador:", error);
+          })
+        console.log('ok');
+      }
+    }, [IdItem, id]); // Dependências corrigidas
 
     useEffect(() => {
       if (diasDoMes.length) {
@@ -205,7 +210,6 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
-        console.log(payload);
         await axios.post(
           `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
           payload
@@ -217,6 +221,26 @@ export function PontoMes() {
         setError('Erro ao salvar:', err);
         console.error('Erro ao salvar:', err);
       }
+    }
+
+    function calcularHorasTrabalhadas(entradaManha, saidaManha, entradaTarde, saidaTarde) {
+      const converterParaMinutos = (horaString) => {
+        if (!horaString) return 0;
+        const [horas, minutos] = horaString.split(':').map(Number);
+        return horas * 60 + minutos;
+      };
+
+      const minutosEntradaManha = converterParaMinutos(entradaManha);
+      const minutosSaidaManha = converterParaMinutos(saidaManha);
+      const minutosEntradaTarde = converterParaMinutos(entradaTarde);
+      const minutosSaidaTarde = converterParaMinutos(saidaTarde);
+
+      const duracaoManha = minutosSaidaManha - minutosEntradaManha;
+      const duracaoTarde = minutosSaidaTarde - minutosEntradaTarde;
+
+      const totalMinutos = duracaoManha + duracaoTarde;
+
+      return totalMinutos;
     }
 
     return (
@@ -233,12 +257,13 @@ export function PontoMes() {
         )}
 
         <DialogTitle>
-          <Grid item xs={6}>
-            <Typography variant="h4">
-              {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
-            </Typography>
-
-            <Grid item xs={6}>
+          <Grid container>
+            <Grid size={{ xs: 12 }} >
+              <Typography variant="h4">
+                {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
+              </Typography>
+            </Grid >
+            <Grid size={{ xs: 12 }} >
               <Table size="small" sx={{ border: '1px solid #e0e0e0' }}>
                 <TableBody>
                   <TableRow>
@@ -281,7 +306,7 @@ export function PontoMes() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(4, 2fr) 1fr',
+              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(5, 2fr) 1fr',
               justifyItems: 'center',
               gap: '8px',
             }}
@@ -294,9 +319,25 @@ export function PontoMes() {
             <strong>Saída Manhã</strong>
             <strong>Entrada Tarde</strong>
             <strong>Saída Tarde</strong>
+            <strong>Horas</strong>
             <strong>Delete</strong>
           </div>
           {registros.map((item, index) => {
+            const entradaManha = item.valores[0];
+            const saidaManha = item.valores[1];
+            const entradaTarde = item.valores[2];
+            const saidaTarde = item.valores[3];
+
+            const totalMinutos = calcularHorasTrabalhadas(entradaManha, saidaManha, entradaTarde, saidaTarde);
+
+            const horas = Math.floor(Math.abs(totalMinutos) / 60);
+            const minutos = Math.abs(totalMinutos) % 60;
+            const sinal = totalMinutos < 0 ? '-' : '';
+
+            const horasFormatadas = `${sinal}${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
+
+            console.log(`Total de horas trabalhadas no dia: ${horasFormatadas}`);
+
             const diaObj = diasDoMes[index];
             const isDelete = item.valores[6];
             const isSabado = ['sábado', 'domingo'].includes(
@@ -305,7 +346,7 @@ export function PontoMes() {
 
             const linhaStyle = {
               display: 'grid',
-              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(4, 2fr)',
+              gridTemplateColumns: '3fr 1fr 1fr 1fr repeat(5, 2fr)',
               justifyItems: 'center',
               height: '35px',
               gap: '8px',
@@ -321,7 +362,7 @@ export function PontoMes() {
                 key={item.data}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '13fr 1fr',
+                  gridTemplateColumns: '14fr 1fr',
                 }}
               >
                 {isDelete ? <div style={{
@@ -415,6 +456,14 @@ export function PontoMes() {
                             handleChange(index, 'saida_tarde', e.target.value)
                           }
                         />
+                        <p className={
+                          (diaObj.diaSemana === 'sexta-feira' && Number(horasFormatadas.slice(0, 2)) < 8) ||
+                            (diaObj.diaSemana !== 'sexta-feira' && Number(horasFormatadas.slice(0, 2)) < 9)
+                            ? 'text-red-500' // Adiciona a classe 'text-red-500' para vermelho
+                            : 'text-green-400'
+                        }>
+                          {horasFormatadas}
+                        </p>
                       </>
                     )
                     }

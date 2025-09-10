@@ -12,7 +12,7 @@ export default function Login({ onLogin }) {
         e.preventDefault();
         try {
             await loginApi(username, password);
-            onLogin(true);
+            window.location.href = '/home'
         } catch {
             setError('Login falhou');
         }
