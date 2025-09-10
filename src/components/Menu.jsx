@@ -238,9 +238,12 @@ import { default as api } from './pages/auth/auth';
 
 // O componente do menu superior
 export function MenuTop() {
+  const [loading, setLoading] = useState(false);
+
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    setLoading(true)
     async function fetchUser() {
       try {
         const userResp = await api.get("me/")
@@ -250,10 +253,12 @@ export function MenuTop() {
               res.data ? JSON.stringify(res.data) : null
             );
             setUser(res.data);
-            console.log(user);
+            console.log(res.data);
             return res; // mantém compatibilidade com o await
           });
+        setLoading(false)
       } catch {
+        setLoading(false)
         console.error('Faça o login novamente')
         window.location.href = '/login'
         setUser(null);
@@ -267,7 +272,7 @@ export function MenuTop() {
   let username = `Sem usuário`;
   if (user) {
     console.log(user);
-    username = `${user.username} ${user.username}`;
+    username = `${user.first_name} ${user.last_name}`;
   }
 
   function stringAvatar(name) {
@@ -285,37 +290,44 @@ export function MenuTop() {
   }
 
   return (
-    <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
-      <Button variant="contained" startIcon={<IoCaretBackOutline />} onClick={() => { logoutApi(); window.location.reload() }}>
-        Sair
-      </Button>
-      <a href="#">
-        <ListItemAvatar>
-          <Avatar {...stringAvatar(`${username}`)} />
-        </ListItemAvatar>
-      </a>
-      <a href="#">
-        <IconButton aria-label={'adsdasd'} color="info">
-          <Badge badgeContent={100} color="success">
-            <IoIosMail />
-          </Badge>
-        </IconButton>
-      </a>
-      {window.location.pathname.split(' /') != '/home' && (
-        <div className="w-full items-start">
-          <a
-            href={`/${window.location.pathname
-              .split('/')
-              .filter(Boolean)
-              .slice(0, -1)
-              .join('/')}`}
-          >
-            <Button variant="contained" startIcon={<IoCaretBackOutline />}>
-              Voltar
-            </Button>
-          </a>
+    <>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
         </div>
       )}
-    </div>
+      <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
+        <Button variant="contained" startIcon={<IoCaretBackOutline />} onClick={() => { logoutApi(); window.location.reload() }}>
+          Sair
+        </Button>
+        <a href="#">
+          <ListItemAvatar>
+            <Avatar {...stringAvatar(`${username}`)} />
+          </ListItemAvatar>
+        </a>
+        <a href="#">
+          <IconButton aria-label={'adsdasd'} color="info">
+            <Badge badgeContent={100} color="success">
+              <IoIosMail />
+            </Badge>
+          </IconButton>
+        </a>
+        {window.location.pathname.split(' /') != '/home' && (
+          <div className="w-full items-start">
+            <a
+              href={`/${window.location.pathname
+                .split('/')
+                .filter(Boolean)
+                .slice(0, -1)
+                .join('/')}`}
+            >
+              <Button variant="contained" startIcon={<IoCaretBackOutline />}>
+                Voltar
+              </Button>
+            </a>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
