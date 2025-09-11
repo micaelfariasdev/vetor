@@ -48,11 +48,12 @@ function App() {
             </div>
           </>
         )}
-        <div className="col-span-2 row-span-2">
-          <Routes>
-            <Route path="/test" element={<Comp.PontoMesMockup />} />
-          </Routes>
-        </div>
+        {window.location.pathname == '/test' && (
+          <div className="col-span-2 row-span-2">
+            <Routes>
+              <Route path="/test" element={<Comp.PontoMesMockup />} />
+            </Routes>
+          </div>)}
       </BrowserRouter>
     </>
   );

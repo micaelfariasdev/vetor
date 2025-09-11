@@ -2,7 +2,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { FaEdit } from 'react-icons/fa';
 import {
   Grid,
@@ -21,6 +20,7 @@ import IconButton from '@mui/material/IconButton';
 import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
+import api from '../auth/auth'
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -118,7 +118,7 @@ export function PontoMes() {
     useEffect(() => {
       // Verifica se IdItem existe para evitar requisições desnecessárias
       if (IdItem) {
-        axios
+        api
           .get(
             `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/pontos/${id}`
           )
@@ -210,7 +210,7 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
-        await axios.post(
+        await api.post(
           `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
           payload
         );
@@ -505,7 +505,7 @@ export function PontoMes() {
 
   useEffect(() => {
     setLoading(true);
-    axios
+    api
       .get(`https://vetor-api.micaelfarias.com/api/mes-ponto/${id}/relacao/`)
       .then((res) => {
         setFuncionarios(res.data.funcionarios);
@@ -617,7 +617,6 @@ export function PontoMes() {
                 sortModel: [{ field: 'nome', sort: 'asc' }],
               },
             }}
-            pageSizeOptions={[5, 10]}
             sx={{ border: 0 }}
           />
         </Paper>

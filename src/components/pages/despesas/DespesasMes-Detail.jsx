@@ -5,7 +5,6 @@ import {
 } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { useParams } from 'react-router-dom';
 import { IoIosCloseCircle } from 'react-icons/io';
@@ -17,6 +16,7 @@ import { FaCloudUploadAlt } from 'react-icons/fa';
 import { FaFileDownload } from 'react-icons/fa';
 import { FaEdit } from 'react-icons/fa';
 import IconButton from '@mui/material/IconButton';
+import api from '../auth/auth'
 
 export function DesMesMesDetail() {
   const { id } = useParams();
@@ -30,7 +30,7 @@ export function DesMesMesDetail() {
     const [DataItem, setDataItem] = useState('');
 
     useEffect(() => {
-      axios
+      api
         .get(
           `https://vetor-api.micaelfarias.com/api/despesasitens/${item['item']}/`
         )
@@ -49,7 +49,7 @@ export function DesMesMesDetail() {
       formData.append('Object', DataItem.despesas_mes);
 
       try {
-        const response = await axios.patch(
+        const response = await api.patch(
           `https://vetor-api.micaelfarias.com/api/despesasitens/${item['item']}/`,
           formData
         );
@@ -164,7 +164,7 @@ export function DesMesMesDetail() {
       formData.append('Object', id);
 
       try {
-        const response = await axios.post(
+        const response = await api.post(
           `https://vetor-api.micaelfarias.com/api/excel/`,
           formData,
           {
@@ -263,7 +263,7 @@ export function DesMesMesDetail() {
   }
 
   useEffect(() => {
-    axios
+    api
       .get(`https://vetor-api.micaelfarias.com/api/despesas/${id}`)
       .then((response) => {
         setData(response.data);

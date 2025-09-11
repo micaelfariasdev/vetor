@@ -1,7 +1,6 @@
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
 import { IoIosCloseCircle } from 'react-icons/io';
@@ -16,6 +15,7 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import { TextField } from '@mui/material';
 import { useMemo } from 'react';
+import api from '../auth/auth'
 
 export function Servicos() {
   const [data, setData] = useState([]);
@@ -31,7 +31,7 @@ export function Servicos() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await axios.delete(
+        const response = await api.delete(
           `https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`
         );
         setDelete(false);
@@ -87,7 +87,7 @@ export function Servicos() {
       setLoading(true);
 
       try {
-        await axios.patch(
+        await api.patch(
           `https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`,
           {
             titulo: titulo,
@@ -104,7 +104,7 @@ export function Servicos() {
     };
 
     useEffect(() => {
-      axios
+      api
         .get(`https://vetor-api.micaelfarias.com/api/servico/${IdItem}/`)
         .then((response) => {
           setTitulo(response.data.titulo);
@@ -180,7 +180,7 @@ export function Servicos() {
       setLoading(true);
 
       try {
-        const resp = await axios.post(
+        const resp = await api.post(
           'https://vetor-api.micaelfarias.com/api/servico/',
           {
             titulo: titulo,
@@ -254,7 +254,7 @@ export function Servicos() {
 
   useEffect(() => {
     setLoading(true);
-    axios
+    api
       .get('https://vetor-api.micaelfarias.com/api/servico/')
       .then((response) => {
         setData(response.data);

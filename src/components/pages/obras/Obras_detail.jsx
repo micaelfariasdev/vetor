@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { IoIosCloseCircle } from 'react-icons/io';
 
 import Paper from '@mui/material/Paper';
@@ -29,12 +28,9 @@ import TableRow from '@mui/material/TableRow';
 import Collapse from '@mui/material/Collapse';
 import { ThemeProvider } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import api from '../auth/auth'
 
 
 function a11yProps(index) {
@@ -60,7 +56,7 @@ export function Obras_detail() {
 
   useEffect(() => {
     setLoading(true);
-    axios
+    api
       .get(`https://vetor-api.micaelfarias.com/api/obras/${id}/`)
       .then((response) => {
         setNome(response.data.nome);
@@ -84,7 +80,7 @@ export function Obras_detail() {
     setLoading(true);
 
     try {
-      const resp = await axios.patch(
+      const resp = await api.patch(
         `https://vetor-api.micaelfarias.com/api/obras/${id}/`,
         {
           nome,
@@ -106,7 +102,7 @@ export function Obras_detail() {
     setLoading(true);
 
     try {
-      const resp = await axios.patch(
+      const resp = await api.patch(
         `https://vetor-api.micaelfarias.com/api/obras/${id}/`,
         {
           servicos: serv.map((item) => item.id),
@@ -153,7 +149,7 @@ export function Obras_detail() {
     const [getServ, setGetServ] = React.useState(0);
 
     useEffect(() => {
-      axios
+      api
         .get(`https://vetor-api.micaelfarias.com/api/servico/`)
         .then((response) => {
           setGetServ(response.data);

@@ -1,7 +1,6 @@
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
 import { IoIosCloseCircle } from 'react-icons/io';
@@ -17,6 +16,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
+import api from '../auth/auth'
 
 export function ConvertMes(mes) {
   const meses = {
@@ -71,7 +71,7 @@ export function DesMesMes() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await axios.delete(
+        const response = await api.delete(
           `https://vetor-api.micaelfarias.com/api/despesas/${IdItem}/`
         );
         setDelete(false);
@@ -125,7 +125,7 @@ export function DesMesMes() {
     const [arrayobra, setArrayObra] = useState([]);
 
     useEffect(() => {
-      axios
+      api
         .get('https://vetor-api.micaelfarias.com/api/obras/')
         .then((response) => {
           setArrayObra(response.data);
@@ -146,7 +146,7 @@ export function DesMesMes() {
       formData.append('ano', ano);
 
       try {
-        const response = await axios.post(
+        const response = await api.post(
           `https://vetor-api.micaelfarias.com/api/despesas/`,
           formData,
           {
@@ -267,7 +267,7 @@ export function DesMesMes() {
   }
 
   useEffect(() => {
-    axios
+    api
       .get('https://vetor-api.micaelfarias.com/api/despesas/')
       .then((response) => {
         setData(response.data);

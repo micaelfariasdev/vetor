@@ -1,7 +1,6 @@
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { FaEdit } from 'react-icons/fa';
 import { IoIosCloseCircle } from 'react-icons/io';
@@ -71,7 +70,7 @@ export function Funcionarios() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await axios.delete(
+        const response = await api.delete(
           `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`
         );
         setDelete(false);
@@ -122,7 +121,7 @@ export function Funcionarios() {
     const [error, setError] = useState('');
 
     useEffect(() => {
-      axios
+      api
         .get('https://vetor-api.micaelfarias.com/api/obras/')
         .then((response) => {
           setArrayObra(response.data);
@@ -134,7 +133,7 @@ export function Funcionarios() {
       setLoading(true);
 
       try {
-        const response = await axios.patch(
+        const response = await api.patch(
           `https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`,
           {
             nome,
@@ -153,7 +152,7 @@ export function Funcionarios() {
     };
 
     useEffect(() => {
-      axios
+      api
         .get(`https://vetor-api.micaelfarias.com/api/colaboradores/${IdItem}/`)
         .then((response) => {
           setNome(response.data.nome);
@@ -255,7 +254,7 @@ export function Funcionarios() {
     const [error, setError] = useState('');
 
     useEffect(() => {
-      axios
+      api
         .get('https://vetor-api.micaelfarias.com/api/obras/')
         .then((response) => {
           setArrayObra(response.data);
@@ -267,7 +266,7 @@ export function Funcionarios() {
       setLoading(true);
 
       try {
-        const response = await axios.post(
+        const response = await api.post(
           'https://vetor-api.micaelfarias.com/api/colaboradores/',
           {
             nome,
@@ -518,7 +517,6 @@ export function Funcionarios() {
                 sortModel: [{ field: 'nome', sort: 'asc' }],
               },
             }}
-            pageSizeOptions={[5, 10]}
             sx={{ border: 0 }}
           />
         </Paper>

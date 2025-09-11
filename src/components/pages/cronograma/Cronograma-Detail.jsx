@@ -5,7 +5,6 @@ import {
 } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { FaCirclePlus } from 'react-icons/fa6';
 import { useParams } from 'react-router-dom';
 import { IoReload } from 'react-icons/io5';
@@ -15,6 +14,7 @@ import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import { FaCloudUploadAlt } from 'react-icons/fa';
 import IconButton from '@mui/material/IconButton';
+import api from '../auth/auth'
 
 export function CronogramaDetail() {
   const { id } = useParams();
@@ -48,7 +48,7 @@ export function CronogramaDetail() {
       formData.append('cronograma', id);
 
       try {
-        const response = await axios.post(
+        const response = await api.post(
           `https://vetor-api.micaelfarias.com/api/xmlcronograma/`,
           formData,
           {
@@ -147,7 +147,7 @@ export function CronogramaDetail() {
   }
 
   useEffect(() => {
-    axios
+    api
       .get(`https://vetor-api.micaelfarias.com/api/cronograma/${id}/`)
       .then((response) => {
         setObra(response.data);
@@ -155,7 +155,7 @@ export function CronogramaDetail() {
   }, []);
 
   useEffect(() => {
-    axios
+    api
       .get(
         `https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`
       )
@@ -166,7 +166,7 @@ export function CronogramaDetail() {
 
   const handleRowUpdate = async (newRow, oldRow) => {
     try {
-      const response = await axios.patch(
+      const response = await api.patch(
         `https://vetor-api.micaelfarias.com/api/servicos-cronograma/${newRow.id}/`,
         {
           dias: newRow.dias,
@@ -186,16 +186,16 @@ export function CronogramaDetail() {
   const ReloadCronograma = async () => {
     setLoading(true);
     try {
-      await axios.post(
+      await api.post(
         `https://vetor-api.micaelfarias.com/api/cronograma/recalcular/${id}/`
       );
 
-      const servicosRes = await axios.get(
+      const servicosRes = await api.get(
         `https://vetor-api.micaelfarias.com/api/servicos-cronograma/?cronograma=${id}`
       );
       setData(servicosRes.data);
 
-      const obraRes = await axios.get(
+      const obraRes = await api.get(
         `https://vetor-api.micaelfarias.com/api/cronograma/${id}/`
       );
       setObra(obraRes.data);
