@@ -4,6 +4,8 @@ export { default as Footer } from './pages/Footer';
 
 export { default as Config } from './pages/conta/Config';
 
+export { Medicao } from './pages/financeiro/Medicao';
+
 export { Obras } from './pages/obras/Obras';
 export { Obras_detail } from './pages/obras/Obras_detail';
 export { Servicos } from './pages/obras/Servicos';

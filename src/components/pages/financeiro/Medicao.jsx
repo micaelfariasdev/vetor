@@ -20,7 +20,7 @@ import { TextField } from '@mui/material';
 import { useMemo } from 'react';
 import api from '../auth/auth';
 
-export function Obras() {
+export function Medicao() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -59,8 +59,8 @@ export function Obras() {
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Tem certeza que deseja excluir a Obra <strong>{itemName}</strong>?
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o funcionario{' '}
+              <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -214,7 +214,7 @@ export function Obras() {
   useEffect(() => {
     setLoading(true);
     api
-      .get('https://vetor-api.micaelfarias.com/api/obras/')
+      .get('medicao/')
       .then((response) => {
         setData(response.data);
       })
@@ -227,23 +227,7 @@ export function Obras() {
   }, []);
 
   const columns = [
-    { field: 'nome', headerName: 'Obra', minWidth: 250, flex: 1 },
-    {
-      field: 'cnpj',
-      headerName: 'CNPJ',
-      sortable: false,
-      filterable: false,
-      minWidth: 250,
-      flex: 1,
-    },
-    {
-      field: 'endereço',
-      headerName: 'Endereço',
-      sortable: false,
-      filterable: false,
-      minWidth: 200,
-      flex: 3,
-    },
+    { field: 'str', headerName: 'Medição', minWidth: 250, flex: 1 },
     {
       field: 'acoes',
       headerName: 'Ações',
@@ -316,7 +300,7 @@ export function Obras() {
       {edit && <Edit IdItem={edit.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">Obras</h1>
+          <h1 className="font-bold text-3xl">Medição</h1>
           <IconButton
             sx={{
               padding: 1,

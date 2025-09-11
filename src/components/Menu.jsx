@@ -19,7 +19,7 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { IoIosMail } from 'react-icons/io';
 import { logout as logoutApi } from './pages/auth/auth';
-import MenuMui from '@mui/material/Menu'
+import MenuMui from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
@@ -38,9 +38,7 @@ function ItemMenu({ label, link, icon, sorted, open }) {
         }}
         selected={open === sorted}
       >
-        <ListItemIcon sx={{ fontSize: 25 }}>
-          {icon}
-        </ListItemIcon>
+        <ListItemIcon sx={{ fontSize: 25 }}>{icon}</ListItemIcon>
         <ListItemText primary={label} />
       </ListItemButton>
     </>
@@ -56,9 +54,7 @@ function ListItems({ label, icon, handleClick, sorted, list, open }) {
         }}
         selected={open === sorted}
       >
-        <ListItemIcon sx={{ fontSize: 25 }}>
-          {icon}
-        </ListItemIcon>
+        <ListItemIcon sx={{ fontSize: 25 }}>{icon}</ListItemIcon>
         <ListItemText primary={label} />
         {open === sorted ? (
           <IoIosArrowForward className={'rotate-90'} />
@@ -73,7 +69,6 @@ function ListItems({ label, icon, handleClick, sorted, list, open }) {
               key={index}
               sx={{ pl: 10 }}
               selected={open === sorted}
-
               onClick={() => (window.location.href = `/${item[0]}`)}
             >
               <ListItemText
@@ -174,58 +169,71 @@ export function Menu({ onNavigate }) {
           open={open}
           list={[
             {
-              'type': 'buttom',
-              'label': 'Home',
-              'link': 'home',
-              'icon': <FaHome />,
-              'open': 1,
+              type: 'buttom',
+              label: 'Home',
+              link: 'home',
+              icon: <FaHome />,
+              open: 1,
             },
             {
-              'type': 'list',
-              'label': 'Obras',
-              'icon': <FaHelmetSafety />,
-              'open': 2,
-              'list': [
+              type: 'list',
+              label: 'Obras',
+              icon: <FaHelmetSafety />,
+              open: 2,
+              list: [
                 ['obras', 'Obras'],
                 ['servicos', 'Serviços'],
               ],
             },
             {
-              'type': 'list',
-              'label': 'Funcionários',
-              'icon': <FaPeopleGroup />,
-              'open': 3,
-              'list': [
+              type: 'list',
+              label: 'Financeiro',
+              icon: <IoIosBusiness />,
+              open: 6,
+              list: [['medicao', 'Medição']],
+            },
+            {
+              type: 'list',
+              label: 'Funcionários',
+              icon: <FaPeopleGroup />,
+              open: 3,
+              list: [
                 ['funcionarios', 'Funcionários'],
                 ['ponto', 'Ponto'],
               ],
             },
             {
-              'type': 'list',
-              'label': 'Engenharia',
-              'icon': <IoIosConstruct />,
-              'open': 5,
-              'list': [
+              type: 'list',
+              label: 'Engenharia',
+              icon: <IoIosConstruct />,
+              open: 5,
+              list: [
                 ['desp-mes-mes', 'Despesas Mês a Mês'],
                 ['cronograma', 'Cronograma'],
               ],
             },
           ]}
         />
-        <amp-ad width="100vw" height="320"
+        <amp-ad
+          width="100vw"
+          height="320"
           type="adsense"
           data-ad-client="ca-pub-7361302895831275"
           data-ad-slot="8161032099"
           data-auto-format="rspv"
-          data-full-width="">
+          data-full-width=""
+        >
           <div overflow=""></div>
         </amp-ad>
-        <amp-ad width="100vw" height="320"
+        <amp-ad
+          width="100vw"
+          height="320"
           type="adsense"
           data-ad-client="ca-pub-7361302895831275"
           data-ad-slot="3411306280"
           data-auto-format="mcrspv"
-          data-full-width="">
+          data-full-width=""
+        >
           <div overflow=""></div>
         </amp-ad>
       </List>
@@ -234,8 +242,6 @@ export function Menu({ onNavigate }) {
 }
 
 import { default as api } from './pages/auth/auth';
-
-
 
 // O componente do menu superior
 export function MenuTop() {
@@ -253,37 +259,34 @@ export function MenuTop() {
   };
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     async function fetchUser() {
       try {
-        const userResp = await api.get("me/")
-          .then(res => {
-            localStorage.setItem(
-              "auth",
-              res.data ? JSON.stringify(res.data) : null
-            );
-            setUser(res.data);
-            return res; // mantém compatibilidade com o await
-          });
-        setLoading(false)
+        const userResp = await api.get('me/').then((res) => {
+          localStorage.setItem(
+            'auth',
+            res.data ? JSON.stringify(res.data) : null
+          );
+          setUser(res.data);
+          return res; // mantém compatibilidade com o await
+        });
+        setLoading(false);
       } catch {
-        setLoading(false)
-        console.error('Faça o login novamente')
-        window.location.href = '/login'
+        setLoading(false);
+        console.error('Faça o login novamente');
+        window.location.href = '/login';
         setUser(null);
       }
     }
     fetchUser();
   }, []);
 
-
-
   let username = `Sem usuário`;
   if (user) {
     username = `${user.first_name} ${user.last_name}`;
     if (window.location.pathname === '/login') {
-      window.location.href = '/home'
-    };
+      window.location.href = '/home';
+    }
   }
 
   function stringAvatar(name) {
@@ -308,7 +311,9 @@ export function MenuTop() {
         </div>
       )}
       <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
-        <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}
+        >
           <Tooltip title="Account settings">
             <IconButton
               onClick={handleClick}
@@ -359,13 +364,22 @@ export function MenuTop() {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={() => { window.location.href = '/perfil' }}>
+          <MenuItem
+            onClick={() => {
+              window.location.href = '/perfil';
+            }}
+          >
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
             Configuração
           </MenuItem>
-          <MenuItem onClick={() => { logoutApi() }} sx={{ color: 'error.main' }}>
+          <MenuItem
+            onClick={() => {
+              logoutApi();
+            }}
+            sx={{ color: 'error.main' }}
+          >
             <ListItemIcon sx={{ color: 'error.main' }}>
               <Logout fontSize="small" />
             </ListItemIcon>
