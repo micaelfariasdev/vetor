@@ -201,13 +201,6 @@ export function Menu({ onNavigate }) {
               ],
             },
             {
-              'type': 'buttom',
-              'label': 'Empresas',
-              'link': 'empresas',
-              'icon': <IoIosBusiness />,
-              'open': 4,
-            },
-            {
               'type': 'list',
               'label': 'Engenharia',
               'icon': <IoIosConstruct />,
@@ -366,7 +359,7 @@ export function MenuTop() {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={() => { window.location.href = '/perfil' }}>
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>

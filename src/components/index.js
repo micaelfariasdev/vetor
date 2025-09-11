@@ -1,5 +1,8 @@
 export { Menu, MenuTop } from './Menu';
 export { default as Home } from './pages/Home';
+export { default as Footer } from './pages/Footer';
+
+export { default as Config } from './pages/conta/Config';
 
 export { Obras } from './pages/obras/Obras';
 export { Obras_detail } from './pages/obras/Obras_detail';

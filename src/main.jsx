@@ -24,6 +24,7 @@ function App() {
                 <Route path="/login" element={<Comp.Login />} />
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home" element={<Comp.Home />} />
+                <Route path="/perfil" element={<Comp.Config />} />
                 <Route path="/obras" element={<Comp.Obras />} />
                 <Route path="/obras/:id" element={<Comp.Obras_detail />} />
                 <Route path="/servicos" element={<Comp.Servicos />} />
@@ -33,7 +34,6 @@ function App() {
                 <Route path="/funcionarios" element={<Comp.Funcionarios />} />
                 <Route path="/ponto" element={<Comp.Ponto />} />
                 <Route path="/ponto/:id" element={<Comp.PontoMes />} />
-                <Route path="/empresas" element={<Comp.Man />} />
                 <Route path="/cronograma" element={<Comp.Cronograma />} />
                 <Route path="/desp-mes-mes" element={<Comp.DesMesMes />} />
                 <Route
@@ -46,6 +46,7 @@ function App() {
                 />
               </Routes>
             </div>
+            <Comp.Footer />
           </>
         )}
         {window.location.pathname == '/test' && (

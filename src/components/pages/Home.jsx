@@ -24,7 +24,12 @@ export default function Home() {
     fetchInfos();
   }, []);
 
-  const user = localStorage.getItem('auth')
+  function capitalizeName(name) {
+    if (!name) return ''; // Retorna string vazia se o nome for nulo ou vazio
+    return name.charAt(0).toLocaleUpperCase() + name.slice(1).toLocaleLowerCase();
+  }
+
+  const user = JSON.parse(localStorage.getItem('auth'))
   return (
     <>
       {loading && (
@@ -38,8 +43,8 @@ export default function Home() {
           <Typography variant="h4" fontWeight="bold" gutterBottom>
             Olá, {user
               ? (user.first_name && user.last_name
-                ? `${user.first_name} ${user.last_name}`.toUpperCase()
-                : (user?.username || 'Usuário').toUpperCase())
+                ? `${capitalizeName(user.first_name)} ${capitalizeName(user.last_name)}`
+                : capitalizeName(user.username))
               : 'Usuário'} 👋
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 6 }}>
