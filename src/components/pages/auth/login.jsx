@@ -1,19 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TextField, Button, Paper, Typography, CircularProgress } from '@mui/material';
 import { login as loginApi } from './auth';
+import { default as api } from './auth';
 
 export default function Login({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [user, setUser] = useState(null);
+
+    useEffect(async () => {
+        try {
+            const userResp = await api.get("me/")
+                .then(res => {
+                    localStorage.setItem(
+                        "auth",
+                        res.data ? JSON.stringify(res.data) : null
+                    );
+                    setUser(res.data);
+                    window.location.href = '/home';
+                    return res; // mantém compatibilidade com o await
+                });
+        } catch {
+            setUser(false);
+        }
+    }, []);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await loginApi(username, password);
             window.location.href = '/home'
         } catch {
+            setLoading(false);
             setError('Login falhou');
         }
     };

@@ -102,15 +102,10 @@ export async function login(username, password) {
 }
 
 export async function logout() {
-    try {
-        await api.post("logout/");
-    } catch (error) {
-        console.error("Erro no logout:", error.response?.data || error);
-    } finally {
-        document.cookie = "access=; path=/; max-age=0";
-        document.cookie = "refresh=; path=/; max-age=0";
-        // 🔴 não dá reload nem redirect
-    }
+    window.location.href = '/login';
+    document.cookie = "access=; path=/; max-age=0";
+    document.cookie = "refresh=; path=/; max-age=0";
+    localStorage.removeItem("auth");
 }
 
 export default api;

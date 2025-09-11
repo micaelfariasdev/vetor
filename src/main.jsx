@@ -23,7 +23,7 @@ function App() {
               <Routes>
                 <Route path="/login" element={<Comp.Login />} />
                 <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={<Comp.Man />} />
+                <Route path="/home" element={<Comp.Home />} />
                 <Route path="/obras" element={<Comp.Obras />} />
                 <Route path="/obras/:id" element={<Comp.Obras_detail />} />
                 <Route path="/servicos" element={<Comp.Servicos />} />
