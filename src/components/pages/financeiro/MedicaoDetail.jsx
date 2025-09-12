@@ -32,7 +32,7 @@ export function MedicaoDetail() {
   const [edit, setEdit] = useState(false);
   const [create, setCreate] = useState(false);
   const [del, setDelete] = useState(false);
-  const [loading, setLoading] = useState(false);
+  var [loading, setLoading] = useState(false);
   var [att, setAtt] = useState(false);
 
   const [error, setError] = useState('')
@@ -52,7 +52,7 @@ export function MedicaoDetail() {
         );
         setDelete(false);
         setLoading(false);
-        setAtt(true)
+        setAtt(prev => !prev)
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -62,12 +62,6 @@ export function MedicaoDetail() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -113,7 +107,7 @@ export function MedicaoDetail() {
           medicao: id,
         });
         setCreate(false);
-        setAtt(true)
+        setAtt(prev => !prev)
       } catch (err) {
         if (err.response && err.response.data) {
           const data = err.response.data;
@@ -134,7 +128,6 @@ export function MedicaoDetail() {
     const handleClose = () => {
       setCreate(false)
     }
-    console.log(arrayColaborador)
     const options = arrayColaborador.filter(i => i.obra === data.obra).map(({ id, nome }) => ({ 'id': id, 'label': nome }))
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
@@ -180,96 +173,12 @@ export function MedicaoDetail() {
     const [quantidade, setQuantidade] = useState('')
     const [valor, setValor] = useState('')
     const [create, setCreate] = useState(false)
-    const [createServ, setCreateServ] = useState(false)
     const [arrayServicos, setArrayServicos] = useState([])
 
-    function CreateNewServ() {
-      const [titulo, setTitulo] = useState('');
-      const [desc, setDesc] = useState('');
-
-      const [error, setError] = useState('');
-
-      const NewServico = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-          const resp = await api.post(
-            'servico/',
-            {
-              titulo: titulo,
-              descricao: desc,
-            }
-          );
-          await api.patch(
-            `obras/${data.obra}/`,
-            {
-              titulo: titulo,
-              descricao: desc,
-            }
-          );
-          handleClose()
-        } catch (error) {
-          console.error(error);
-          setError('Não foi possível criar. Verifique os dados.');
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      const handleClose = () => {
-        setCreateServ(false);
-      };
-
-      return (
-        <Dialog open={createServ} onClose={handleClose} keepMounted>
-          <div className="p-5 gap-4 flex flex-col w-100">
-            <div className="w-full flex flex-row justify-between text-3xl">
-              <h1 className="block text-lg font-semibold text-gray-700">
-                Cadastrar
-              </h1>
-              <IoIosCloseCircle
-                className="text-red-500 hover:text-red-200 cursor-pointer"
-                onClick={handleClose}
-              />
-            </div>
-            <form onSubmit={NewServico} className="grid grid-cols-2 gap-5 gap-x-4">
-              <FormControl fullWidth className="col-span-2">
-                <TextField
-                  id="titulo"
-                  label="Título"
-                  variant="outlined"
-                  value={titulo}
-                  onChange={(e) => setTitulo(e.target.value)}
-                />
-              </FormControl>
-              <FormControl fullWidth className="col-span-2">
-                <TextField
-                  id="desc"
-                  label="Descrição"
-                  variant="outlined"
-                  value={desc}
-                  onChange={(e) => setDesc(e.target.value)}
-                />
-              </FormControl>
-              <button
-                type="submit"
-                className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
-              >
-                Cadastrar
-              </button>
-            </form>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-          </div>
-        </Dialog>
-      );
-    }
 
     useEffect(() => {
       api.get('servico/').then((response) => {
         setArrayServicos(response.data)
-        console.log(response.data)
       })
     }, [])
 
@@ -285,7 +194,7 @@ export function MedicaoDetail() {
             `item-medicao/${IdItem}/`
           );
           setDeleteServ(false);
-          setAtt(true);
+          setAtt(prev => !prev);
 
         } catch (error) {
           console.error(error);
@@ -333,7 +242,7 @@ export function MedicaoDetail() {
           valor_unitario: valor,
         });
         setCreate(false);
-        setAtt(true)
+        setAtt(prev => !prev)
       } catch (err) {
         if (err.response && err.response.data) {
           const data = err.response.data;
@@ -397,29 +306,23 @@ export function MedicaoDetail() {
       const find = data.colaboradores_associados.find((col) => col.id === IdColaborador)
       setDataCol(find);
       setLoading(false);
-      console.log(dataCol)
     }, [IdColaborador]);
 
     const handleProcessRowUpdate = async (newRow, oldRow) => {
       try {
         const resp = await api.patch(`item-medicao/${newRow.id}/`, newRow);
-        const updatedRow = resp.data;
-
-        setAtt(true);
-
-        return updatedRow;
+        setAtt(prev => !prev); // ✅ ativa o useEffect do fetch
       } catch (error) {
         console.error("Erro ao atualizar:", error);
-        return oldRow; // volta pro valor antigo se der erro
       }
     };
+
 
 
 
     return (
       <>
         {deleteServ && <DeleteServ IdItem={deleteServ.id} itemName={deleteServ.nome} />}
-        {createServ && <CreateNewServ />}
 
         <Dialog open={edit} onClose={() => setEdit(false)} fullWidth maxWidth="lg"
           aria-labelledby="alert-dialog-title"
@@ -464,20 +367,6 @@ export function MedicaoDetail() {
                     renderInput={(params) => <TextField {...params} label="Serviços" />}
                   />
                 </FormControl>
-                {/* <IconButton
-                  sx={{
-                    backgroundColor: 'info.main',
-                    height: 'fit-content',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'info.dark',
-                    },
-                  }}
-                  aria-label="plus"
-                  onClick={() => setCreateServ(true)}
-                >
-                  <FaCirclePlus />
-                </IconButton> */}
                 <FormControl fullWidth className="col-span-2">
                   <TextField
                     id="descricao"
@@ -553,19 +442,20 @@ export function MedicaoDetail() {
 
 
   useEffect(() => {
+    console.log(att)
     setLoading(true);
     api
       .get(`medicao/${id}`)
       .then((response) => {
         setData(response.data);
-        console.log(response.data)
       })
       .catch((error) => {
         console.error('Erro ao buscar os dados:', error);
       })
       .finally(() => {
-        setAtt(false)
-        setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000); // 3000ms = 3 segundos
       });
   }, [att]);
 
@@ -635,65 +525,69 @@ export function MedicaoDetail() {
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+      {loading ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200">
+          <div className="w-12 h-12 border-4 border-blue-300 border-t-transparent rounded-full animate-spin" />
         </div>
+      ) : (
+        <>
+          {create && <CreateNew create={create} setCreate={setCreate} />}
+          {edit && <EditMedicaoColaborador IdColaborador={edit} />}
+          {del && <Delete IdItem={del.id} itemName={del.nome} />}
+          <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
+            <div className="grid grid-cols-[1fr_auto] items-center ">
+              <h1 className="font-bold text-3xl">{data.str}</h1>
+              <IconButton
+                sx={{
+                  padding: 1,
+                  backgroundColor: 'info.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'info.dark',
+                  },
+                }}
+                aria-label="deletar"
+                size="small"
+                onClick={() => setCreate(true)}
+              >
+                <FaCirclePlus />
+              </IconButton>
+            </div>
+            <hr className="col-span-2" />
+            <div className="col-span-2 flex gap-2 ">
+              <input
+                type="text"
+                placeholder="Pesquisar por nome..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="p-2 border rounded-md w-[50%]"
+              />
+            </div>
+            <Paper>
+              <DataGrid
+                rows={filterObra}
+                columns={columns}
+                columnVisibilityModel={{
+                  ano: false,
+                  mes: false,
+                }}
+                initialState={{
+                  sorting: {
+                    sortModel: [
+                      { field: 'ano', sort: 'desc' },
+                      { field: 'mes', sort: 'desc' },
+                      { field: 'nome', sort: 'asc' },
+                    ],
+                  },
+                }}
+                pageSizeOptions={[5, 10]}
+                sx={{ border: 0 }}
+              />
+            </Paper>
+          </div>
+        </>
       )}
-      {create && <CreateNew create={create} setCreate={setCreate} />}
-      {edit && <EditMedicaoColaborador IdColaborador={edit} />}
-      {del && <Delete IdItem={del.id} itemName={del.nome} />}
-      <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
-        <div className="grid grid-cols-[1fr_auto] items-center ">
-          <h1 className="font-bold text-3xl">{data.str}</h1>
-          <IconButton
-            sx={{
-              padding: 1,
-              backgroundColor: 'info.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'info.dark',
-              },
-            }}
-            aria-label="deletar"
-            size="small"
-            onClick={() => setCreate(true)}
-          >
-            <FaCirclePlus />
-          </IconButton>
-        </div>
-        <hr className="col-span-2" />
-        <div className="col-span-2 flex gap-2 ">
-          <input
-            type="text"
-            placeholder="Pesquisar por nome..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 border rounded-md w-[50%]"
-          />
-        </div>
-        <Paper>
-          <DataGrid
-            rows={filterObra}
-            columns={columns}
-            columnVisibilityModel={{
-              ano: false,
-              mes: false,
-            }}
-            initialState={{
-              sorting: {
-                sortModel: [
-                  { field: 'ano', sort: 'desc' },
-                  { field: 'mes', sort: 'desc' },
-                  { field: 'nome', sort: 'asc' },
-                ],
-              },
-            }}
-            pageSizeOptions={[5, 10]}
-            sx={{ border: 0 }}
-          />
-        </Paper>
-      </div>
     </>
+
   );
 }
