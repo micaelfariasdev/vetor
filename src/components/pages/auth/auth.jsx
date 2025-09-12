@@ -94,7 +94,7 @@ export async function login(username, password) {
     const resp = await api.post("token/", { username, password });
 
     document.cookie = `access=${resp.data.access}; path=/; max-age=3600;`;
-    document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=86400;`;
+    document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=604800;`;
 
     api.defaults.headers.common["Authorization"] = `Bearer ${resp.data.access}`;
 

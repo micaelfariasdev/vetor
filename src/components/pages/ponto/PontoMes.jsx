@@ -21,6 +21,7 @@ import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import api from '../auth/auth'
+import { ConvertMes } from '../../utils';
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -59,36 +60,6 @@ function gerarMesCompleto(mes, ano) {
   return resultado;
 }
 
-export function ConvertMes(mes) {
-  const meses = {
-    '01': 'Janeiro',
-    '02': 'Fevereiro',
-    '03': 'Março',
-    '04': 'Abril',
-    '05': 'Maio',
-    '06': 'Junho',
-    '07': 'Julho',
-    '08': 'Agosto',
-    '09': 'Setembro',
-    10: 'Outubro',
-    11: 'Novembro',
-    12: 'Dezembro',
-    1: 'Janeiro',
-    2: 'Fevereiro',
-    3: 'Março',
-    4: 'Abril',
-    5: 'Maio',
-    6: 'Junho',
-    7: 'Julho',
-    8: 'Agosto',
-    9: 'Setembro',
-    10: 'Outubro',
-    11: 'Novembro',
-    12: 'Dezembro',
-  };
-
-  return meses[mes] || '';
-}
 
 export function PontoMes() {
   const { id } = useParams();
@@ -625,4 +596,3 @@ export function PontoMes() {
   );
 }
 
-export default ConvertMes;

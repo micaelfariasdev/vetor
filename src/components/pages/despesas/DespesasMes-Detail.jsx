@@ -9,7 +9,6 @@ import { FaCirclePlus } from 'react-icons/fa6';
 import { useParams } from 'react-router-dom';
 import { IoIosCloseCircle } from 'react-icons/io';
 import Dialog from '@mui/material/Dialog';
-import { ConvertMes } from './DespesasMes';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import { FaCloudUploadAlt } from 'react-icons/fa';
@@ -17,6 +16,7 @@ import { FaFileDownload } from 'react-icons/fa';
 import { FaEdit } from 'react-icons/fa';
 import IconButton from '@mui/material/IconButton';
 import api from '../auth/auth'
+import { ConvertMes } from '../../utils';
 
 export function DesMesMesDetail() {
   const { id } = useParams();

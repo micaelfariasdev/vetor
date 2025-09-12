@@ -18,37 +18,8 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import api from '../auth/auth'
+import { ConvertMes } from '../../utils';
 
-export function ConvertMes(mes) {
-  const meses = {
-    '01': 'Janeiro',
-    '02': 'Fevereiro',
-    '03': 'Março',
-    '04': 'Abril',
-    '05': 'Maio',
-    '06': 'Junho',
-    '07': 'Julho',
-    '08': 'Agosto',
-    '09': 'Setembro',
-    10: 'Outubro',
-    11: 'Novembro',
-    12: 'Dezembro',
-    1: 'Janeiro',
-    2: 'Fevereiro',
-    3: 'Março',
-    4: 'Abril',
-    5: 'Maio',
-    6: 'Junho',
-    7: 'Julho',
-    8: 'Agosto',
-    9: 'Setembro',
-    10: 'Outubro',
-    11: 'Novembro',
-    12: 'Dezembro',
-  };
-
-  return meses[mes] || '';
-}
 
 export function Ponto() {
   const [data, setData] = useState([]);
@@ -379,4 +350,3 @@ export function Ponto() {
   );
 }
 
-export default ConvertMes;

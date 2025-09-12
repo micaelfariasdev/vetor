@@ -16,14 +16,17 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
-import { TextField } from '@mui/material';
+import { DateField } from '@mui/x-date-pickers/DateField'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+
 import { useMemo } from 'react';
 import api from '../auth/auth';
+import { formatarDinheiro } from '../../utils';
 
 export function Medicao() {
   const [data, setData] = useState([]);
   const [create, setCreate] = useState(false);
-  const [edit, setEdit] = useState(false);
   const [del, setDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,11 +39,10 @@ export function Medicao() {
 
       try {
         const response = await api.delete(
-          `https://vetor-api.micaelfarias.com/api/obras/${IdItem}/`
+          `medicao/${IdItem}/`
         );
         setDelete(false);
         setLoading(false);
-        window.location.reload();
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -59,7 +61,7 @@ export function Medicao() {
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Tem certeza que deseja excluir o funcionario{' '}
+              Tem certeza que deseja excluir a medição{' '}
               <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
             </DialogContentText>
           </DialogContent>
@@ -80,58 +82,41 @@ export function Medicao() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [nome, setNome] = useState('');
-    const [end, setEnd] = useState('');
-    const [cnpj, setCnpj] = useState('');
-    const [type, setType] = useState('');
+    const [obra, setObra] = useState('')
+    const [pagamento, setPagamento] = useState(null)
+    const [arrayObra, setArrayObra] = useState([])
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+      api.get('obras/').then((response) => {
+        setArrayObra(response.data)
+      })
+    }, [])
 
     const NewObra = async (e) => {
-      e.preventDefault();
-      setLoading(true);
+      e.preventDefault()
+      setLoading(true)
 
       try {
-        const resp = await api.post(
-          'https://vetor-api.micaelfarias.com/api/obras/',
-          {
-            author: 1,
-            nome,
-            endereço: end,
-            cnpj,
-            type,
-          }
-        );
-        window.location.reload();
+        await api.post('medicao/', {
+          obra,
+          data_pagamento: pagamento ? pagamento.format('YYYY-MM-DD') : null,
+        })
+        setCreate(false)
       } catch (error) {
-        console.error(error);
-        setError('Não foi possível criar. Verifique os dados.');
+        console.error(error)
+        setError('Não foi possível criar. Verifique os dados.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     const handleClose = () => {
-      setCreate(false);
-    };
+      setCreate(false)
+    }
 
-    const formatCNPJ = (value) => {
-      if (!value) return '';
-      value = value.replace(/\D/g, ''); // Remove tudo o que não é dígito
-      value = value.replace(/^(\d{2})(\d)/, '$1.$2');
-      value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      value = value.replace(/(\d{4})(\d)/, '$1-$2');
-      return value.substring(0, 18);
-    };
-
-    const handleChange = (event) => {
-      const rawValue = event.target.value;
-      const formattedValue = formatCNPJ(rawValue);
-
-      setCnpj(formattedValue);
-    };
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
         {loading && (
@@ -150,55 +135,36 @@ export function Medicao() {
                 onClick={handleClose}
               />
             </div>
-            <form onSubmit={NewObra} className="grid grid-cols-2 gap-5 gap-x-4">
-              <FormControl fullWidth className="col-span-2">
-                <TextField
-                  id="nome"
-                  label="Nome"
-                  variant="outlined"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                />
-              </FormControl>
-              <FormControl fullWidth className="col-span-2">
-                <TextField
-                  id="endereco"
-                  label="Endereço"
-                  variant="outlined"
-                  value={end}
-                  onChange={(e) => setEnd(e.target.value)}
-                />
-              </FormControl>
-              <FormControl fullWidth className="col-span-2">
-                <TextField
-                  label="CNPJ"
-                  variant="outlined"
-                  value={cnpj}
-                  fullWidth
-                  margin="normal"
-                  className="rounded-lg"
-                  error={error}
-                  onChange={(e) => handleChange(e)}
-                />
-              </FormControl>
-              <FormControl fullWidth className="col-span-2">
-                <InputLabel id="type">Tipo de Obra</InputLabel>
+            <form onSubmit={NewObra} className="flex flex-col gap-5 gap-x-4">
+              <FormControl fullWidth>
+                <InputLabel id="obra-label">Obra</InputLabel>
                 <Select
-                  labelId="type"
-                  id="type-id"
-                  label="Tipo de Obra"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
+                  labelId="obra-label"
+                  id="obra-select"
+                  value={obra}
+                  onChange={(e) => setObra(e.target.value)}
                 >
-                  <MenuItem value="PREDIO">Prédio'</MenuItem>
-                  <MenuItem value="CONDOMINIO">'Condomínio de Casas'</MenuItem>
-                  <MenuItem value="LOTEAMENTO">'Loteamento'</MenuItem>
+                  {arrayObra.map((item) => (
+                    <MenuItem key={item.id} value={item.id}>
+                      {item.nome}
+                    </MenuItem>
+                  ))}
                 </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateField
+                    label="Data de Pagamento"
+                    value={pagamento}
+                    onChange={(newValue) => setPagamento(newValue)}
+                    format="DD/MM/YYYY"
+                  />
+                </LocalizationProvider>
               </FormControl>
 
               <button
                 type="submit"
-                className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
+                className="bg-cyan-500 rounded-xl text-white p-2 w-full col-span-2"
               >
                 Cadastrar
               </button>
@@ -208,8 +174,11 @@ export function Medicao() {
           </div>
         )}
       </Dialog>
-    );
+    )
   }
+
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -224,10 +193,29 @@ export function Medicao() {
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
-  }, []);
+  }, [del, create]);
 
   const columns = [
     { field: 'str', headerName: 'Medição', minWidth: 250, flex: 1 },
+    { field: 'valor_total', headerName: 'Valor Total', minWidth: 250, flex: 1, valueFormatter: (params) => formatarDinheiro(params), },
+    {
+      field: 'ano',
+      headerName: 'Ano',
+      width: 100,
+      hidden: false, // Oculta a coluna de Mês
+      valueGetter: (value, row) => {
+        return Number(new Date(row.data_medicao).getUTCFullYear());
+      },
+    },
+    {
+      field: 'mes',
+      headerName: 'Mês',
+      width: 100,
+      hidden: true, // Oculta a coluna de Mês
+      valueGetter: (value, row) => {
+        return Number(new Date(row.data_medicao).getUTCMonth() + 1);
+      },
+    },
     {
       field: 'acoes',
       headerName: 'Ações',
@@ -266,7 +254,7 @@ export function Medicao() {
             aria-label="deletar"
             size="small"
             onClick={() =>
-              setDelete({ id: params.row.id, nome: params.row.nome })
+              setDelete({ id: params.row.id, nome: params.row.str })
             }
           >
             <MdDelete />
@@ -297,7 +285,6 @@ export function Medicao() {
       )}
       {create && <CreateNew create={create} setCreate={setCreate} />}
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
-      {edit && <Edit IdItem={edit.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Medição</h1>
@@ -331,9 +318,17 @@ export function Medicao() {
           <DataGrid
             rows={filterObra}
             columns={columns}
+            columnVisibilityModel={{
+              ano: false,
+              mes: false,
+            }}
             initialState={{
               sorting: {
-                sortModel: [{ field: 'nome', sort: 'asc' }],
+                sortModel: [
+                  { field: 'ano', sort: 'desc' },
+                  { field: 'mes', sort: 'desc' },
+                  { field: 'nome', sort: 'asc' },
+                ],
               },
             }}
             pageSizeOptions={[5, 10]}

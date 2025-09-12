@@ -31,6 +31,7 @@ function App() {
                 <Route path="/servicos" element={<Comp.Servicos />} />
 
                 <Route path="/medicao" element={<Comp.Medicao />} />
+                <Route path="/medicao/:id" element={<Comp.MedicaoDetail />} />
 
                 <Route path="/funcionarios" element={<Comp.Funcionarios />} />
                 <Route path="/ponto" element={<Comp.Ponto />} />
