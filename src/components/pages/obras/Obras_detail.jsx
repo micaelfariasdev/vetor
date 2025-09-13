@@ -31,6 +31,7 @@ import Dialog from '@mui/material/Dialog';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import api from '../auth/auth'
+import { topNotice } from '../../utils';
 
 
 function a11yProps(index) {
@@ -50,6 +51,7 @@ export function Obras_detail() {
   const [type, setType] = useState('');
   const [serv, setServ] = useState('');
   const [edit, setEdit] = useState('');
+  let [att, setAtt] = useState(false);
   const [unidades, setUnidades] = useState([]);
   const [openAndar, setOpenAndar] = useState('');
   const [search, setSearch] = useState(false);
@@ -73,7 +75,7 @@ export function Obras_detail() {
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
-  }, []);
+  }, [att]);
 
   const EditObra = async (e) => {
     e.preventDefault();
@@ -81,7 +83,7 @@ export function Obras_detail() {
 
     try {
       const resp = await api.patch(
-        `https://vetor-api.micaelfarias.com/api/obras/${id}/`,
+        `obras/${id}/`,
         {
           nome,
           endereço: end,
@@ -89,7 +91,8 @@ export function Obras_detail() {
           type,
         }
       );
-      window.location.reload();
+      setAtt(prev => !prev)
+      topNotice({ success: "Obra editada com sucesso!" })
     } catch (error) {
       console.error(error);
       setError('Não foi possível criar. Verifique os dados.');
@@ -103,12 +106,13 @@ export function Obras_detail() {
 
     try {
       const resp = await api.patch(
-        `https://vetor-api.micaelfarias.com/api/obras/${id}/`,
+        `obras/${id}/`,
         {
           servicos: serv.map((item) => item.id),
         }
       );
-      window.location.reload();
+      setAtt(prev => !prev)
+      topNotice({ success: "Serviços editados com sucesso!" })
     } catch (error) {
       console.log(error);
       setError('Não foi possível criar. Verifique os dados.');
@@ -190,7 +194,7 @@ export function Obras_detail() {
                   <IconButton
                     edge="end"
                     aria-label="adicionar"
-                    onClick={() => setServ([...serv, item])}
+                    onClick={() => { setServ([...serv, item]); topNotice({ success: `Serviço ${item.titulo} adicionado!` }) }}
                     color="primary"
                   >
                     <AddCircleIcon />
@@ -211,45 +215,81 @@ export function Obras_detail() {
   function EditServicosUnidades({ idUni, obra }) {
     const [editServ, setEditServ] = useState([])
 
+
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          const response = await api.get("servico-unidade/")
+          const filterServ = response.data.filter(item => item.unidade === idUni)
+          setEditServ(filterServ)
+          console.log("filterServ", filterServ)
+        } catch (err) {
+          console.error("Erro ao carregar serviço:", err)
+        }
+      }
+
+      if (idUni) {
+        fetchData()
+      }
+    }, [idUni])
+
     const handleClose = () => {
       setEdit(false);
     };
 
+
+    // Atualiza o valor localmente
     const handleChange = ({ ServId, Value }) => {
-      setEditServ((prev) => {
-        const mapaCampos = {
-          obra: obra,
-          unidade: idUni,
-          valor: Value,
-        }
-        const copia = prev;
-        const edit = {}
-
-        edit[ServId] = mapaCampos
-
-        return { ...copia, ...edit };
-      });
+      setEditServ((prev) =>
+        prev.map((item) =>
+          item.servico === ServId ? { ...item, progresso: Value } : item
+        )
+      )
     }
+
+    // Envia para a API ao sair do campo
+    const handleBlur = async ({ ServId, Value }) => {
+      const payload = {
+        [ServId]: {
+          unidade: Number(idUni),
+          valor: Number(Value)
+        }
+      }
+
+      try {
+        await api.post("servico-unidade/salvar-servicos/", payload)
+        topNotice({ success: "Serviço salvo com sucesso!" })
+      } catch (err) {
+        topNotice({ error: `Erro ao salvar serviço. ${err}` })
+        console.error("Erro ao salvar serviço:", err)
+      }
+    }
+
+
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
         <Box className="w-full h-full min-h-150 min-w-150 p-5">
           <List>
-            {serv.map((item, index) => (
-              <ListItem key={index} divider>
-                <ListItemText primary={item.titulo} />
-                <TextField
-                  label="Progresso (%)"
-                  type="number"
-                  inputProps={{
-                    min: 0,
-                    max: 100,
-                  }}
-                  onChange={(e) => handleChange({ ServId: item.id, Value: e.target.value })}
-                  helperText="Digite um valor de 0 a 100"
-                />
-              </ListItem>
-            ))
-            }
+            {serv.map((item) => {
+              const found = editServ.find(i => i.servico === item.id) || {}
+              return (
+                <ListItem key={item.id} divider>
+                  <ListItemText primary={item.titulo} />
+                  <TextField
+                    label="Progresso (%)"
+                    type="number"
+                    value={found.progresso ?? ""}
+                    inputProps={{
+                      min: 0,
+                      max: 100,
+                    }}
+                    onChange={(e) => handleChange({ ServId: item.id, Value: e.target.value })}
+                    onBlur={(e) => handleBlur({ ServId: item.id, Value: e.target.value })}
+                    helperText="Digite um valor de 0 a 100"
+                  />
+                </ListItem>
+              )
+            })}
           </List>
         </Box>
 

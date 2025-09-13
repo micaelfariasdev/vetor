@@ -21,7 +21,7 @@ import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import api from '../auth/auth'
-import { ConvertMes } from '../../utils';
+import { ConvertMes, topNotice } from '../../utils';
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -182,12 +182,14 @@ export function PontoMes() {
           registros: registrosPreenchidos,
         };
         await api.post(
-          `https://vetor-api.micaelfarias.com/api/ponto/salvar-registros/`,
+          `ponto/salvar-registros/`,
           payload
         );
         setLoading(false);
         setEditPonto(false);
+        topNotice({ success: `Ponto do colaborador ${colaborador.nome} salvo com sucesso!` })
       } catch (err) {
+        topNotice({ error: `Erro ao salvar o ponto. Tente novamente. ${err}` });
         setLoading(false);
         setError('Erro ao salvar:', err);
         console.error('Erro ao salvar:', err);
