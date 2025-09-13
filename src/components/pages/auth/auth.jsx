@@ -68,7 +68,7 @@ api.interceptors.response.use(
                 });
 
                 const newAccess = resp.data.access;
-                document.cookie = `access=${newAccess}; path=/; max-age=3600;`;
+                document.cookie = `access=${newAccess}; path=/; max-age=3600; SameSite=None; Secure`;
 
                 api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
                 processQueue(null, newAccess);
@@ -79,6 +79,8 @@ api.interceptors.response.use(
                 processQueue(error, null);
                 document.cookie = "access=; path=/; max-age=0";
                 document.cookie = "refresh=; path=/; max-age=0";
+                localStorage.removeItem("auth");
+
                 // 🔴 não redireciona aqui
                 return Promise.reject(error);
             } finally {
@@ -93,8 +95,9 @@ api.interceptors.response.use(
 export async function login(username, password) {
     const resp = await api.post("token/", { username, password });
 
-    document.cookie = `access=${resp.data.access}; path=/; max-age=3600;`;
-    document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=604800;`;
+    document.cookie = `access=${resp.data.access}; path=/; max-age=3600; SameSite=None; Secure`;
+    document.cookie = `refresh=${resp.data.refresh}; path=/; max-age=604800; SameSite=None; Secure`;
+
 
     api.defaults.headers.common["Authorization"] = `Bearer ${resp.data.access}`;
 
