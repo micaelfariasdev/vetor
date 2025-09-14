@@ -20,8 +20,9 @@ import IconButton from '@mui/material/IconButton';
 import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
-import api from '../auth/auth'
+import api from '../auth/auth';
 import { ConvertMes, topNotice } from '../../utils';
+import axios from 'axios';
 
 function gerarMesCompleto(mes, ano) {
   const resultado = [];
@@ -60,7 +61,6 @@ function gerarMesCompleto(mes, ano) {
   return resultado;
 }
 
-
 export function PontoMes() {
   const { id } = useParams();
   const [data, setData] = useState([]);
@@ -98,8 +98,8 @@ export function PontoMes() {
             setPontos(response.data.pontos);
           })
           .catch((error) => {
-            console.error("Erro ao buscar dados do colaborador:", error);
-          })
+            console.error('Erro ao buscar dados do colaborador:', error);
+          });
         console.log('ok');
       }
     }, [IdItem, id]); // Dependências corrigidas
@@ -181,20 +181,24 @@ export function PontoMes() {
           ano: data.ano,
           registros: registrosPreenchidos,
         };
-        await api.post(
-          `ponto/salvar-registros/`,
-          payload
-        );
+        await api.post(`ponto/salvar-registros/`, payload);
         setLoading(false);
         setEditPonto(false);
-        topNotice({ success: `Ponto do colaborador ${colaborador.nome} salvo com sucesso!` })
+        topNotice({
+          success: `Ponto do colaborador ${colaborador.nome} salvo com sucesso!`,
+        });
       } catch (err) {
         topNotice({ error: `Erro ao salvar o ponto. Tente novamente. ${err}` });
         setLoading(false);
       }
     }
 
-    function calcularHorasTrabalhadas(entradaManha, saidaManha, entradaTarde, saidaTarde) {
+    function calcularHorasTrabalhadas(
+      entradaManha,
+      saidaManha,
+      entradaTarde,
+      saidaTarde
+    ) {
       const converterParaMinutos = (horaString) => {
         if (!horaString) return 0;
         const [horas, minutos] = horaString.split(':').map(Number);
@@ -221,16 +225,14 @@ export function PontoMes() {
         maxWidth="lg"
         fullWidth
       >
-
-
         <DialogTitle>
           <Grid container>
-            <Grid size={{ xs: 12 }} >
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h4">
                 {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
               </Typography>
-            </Grid >
-            <Grid size={{ xs: 12 }} >
+            </Grid>
+            <Grid size={{ xs: 12 }}>
               <Table size="small" sx={{ border: '1px solid #e0e0e0' }}>
                 <TableBody>
                   <TableRow>
@@ -295,15 +297,25 @@ export function PontoMes() {
             const entradaTarde = item.valores[2];
             const saidaTarde = item.valores[3];
 
-            const totalMinutos = calcularHorasTrabalhadas(entradaManha, saidaManha, entradaTarde, saidaTarde);
+            const totalMinutos = calcularHorasTrabalhadas(
+              entradaManha,
+              saidaManha,
+              entradaTarde,
+              saidaTarde
+            );
 
             const horas = Math.floor(Math.abs(totalMinutos) / 60);
             const minutos = Math.abs(totalMinutos) % 60;
             const sinal = totalMinutos < 0 ? '-' : '';
 
-            const horasFormatadas = `${sinal}${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
+            const horasFormatadas = `${sinal}${String(horas).padStart(
+              2,
+              '0'
+            )}:${String(minutos).padStart(2, '0')}`;
 
-            console.log(`Total de horas trabalhadas no dia: ${horasFormatadas}`);
+            console.log(
+              `Total de horas trabalhadas no dia: ${horasFormatadas}`
+            );
 
             const diaObj = diasDoMes[index];
             const isDelete = item.valores[6];
@@ -321,8 +333,8 @@ export function PontoMes() {
               backgroundColor: isDelete
                 ? '#f28b82'
                 : isSabado
-                  ? '#fff176'
-                  : '#fff',
+                ? '#fff176'
+                : '#fff',
             };
             return (
               <div
@@ -332,17 +344,26 @@ export function PontoMes() {
                   gridTemplateColumns: '14fr 1fr',
                 }}
               >
-                {isDelete ? <div style={{
-                  width: '100%',
-                  height: '35px',
-                  backgroundColor: '#f28b82',
-                  opacity: 0.6,
-                  pointerEvents: 'none',
-                  textAlign: 'center',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }
-                }> <p className="self-center">DELETAR DIA {diaObj.data}/{diaObj.mes} • {diaObj.diaSemana}</p> </div> :
+                {isDelete ? (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '35px',
+                      backgroundColor: '#f28b82',
+                      opacity: 0.6,
+                      pointerEvents: 'none',
+                      textAlign: 'center',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {' '}
+                    <p className="self-center">
+                      DELETAR DIA {diaObj.data}/{diaObj.mes} •{' '}
+                      {diaObj.diaSemana}
+                    </p>{' '}
+                  </div>
+                ) : (
                   <div style={linhaStyle}>
                     <div
                       style={{
@@ -354,12 +375,16 @@ export function PontoMes() {
                     </div>
                     <select
                       value={
-                        item.valores[5] ? "atestado" : item.valores[8] ? "ferias" : "normal"
+                        item.valores[5]
+                          ? 'atestado'
+                          : item.valores[8]
+                          ? 'ferias'
+                          : 'normal'
                       }
                       onChange={(e) => {
                         const v = e.target.value;
-                        handleChange(index, "atestado", v === "atestado");
-                        handleChange(index, "ferias", v === "ferias");
+                        handleChange(index, 'atestado', v === 'atestado');
+                        handleChange(index, 'ferias', v === 'ferias');
                       }}
                     >
                       <option value="normal">-</option>
@@ -423,18 +448,22 @@ export function PontoMes() {
                             handleChange(index, 'saida_tarde', e.target.value)
                           }
                         />
-                        <p className={
-                          (diaObj.diaSemana === 'sexta-feira' && Number(horasFormatadas.slice(0, 2)) < 8) ||
-                            (diaObj.diaSemana !== 'sexta-feira' && Number(horasFormatadas.slice(0, 2)) < 9)
-                            ? 'text-red-500' // Adiciona a classe 'text-red-500' para vermelho
-                            : 'text-green-400'
-                        }>
+                        <p
+                          className={
+                            (diaObj.diaSemana === 'sexta-feira' &&
+                              Number(horasFormatadas.slice(0, 2)) < 8) ||
+                            (diaObj.diaSemana !== 'sexta-feira' &&
+                              Number(horasFormatadas.slice(0, 2)) < 9)
+                              ? 'text-red-500' // Adiciona a classe 'text-red-500' para vermelho
+                              : 'text-green-400'
+                          }
+                        >
                           {horasFormatadas}
                         </p>
                       </>
-                    )
-                    }
-                  </div>}
+                    )}
+                  </div>
+                )}
                 <IconButton
                   sx={{
                     height: '30px',
@@ -514,12 +543,19 @@ export function PontoMes() {
     },
   ];
 
-  function abrirPopup(url) {
-    const nomeDaJanela = 'popupPersonalizado';
+  async function BaixaPonto(ano, mes) {
+    try {
+      const primeiraResposta = await api.get(`ponto/pdf/${id}/`);
+      console.log('Primeira requisição bem-sucedida:', primeiraResposta.status);
 
-    const opcoes = `width=${1080},height=${720},scrollbars=yes,resizable=yes`;
+       const url_download = `https://64.181.171.161/pontos/${ano}/${mes}/zip`;
+      window.open(url_download, '_blank');
 
-    window.open(url, nomeDaJanela, opcoes);
+    } catch (error) {
+      console.error('Ocorreu um erro nas requisições:', error.message);
+
+      alert('Ocorreu um erro ao baixar os arquivos.');
+    }
   }
 
   const filteredFuncionarios = useMemo(() => {
@@ -533,7 +569,6 @@ export function PontoMes() {
 
   return (
     <>
-
       {editPonto && <EditarPonto IdItem={editPonto.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
@@ -551,11 +586,7 @@ export function PontoMes() {
             }}
             aria-label="deletar"
             size="small"
-            onClick={() => {
-              const pop1 = abrirPopup(
-                `https://vetor-api.micaelfarias.com/api/ponto/pdf/${id}/`
-              );
-            }}
+            onClick={() => BaixaPonto(data.ano, data.mes)}
           >
             <FaFileDownload />
           </IconButton>
@@ -587,4 +618,3 @@ export function PontoMes() {
     </>
   );
 }
-
