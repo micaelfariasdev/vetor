@@ -15,7 +15,8 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import { TextField } from '@mui/material';
 import { useMemo } from 'react';
-import api from '../auth/auth'
+import api from '../auth/auth';
+import { topNotice } from '../../utils';
 
 export function Servicos() {
   const [data, setData] = useState([]);
@@ -24,6 +25,7 @@ export function Servicos() {
   const [del, setDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  var [att, setAtt] = useState(false);
 
   function Delete({ IdItem, itemName }) {
     const deleteAPi = async (IdItem) => {
@@ -36,8 +38,12 @@ export function Servicos() {
         );
         setDelete(false);
         setLoading(false);
-        window.location.reload();
+        setAtt((prev) => !prev);
+        topNotice({ success: 'Serviço excluído com sucesso!' });
       } catch (error) {
+        topNotice({
+          error: `Erro ao excluir o serviço. Tente novamente. ${error}`,
+        });
         console.error(error);
         setLoading(false);
       }
@@ -46,12 +52,7 @@ export function Servicos() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-
+      
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -94,8 +95,12 @@ export function Servicos() {
             descricao: desc,
           }
         );
-        window.location.reload();
+        setAtt((prev) => !prev);
+        topNotice({ success: 'Serviço editado com sucesso!' });
       } catch (error) {
+        topNotice({
+          error: `Não foi possível editar. Verifique os dados!. ${error}`,
+        });
         console.error(error);
         setError('Não foi possível criar. Verifique os dados.');
       } finally {
@@ -110,7 +115,7 @@ export function Servicos() {
           setTitulo(response.data.titulo);
           setDesc(response.data.descricao);
         });
-    }, []);
+    }, [att]);
 
     const handleClose = () => {
       setEdit(false);
@@ -118,12 +123,8 @@ export function Servicos() {
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-        {!loading && (
+   
+     
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
               <h1 className="block text-lg font-semibold text-gray-700">
@@ -163,7 +164,7 @@ export function Servicos() {
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
-        )}
+    
       </Dialog>
     );
   }
@@ -175,22 +176,24 @@ export function Servicos() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const NewObra = async (e) => {
+    const NewServico = async (e) => {
       e.preventDefault();
       setLoading(true);
 
       try {
-        const resp = await api.post(
-          'https://vetor-api.micaelfarias.com/api/servico/',
-          {
-            titulo: titulo,
-            descricao: desc,
-          }
-        );
-        window.location.reload();
+        const resp = await api.post('servico/', {
+          titulo: titulo,
+          descricao: desc,
+        });
+        setAtt((prev) => !prev);
+        topNotice({
+          success: `Serviço ${resp.data.titulo} criado com sucesso!`,
+        });
+        setCreate(false);
       } catch (error) {
-        console.error(error);
-        setError('Não foi possível criar. Verifique os dados.');
+        topNotice({
+          error: `Não foi possível criar. Verifique os dados!. ${error}`,
+        });
       } finally {
         setLoading(false);
       }
@@ -202,12 +205,7 @@ export function Servicos() {
 
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-        {!loading && (
+     
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
               <h1 className="block text-lg font-semibold text-gray-700">
@@ -218,7 +216,10 @@ export function Servicos() {
                 onClick={handleClose}
               />
             </div>
-            <form onSubmit={NewObra} className="grid grid-cols-2 gap-5 gap-x-4">
+            <form
+              onSubmit={NewServico}
+              className="grid grid-cols-2 gap-5 gap-x-4"
+            >
               <FormControl fullWidth className="col-span-2">
                 <TextField
                   id="titulo"
@@ -247,7 +248,7 @@ export function Servicos() {
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
-        )}
+     
       </Dialog>
     );
   }
@@ -260,14 +261,12 @@ export function Servicos() {
         setData(response.data);
       })
       .catch((error) => {
-        console.error("Erro ao buscar os dados:", error);
+        console.error('Erro ao buscar os dados:', error);
       })
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
-  }, []);
-
-
+  }, [att]);
 
   const columns = [
     { field: 'titulo', headerName: 'Serviço', minWidth: 200, flex: 3 },
@@ -339,11 +338,7 @@ export function Servicos() {
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+
       {create && <CreateNew create={create} setCreate={setCreate} />}
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
       {edit && <Edit IdItem={edit.id} />}
@@ -393,4 +388,3 @@ export function Servicos() {
     </>
   );
 }
-

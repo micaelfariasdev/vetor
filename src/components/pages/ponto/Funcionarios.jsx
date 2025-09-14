@@ -20,10 +20,7 @@ import TextField from '@mui/material/TextField';
 import { useMemo } from 'react';
 
 import { default as api } from '../auth/auth';
-
-
-
-
+import { topNotice } from '../../utils';
 
 export function Funcionarios() {
   const [data, setData] = useState([]);
@@ -46,8 +43,12 @@ export function Funcionarios() {
         );
         setDelete(false);
         setLoading(false);
-        setData(prev => prev.filter(f => f.id !== IdItem));
+        topNotice({ success: 'Funcionario excluído com sucesso!' });
+        setData((prev) => prev.filter((f) => f.id !== IdItem));
       } catch (error) {
+        topNotice({
+          error: `Erro ao excluir o funcionario. Tente novamente. ${error}`,
+        });
         console.error(error);
         setLoading(false);
       }
@@ -56,7 +57,6 @@ export function Funcionarios() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -113,8 +113,12 @@ export function Funcionarios() {
             obra,
           }
         );
-        setData(prev => prev.map(f => f.id === IdItem ? response.data : f));
+        setData((prev) =>
+          prev.map((f) => (f.id === IdItem ? response.data : f))
+        );
+        topNotice({ success: 'Funcionario editado com sucesso!' });
       } catch (error) {
+        topNotice({ error: `Não foi possível editar. Verifique os dados!. ${error}` });
         console.error(error);
         setError('Não foi possível criar. Verifique os dados.');
       } finally {
@@ -139,7 +143,6 @@ export function Funcionarios() {
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
-
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
@@ -229,7 +232,7 @@ export function Funcionarios() {
         .get('https://vetor-api.micaelfarias.com/api/obras/')
         .then((response) => {
           setArrayObra(response.data);
-        })
+        });
     }, []);
 
     const NewFuncionario = async (e) => {
@@ -246,11 +249,14 @@ export function Funcionarios() {
             obra,
           }
         );
-        setData(prev => [...prev, response.data]);
-
+        setData((prev) => [...prev, response.data]);
+        topNotice({
+          success: `Funcionario ${response.data.nome} criado com sucesso!`,
+        });
       } catch (error) {
-        console.error(error);
-        setError('Não foi possível criar. Verifique os dados.');
+        topNotice({
+          error: `Não foi possível criar. Verifique os dados!. ${error}`,
+        });
       } finally {
         setLoading(false);
       }
@@ -262,7 +268,6 @@ export function Funcionarios() {
 
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
@@ -345,19 +350,22 @@ export function Funcionarios() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await api.get('https://vetor-api.micaelfarias.com/api/colaboradores/');
+        const response = await api.get(
+          'https://vetor-api.micaelfarias.com/api/colaboradores/'
+        );
         if (isMounted) setData(response.data);
       } catch (error) {
-        console.error("Erro ao buscar os dados:", error);
+        console.error('Erro ao buscar os dados:', error);
       } finally {
         if (isMounted) setLoading(false);
       }
     };
     fetchData();
 
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
 
   const columns = [
     { field: 'nome', headerName: 'Funcionario', minWidth: 200, flex: 1 },
@@ -418,7 +426,8 @@ export function Funcionarios() {
       const nomeMatch = func.nome
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      const obraMatch = (func.obra_name || '').toLowerCase()
+      const obraMatch = (func.obra_name || '')
+        .toLowerCase()
         .includes(searchObraQuery.toLowerCase());
       return nomeMatch && obraMatch;
     });
@@ -430,11 +439,7 @@ export function Funcionarios() {
   }, [data]);
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+
       {create && <CreateNew create={create} setCreate={setCreate} />}
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
       {edit && <Edit IdItem={edit.id} />}

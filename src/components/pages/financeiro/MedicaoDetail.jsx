@@ -11,20 +11,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import { useParams } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import { useMemo } from 'react';
 import api from '../auth/auth';
-import { formatarDinheiro } from '../../utils';
+import { formatarDinheiro, topNotice } from '../../utils';
 import { Collapse, TextField } from '@mui/material';
-
-
 
 export function MedicaoDetail() {
   const { id } = useParams();
@@ -35,8 +30,7 @@ export function MedicaoDetail() {
   var [loading, setLoading] = useState(false);
   var [att, setAtt] = useState(false);
 
-  const [error, setError] = useState('')
-
+  const [error, setError] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
@@ -47,13 +41,15 @@ export function MedicaoDetail() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await api.delete(
-          `medicao-colaborador/${IdItem}/`
-        );
+        const response = await api.delete(`medicao-colaborador/${IdItem}/`);
         setDelete(false);
         setLoading(false);
-        setAtt(prev => !prev)
+        setAtt((prev) => !prev);
+        topNotice({ success: 'Colaborador excluído com sucesso!' });
       } catch (error) {
+        topNotice({
+          error: `Erro ao excluir o colaborador. Tente novamente. ${error}`,
+        });
         console.error(error);
         setLoading(false);
       }
@@ -66,7 +62,8 @@ export function MedicaoDetail() {
           <DialogContent>
             <DialogContentText>
               Tem certeza que deseja excluir o Colaborador{' '}
-              <strong>{itemName}</strong> dessa medição? Esta ação não pode ser desfeita.
+              <strong>{itemName}</strong> dessa medição? Esta ação não pode ser
+              desfeita.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -86,20 +83,19 @@ export function MedicaoDetail() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [colaborador, setColaborador] = useState('')
-    const [arrayColaborador, setArrayColaborador] = useState([])
-
+    const [colaborador, setColaborador] = useState('');
+    const [arrayColaborador, setArrayColaborador] = useState([]);
 
     useEffect(() => {
       api.get('colaboradores/').then((response) => {
-        setArrayColaborador(response.data)
-      })
-    }, [])
+        setArrayColaborador(response.data);
+      });
+    }, []);
 
     const NewColaborador = async (e) => {
       e.preventDefault();
       setLoading(true);
-      setError("");
+      setError('');
 
       try {
         await api.post('medicao-colaborador/', {
@@ -107,18 +103,24 @@ export function MedicaoDetail() {
           medicao: id,
         });
         setCreate(false);
-        setAtt(prev => !prev)
+        setAtt((prev) => !prev);
+        topNotice({ success: `Colaborador adicionado com sucesso!` });
       } catch (err) {
         if (err.response && err.response.data) {
           const data = err.response.data;
 
           // Pega a primeira mensagem de erro disponível
           const firstKey = Object.keys(data)[0];
-          const firstMessage = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey];
-          console.error(firstMessage);
-          setError(firstMessage);
+          const firstMessage = Array.isArray(data[firstKey])
+            ? data[firstKey][0]
+            : data[firstKey];
+          topNotice({
+            error: `Erro ao adicionar o colaborador. Tente novamente. ${firstMessage}`,
+          });
         } else {
-          setError("Não foi possível criar. Verifique os dados.");
+          topNotice({
+            error: `Não foi possível criar. Verifique os dados!. ${err}`,
+          });
         }
       } finally {
         setLoading(false);
@@ -126,9 +128,11 @@ export function MedicaoDetail() {
     };
 
     const handleClose = () => {
-      setCreate(false)
-    }
-    const options = arrayColaborador.filter(i => i.obra === data.obra).map(({ id, nome }) => ({ 'id': id, 'label': nome }))
+      setCreate(false);
+    };
+    const options = arrayColaborador
+      .filter((i) => i.obra === data.obra)
+      .map(({ id, nome }) => ({ id: id, label: nome }));
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
         <div className="p-5 gap-4 flex flex-col w-100">
@@ -142,11 +146,16 @@ export function MedicaoDetail() {
             />
           </div>
 
-          <form onSubmit={NewColaborador} className="flex flex-col gap-5 gap-x-4">
+          <form
+            onSubmit={NewColaborador}
+            className="flex flex-col gap-5 gap-x-4"
+          >
             <Autocomplete
               options={options}
               onChange={(e, value) => setColaborador(value.id)}
-              renderInput={(params) => <TextField {...params} label="Colaborador" />}
+              renderInput={(params) => (
+                <TextField {...params} label="Colaborador" />
+              )}
             />
 
             <button
@@ -158,31 +167,30 @@ export function MedicaoDetail() {
           </form>
 
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
         </div>
       </Dialog>
-
-    )
+    );
   }
 
   function EditMedicaoColaborador({ IdColaborador }) {
     const [dataCol, setDataCol] = useState([]);
     const [deleteServ, setDeleteServ] = useState(false);
-    const [servicos, setServicos] = useState('')
-    const [descricao, setDescricao] = useState('')
-    const [quantidade, setQuantidade] = useState('')
-    const [valor, setValor] = useState('')
-    const [create, setCreate] = useState(false)
-    const [arrayServicos, setArrayServicos] = useState([])
-
+    const [servicos, setServicos] = useState('');
+    const [descricao, setDescricao] = useState('');
+    const [quantidade, setQuantidade] = useState('');
+    const [valor, setValor] = useState('');
+    const [create, setCreate] = useState(false);
+    const [arrayServicos, setArrayServicos] = useState([]);
 
     useEffect(() => {
       api.get('servico/').then((response) => {
-        setArrayServicos(response.data)
-      })
-    }, [])
+        setArrayServicos(response.data);
+      });
+    }, []);
 
-    const options = arrayServicos.filter(i => (i.obras).includes(data.obra)).map(({ id, titulo }) => ({ 'id': id, 'label': titulo }))
+    const options = arrayServicos
+      .filter((i) => i.obras.includes(data.obra))
+      .map(({ id, titulo }) => ({ id: id, label: titulo }));
 
     function DeleteServ({ IdItem, itemName }) {
       const deleteAPi = async (IdItem) => {
@@ -190,13 +198,14 @@ export function MedicaoDetail() {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         try {
-          const response = await api.delete(
-            `item-medicao/${IdItem}/`
-          );
+          const response = await api.delete(`item-medicao/${IdItem}/`);
           setDeleteServ(false);
-          setAtt(prev => !prev);
-
+          setAtt((prev) => !prev);
+          topNotice({ success: 'Serviço excluído com sucesso!' });
         } catch (error) {
+          topNotice({
+            error: `Erro ao excluir o serviço. Tente novamente. ${error}`,
+          });
           console.error(error);
         }
       };
@@ -204,11 +213,10 @@ export function MedicaoDetail() {
       return (
         <>
           <Dialog open={deleteServ} onClose={() => setDeleteServ(false)}>
-
             <DialogTitle>Confirmar Exclusão</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Tem certeza que deseja excluir o serviço de {' '}
+                Tem certeza que deseja excluir o serviço de{' '}
                 <strong>{itemName}</strong>? Esta ação não pode ser desfeita.
               </DialogContentText>
             </DialogContent>
@@ -231,7 +239,7 @@ export function MedicaoDetail() {
     const NewService = async (e) => {
       e.preventDefault();
       setLoading(true);
-      setError("");
+      setError('');
 
       try {
         await api.post('item-medicao/', {
@@ -242,18 +250,24 @@ export function MedicaoDetail() {
           valor_unitario: valor,
         });
         setCreate(false);
-        setAtt(prev => !prev)
+        setAtt((prev) => !prev);
+        topNotice({ success: `Serviço adicionado com sucesso!` });
       } catch (err) {
         if (err.response && err.response.data) {
           const data = err.response.data;
 
           // Pega a primeira mensagem de erro disponível
           const firstKey = Object.keys(data)[0];
-          const firstMessage = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey];
-          console.error(firstMessage);
-          setError(firstMessage);
+          const firstMessage = Array.isArray(data[firstKey])
+            ? data[firstKey][0]
+            : data[firstKey];
+          topNotice({
+            error: `Erro ao adicionar o serviço. Tente novamente. ${firstMessage}`,
+          });
         } else {
-          setError("Não foi possível criar. Verifique os dados.");
+          topNotice({
+            error: `Não foi possível criar. Verifique os dados!. ${err}`,
+          });
         }
       } finally {
         setLoading(false);
@@ -263,13 +277,29 @@ export function MedicaoDetail() {
     const columns = [
       { field: 'servico_nome', headerName: 'Serviço', flex: 1 },
       {
-        field: "descricao",
-        headerName: "Descrição",
+        field: 'descricao',
+        headerName: 'Descrição',
         flex: 1,
       },
-      { field: 'quantidade_feita', headerName: 'Quantidade', flex: 1, editable: true },
-      { field: 'valor_unitario', headerName: 'Valor Unitario', flex: 1, editable: true, valueFormatter: (params) => formatarDinheiro(params), },
-      { field: 'valor_total', headerName: 'Total', flex: 1, valueFormatter: (params) => formatarDinheiro(params), },
+      {
+        field: 'quantidade_feita',
+        headerName: 'Quantidade',
+        flex: 1,
+        editable: true,
+      },
+      {
+        field: 'valor_unitario',
+        headerName: 'Valor Unitario',
+        flex: 1,
+        editable: true,
+        valueFormatter: (params) => formatarDinheiro(params),
+      },
+      {
+        field: 'valor_total',
+        headerName: 'Total',
+        flex: 1,
+        valueFormatter: (params) => formatarDinheiro(params),
+      },
       {
         field: 'acoes',
         headerName: 'Ações',
@@ -291,7 +321,10 @@ export function MedicaoDetail() {
               aria-label="deletar"
               size="small"
               onClick={() =>
-                setDeleteServ({ id: params.row.id, nome: params.row.servico_nome })
+                setDeleteServ({
+                  id: params.row.id,
+                  nome: params.row.servico_nome,
+                })
               }
             >
               <MdDelete />
@@ -303,7 +336,9 @@ export function MedicaoDetail() {
 
     useEffect(() => {
       setLoading(true);
-      const find = data.colaboradores_associados.find((col) => col.id === IdColaborador)
+      const find = data.colaboradores_associados.find(
+        (col) => col.id === IdColaborador
+      );
       setDataCol(find);
       setLoading(false);
     }, [IdColaborador]);
@@ -311,34 +346,43 @@ export function MedicaoDetail() {
     const handleProcessRowUpdate = async (newRow, oldRow) => {
       try {
         const resp = await api.patch(`item-medicao/${newRow.id}/`, newRow);
-        setAtt(prev => !prev); // ✅ ativa o useEffect do fetch
+        setAtt((prev) => !prev); // ✅ ativa o useEffect do fetch
+        topNotice({ success: 'Atualizado com sucesso!' });
       } catch (error) {
-        console.error("Erro ao atualizar:", error);
+        topNotice({ error: `Erro ao atualizar. Tente novamente. ${error}` });
+        console.error('Erro ao atualizar:', error);
       }
     };
 
-
-
-
     return (
       <>
-        {deleteServ && <DeleteServ IdItem={deleteServ.id} itemName={deleteServ.nome} />}
+        {deleteServ && (
+          <DeleteServ IdItem={deleteServ.id} itemName={deleteServ.nome} />
+        )}
 
-        <Dialog open={edit} onClose={() => setEdit(false)} fullWidth maxWidth="lg"
+        <Dialog
+          open={edit}
+          onClose={() => setEdit(false)}
+          fullWidth
+          maxWidth="lg"
           aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description">
-          <DialogContent aria-label="close"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent
+            aria-label="close"
             sx={(theme) => ({
               display: 'flex',
               justifyContent: 'space-between',
               flexDirection: 'row',
               alignItems: 'center',
-            })}>
+            })}
+          >
             <DialogTitle id="alert-dialog-title">
               <strong>Nome:</strong> {dataCol.colaborador_name}
             </DialogTitle>
             <DialogTitle id="alert-dialog-title">
-              <strong>Valor Total:</strong> {formatarDinheiro(dataCol.valor_total)}
+              <strong>Valor Total:</strong>{' '}
+              {formatarDinheiro(dataCol.valor_total)}
             </DialogTitle>
             <IconButton
               sx={{
@@ -350,21 +394,24 @@ export function MedicaoDetail() {
                 },
               }}
               aria-label="plus"
-              onClick={() => setCreate(prev => !prev)}
+              onClick={() => setCreate((prev) => !prev)}
             >
               <FaCirclePlus />
             </IconButton>
-
           </DialogContent>
           <Collapse in={create} timeout="auto" unmountOnExit>
-            <DialogContent dividers >
-
-              <form onSubmit={NewService} className="flex flex-row gap-5 gap-x-4">
+            <DialogContent dividers>
+              <form
+                onSubmit={NewService}
+                className="flex flex-row gap-5 gap-x-4"
+              >
                 <FormControl fullWidth className="col-span-2">
                   <Autocomplete
                     options={options}
                     onChange={(e, value) => setServicos(value.id)}
-                    renderInput={(params) => <TextField {...params} label="Serviços" />}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Serviços" />
+                    )}
                   />
                 </FormControl>
                 <FormControl fullWidth className="col-span-2">
@@ -384,8 +431,8 @@ export function MedicaoDetail() {
                     value={quantidade}
                     type="number"
                     inputProps={{
-                      step: "0.01",
-                      min: "0.00"
+                      step: '0.01',
+                      min: '0.00',
                     }}
                     onChange={(e) => setQuantidade(e.target.value)}
                   />
@@ -397,8 +444,8 @@ export function MedicaoDetail() {
                     variant="outlined"
                     type="number"
                     inputProps={{
-                      step: "0.01",
-                      min: "0.00"
+                      step: '0.01',
+                      min: '0.00',
                     }}
                     value={valor}
                     onChange={(e) => setValor(e.target.value)}
@@ -424,9 +471,7 @@ export function MedicaoDetail() {
                 }}
                 initialState={{
                   sorting: {
-                    sortModel: [
-                      { field: 'servico', sort: 'desc' },
-                    ],
+                    sortModel: [{ field: 'servico', sort: 'desc' }],
                   },
                 }}
                 sx={{ border: 0 }}
@@ -435,14 +480,12 @@ export function MedicaoDetail() {
               />
             </Paper>
           </DialogContent>
-        </Dialog >
+        </Dialog>
       </>
-    )
+    );
   }
 
-
   useEffect(() => {
-    console.log(att)
     setLoading(true);
     api
       .get(`medicao/${id}`)
@@ -459,10 +502,15 @@ export function MedicaoDetail() {
       });
   }, [att]);
 
-
   const columns = [
     { field: 'colaborador_name', headerName: 'Nome', minWidth: 250, flex: 1 },
-    { field: 'valor_total', headerName: 'Valor Total', minWidth: 250, flex: 1, valueFormatter: (params) => formatarDinheiro(params), },
+    {
+      field: 'valor_total',
+      headerName: 'Valor Total',
+      minWidth: 250,
+      flex: 1,
+      valueFormatter: (params) => formatarDinheiro(params),
+    },
     {
       field: 'acoes',
       headerName: 'Ações',
@@ -482,9 +530,7 @@ export function MedicaoDetail() {
               },
               padding: 1,
             }}
-            onClick={() =>
-              setEdit(params.row.id)
-            }
+            onClick={() => setEdit(params.row.id)}
           >
             <FaEdit />
           </IconButton>
@@ -501,7 +547,10 @@ export function MedicaoDetail() {
             aria-label="deletar"
             size="small"
             onClick={() =>
-              setDelete({ id: params.row.id, nome: params.row.colaborador_name })
+              setDelete({
+                id: params.row.id,
+                nome: params.row.colaborador_name,
+              })
             }
           >
             <MdDelete />
@@ -525,69 +574,60 @@ export function MedicaoDetail() {
 
   return (
     <>
-      {loading ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200">
-          <div className="w-12 h-12 border-4 border-blue-300 border-t-transparent rounded-full animate-spin" />
+      {create && <CreateNew create={create} setCreate={setCreate} />}
+      {edit && <EditMedicaoColaborador IdColaborador={edit} />}
+      {del && <Delete IdItem={del.id} itemName={del.nome} />}
+      <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
+        <div className="grid grid-cols-[1fr_auto] items-center ">
+          <h1 className="font-bold text-3xl">{data.str}</h1>
+          <IconButton
+            sx={{
+              padding: 1,
+              backgroundColor: 'info.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'info.dark',
+              },
+            }}
+            aria-label="deletar"
+            size="small"
+            onClick={() => setCreate(true)}
+          >
+            <FaCirclePlus />
+          </IconButton>
         </div>
-      ) : (
-        <>
-          {create && <CreateNew create={create} setCreate={setCreate} />}
-          {edit && <EditMedicaoColaborador IdColaborador={edit} />}
-          {del && <Delete IdItem={del.id} itemName={del.nome} />}
-          <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
-            <div className="grid grid-cols-[1fr_auto] items-center ">
-              <h1 className="font-bold text-3xl">{data.str}</h1>
-              <IconButton
-                sx={{
-                  padding: 1,
-                  backgroundColor: 'info.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'info.dark',
-                  },
-                }}
-                aria-label="deletar"
-                size="small"
-                onClick={() => setCreate(true)}
-              >
-                <FaCirclePlus />
-              </IconButton>
-            </div>
-            <hr className="col-span-2" />
-            <div className="col-span-2 flex gap-2 ">
-              <input
-                type="text"
-                placeholder="Pesquisar por nome..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="p-2 border rounded-md w-[50%]"
-              />
-            </div>
-            <Paper>
-              <DataGrid
-                rows={filterObra}
-                columns={columns}
-                columnVisibilityModel={{
-                  ano: false,
-                  mes: false,
-                }}
-                initialState={{
-                  sorting: {
-                    sortModel: [
-                      { field: 'ano', sort: 'desc' },
-                      { field: 'mes', sort: 'desc' },
-                      { field: 'nome', sort: 'asc' },
-                    ],
-                  },
-                }}
-                pageSizeOptions={[5, 10]}
-                sx={{ border: 0 }}
-              />
-            </Paper>
-          </div>
-        </>
-      )}
+        <hr className="col-span-2" />
+        <div className="col-span-2 flex gap-2 ">
+          <input
+            type="text"
+            placeholder="Pesquisar por nome..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 border rounded-md w-[50%]"
+          />
+        </div>
+        <Paper>
+          <DataGrid
+            rows={filterObra}
+            columns={columns}
+            columnVisibilityModel={{
+              ano: false,
+              mes: false,
+            }}
+            initialState={{
+              sorting: {
+                sortModel: [
+                  { field: 'ano', sort: 'desc' },
+                  { field: 'mes', sort: 'desc' },
+                  { field: 'nome', sort: 'asc' },
+                ],
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+            sx={{ border: 0 }}
+          />
+        </Paper>
+      </div>
     </>
-
   );
 }

@@ -202,16 +202,6 @@ export function Menu({ onNavigate }) {
                 ['ponto', 'Ponto'],
               ],
             },
-            {
-              type: 'list',
-              label: 'Engenharia',
-              icon: <IoIosConstruct />,
-              open: 5,
-              list: [
-                ['desp-mes-mes', 'Despesas Mês a Mês'],
-                ['cronograma', 'Cronograma'],
-              ],
-            },
           ]}
         />
         <amp-ad
@@ -305,11 +295,7 @@ export function MenuTop() {
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+      
       <div className="flex flex-row-reverse items-center gap-4 px-10 border-b-2 border-gray-200 ">
         <Box
           sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}

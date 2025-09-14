@@ -30,9 +30,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import api from '../auth/auth'
+import api from '../auth/auth';
 import { topNotice } from '../../utils';
-
 
 function a11yProps(index) {
   return {
@@ -67,10 +66,9 @@ export function Obras_detail() {
         setType(response.data.tipo_obra);
         setServ(response.data.servicos);
         setUnidades(response.data.andares);
-
       })
       .catch((error) => {
-        console.error("Erro ao buscar os dados:", error);
+        console.error('Erro ao buscar os dados:', error);
       })
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
@@ -82,39 +80,16 @@ export function Obras_detail() {
     setLoading(true);
 
     try {
-      const resp = await api.patch(
-        `obras/${id}/`,
-        {
-          nome,
-          endereço: end,
-          cnpj,
-          type,
-        }
-      );
-      setAtt(prev => !prev)
-      topNotice({ success: "Obra editada com sucesso!" })
+      const resp = await api.patch(`obras/${id}/`, {
+        nome,
+        endereço: end,
+        cnpj,
+        type,
+      });
+      setAtt((prev) => !prev);
+      topNotice({ success: 'Obra editada com sucesso!' });
     } catch (error) {
       console.error(error);
-      setError('Não foi possível criar. Verifique os dados.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const EditServicos = async (e) => {
-    setLoading(true);
-
-    try {
-      const resp = await api.patch(
-        `obras/${id}/`,
-        {
-          servicos: serv.map((item) => item.id),
-        }
-      );
-      setAtt(prev => !prev)
-      topNotice({ success: "Serviços editados com sucesso!" })
-    } catch (error) {
-      console.log(error);
       setError('Não foi possível criar. Verifique os dados.');
     } finally {
       setLoading(false);
@@ -144,9 +119,33 @@ export function Obras_detail() {
     setValue(newValue);
   };
 
-  const handleRemoveItem = (idToRemove) => {
+  const handleRemoveItem = (idToRemove, name) => {
     const updatedItems = serv.filter((item) => item.id !== idToRemove);
     setServ(updatedItems);
+    try {
+      api
+        .delete(`obras/${id}/remove-servicos/`, {
+          data: { servico_id: idToRemove },
+        })
+        .then((response) => {
+          topNotice({ success: `Serviço ${name} removido com sucesso!` });
+        });
+    } catch (err) {
+      topNotice({ error: 'Erro ao remover serviço. Tente novamente.' });
+    }
+  };
+  const handleAddItem = (idToAdd, name) => {
+    try {
+      api
+        .post(`obras/${id}/add-servicos/`, {
+          servico_id: idToAdd,
+        })
+        .then((response) => {
+          topNotice({ success: `Serviço ${name} adicionado com sucesso!` });
+        });
+    } catch (err) {
+      topNotice({ error: 'Erro ao adicionar serviço. Tente novamente.' });
+    }
   };
 
   function SearchServ({ search, setSearch }) {
@@ -194,7 +193,10 @@ export function Obras_detail() {
                   <IconButton
                     edge="end"
                     aria-label="adicionar"
-                    onClick={() => { setServ([...serv, item]); topNotice({ success: `Serviço ${item.titulo} adicionado!` }) }}
+                    onClick={() => {
+                      setServ([...serv, item]);
+                      handleAddItem(item.id, item.titulo);
+                    }}
                     color="primary"
                   >
                     <AddCircleIcon />
@@ -213,98 +215,93 @@ export function Obras_detail() {
   }
 
   function EditServicosUnidades({ idUni, obra }) {
-    const [editServ, setEditServ] = useState([])
-
+    const [editServ, setEditServ] = useState([]);
 
     useEffect(() => {
       async function fetchData() {
         try {
-          const response = await api.get("servico-unidade/")
-          const filterServ = response.data.filter(item => item.unidade === idUni)
-          setEditServ(filterServ)
-          console.log("filterServ", filterServ)
+          const response = await api.get('servico-unidade/');
+          const filterServ = response.data.filter(
+            (item) => item.unidade === idUni
+          );
+          setEditServ(filterServ);
+          console.log('filterServ', filterServ);
         } catch (err) {
-          console.error("Erro ao carregar serviço:", err)
+          console.error('Erro ao carregar serviço:', err);
         }
       }
 
       if (idUni) {
-        fetchData()
+        fetchData();
       }
-    }, [idUni])
+    }, [idUni]);
 
     const handleClose = () => {
       setEdit(false);
     };
 
-
-    // Atualiza o valor localmente
     const handleChange = ({ ServId, Value }) => {
       setEditServ((prev) =>
         prev.map((item) =>
           item.servico === ServId ? { ...item, progresso: Value } : item
         )
-      )
-    }
+      );
+    };
 
-    // Envia para a API ao sair do campo
     const handleBlur = async ({ ServId, Value }) => {
       const payload = {
         [ServId]: {
           unidade: Number(idUni),
-          valor: Number(Value)
-        }
-      }
+          valor: Number(Value),
+        },
+      };
 
       try {
-        await api.post("servico-unidade/salvar-servicos/", payload)
-        topNotice({ success: "Serviço salvo com sucesso!" })
+        await api.post('servico-unidade/salvar-servicos/', payload);
+        topNotice({ success: 'Serviço salvo com sucesso!' });
       } catch (err) {
-        topNotice({ error: `Erro ao salvar serviço. ${err}` })
-        console.error("Erro ao salvar serviço:", err)
+        topNotice({ error: `Erro ao salvar serviço. ${err}` });
+        console.error('Erro ao salvar serviço:', err);
       }
-    }
-
+    };
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
         <Box className="w-full h-full min-h-150 min-w-150 p-5">
           <List>
             {serv.map((item) => {
-              const found = editServ.find(i => i.servico === item.id) || {}
+              const found = editServ.find((i) => i.servico === item.id) || {};
               return (
                 <ListItem key={item.id} divider>
                   <ListItemText primary={item.titulo} />
                   <TextField
                     label="Progresso (%)"
                     type="number"
-                    value={found.progresso ?? ""}
+                    value={found.progresso ?? ''}
                     inputProps={{
                       min: 0,
                       max: 100,
                     }}
-                    onChange={(e) => handleChange({ ServId: item.id, Value: e.target.value })}
-                    onBlur={(e) => handleBlur({ ServId: item.id, Value: e.target.value })}
+                    onChange={(e) =>
+                      handleChange({ ServId: item.id, Value: e.target.value })
+                    }
+                    onBlur={(e) =>
+                      handleBlur({ ServId: item.id, Value: e.target.value })
+                    }
                     helperText="Digite um valor de 0 a 100"
                   />
                 </ListItem>
-              )
+              );
             })}
           </List>
         </Box>
-
       </Dialog>
     );
   }
 
-
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+    
       {search && <SearchServ search={search} setSearch={setSearch} />}
       {edit && <EditServicosUnidades idUni={edit} obra={id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
@@ -313,7 +310,9 @@ export function Obras_detail() {
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2 flex gap-2 ">
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', minWidth: '100%' }}>
+          <Box
+            sx={{ borderBottom: 1, borderColor: 'divider', minWidth: '100%' }}
+          >
             <Tabs
               value={value}
               onChange={handleChangee}
@@ -393,7 +392,7 @@ export function Obras_detail() {
                   <IconButton
                     edge="end"
                     aria-label="remover"
-                    onClick={() => handleRemoveItem(item.id)}
+                    onClick={() => handleRemoveItem(item.id, item.titulo)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -405,18 +404,12 @@ export function Obras_detail() {
               </Typography>
             )}
           </List>
-          <Box className="grid gap-2 grid-cols-2 justify-self-end">
+          <Box className="grid gap-2 grid-cols-1 justify-self-end">
             <button
               className="bg-gray-500 rounded-xl cursor-pointer text-white p-2"
               onClick={() => setSearch(true)}
             >
               Adicionar
-            </button>
-            <button
-              className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 "
-              onClick={() => EditServicos()}
-            >
-              Salvar
             </button>
           </Box>
         </Paper>
@@ -436,15 +429,21 @@ export function Obras_detail() {
                       key={row.id}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                      <TableCell component="th" scope="row"
+                      <TableCell
+                        component="th"
+                        scope="row"
                         onClick={() => setOpenAndar(row.id)}
                         selected={openAndar === row.id}
                       >
                         {row.nome}
                       </TableCell>
                     </TableRow>
-                    <Collapse in={openAndar === row.id} timeout="auto" unmountOnExit>
-                      <div className='w-full flex gap-5 p-2 font-bold'>
+                    <Collapse
+                      in={openAndar === row.id}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      <div className="w-full flex gap-5 p-2 font-bold">
                         {row.unidades.map((item, index) => (
                           <ThemeProvider
                             theme={{
@@ -470,7 +469,9 @@ export function Obras_detail() {
                                 },
                               }}
                               onClick={() => setEdit(item.id)}
-                            >{item.nome_ou_numero}</Box>
+                            >
+                              {item.nome_ou_numero}
+                            </Box>
                           </ThemeProvider>
                         ))}
                       </div>

@@ -19,6 +19,7 @@ import IconButton from '@mui/material/IconButton';
 import { TextField } from '@mui/material';
 import { useMemo } from 'react';
 import api from '../auth/auth';
+import { topNotice } from '../../utils';
 
 export function Obras() {
   const [data, setData] = useState([]);
@@ -28,6 +29,7 @@ export function Obras() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
+  var [att, setAtt] = useState(false);
 
   function Delete({ IdItem, itemName }) {
     const deleteAPi = async (IdItem) => {
@@ -40,8 +42,12 @@ export function Obras() {
         );
         setDelete(false);
         setLoading(false);
-        window.location.reload();
+        setAtt((prev) => !prev);
+        topNotice({ success: 'Obra excluída com sucesso!' });
       } catch (error) {
+        topNotice({
+          error: `Erro ao excluir a obra. Tente novamente. ${error}`,
+        });
         console.error(error);
         setLoading(false);
       }
@@ -50,12 +56,7 @@ export function Obras() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-
+       
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -93,20 +94,19 @@ export function Obras() {
       setLoading(true);
 
       try {
-        const resp = await api.post(
-          'https://vetor-api.micaelfarias.com/api/obras/',
-          {
-            author: 1,
-            nome,
-            endereço: end,
-            cnpj,
-            type,
-          }
-        );
-        window.location.reload();
+        const resp = await api.post('obras/', {
+          author: 1,
+          nome,
+          endereço: end,
+          cnpj,
+          type,
+        });
+        setAtt((prev) => !prev);
+        topNotice({ success: `Obra ${resp.data.nome} criada com sucesso!` });
       } catch (error) {
-        console.error(error);
-        setError('Não foi possível criar. Verifique os dados.');
+        topNotice({
+          error: `Não foi possível criar. Verifique os dados!. ${error}`,
+        });
       } finally {
         setLoading(false);
       }
@@ -134,11 +134,7 @@ export function Obras() {
     };
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
+      
         {!loading && (
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
@@ -224,7 +220,7 @@ export function Obras() {
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
       });
-  }, []);
+  }, [att]);
 
   const columns = [
     { field: 'nome', headerName: 'Obra', minWidth: 250, flex: 1 },
@@ -306,14 +302,9 @@ export function Obras() {
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+ 
       {create && <CreateNew create={create} setCreate={setCreate} />}
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
-      {edit && <Edit IdItem={edit.id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Obras</h1>

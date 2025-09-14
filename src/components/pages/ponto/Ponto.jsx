@@ -17,9 +17,8 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import api from '../auth/auth'
-import { ConvertMes } from '../../utils';
-
+import api from '../auth/auth';
+import { ConvertMes, topNotice } from '../../utils';
 
 export function Ponto() {
   const [data, setData] = useState([]);
@@ -47,12 +46,7 @@ export function Ponto() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-
+       
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -93,23 +87,26 @@ export function Ponto() {
         });
     }, []);
 
-    const NewFuncionario = async (e) => {
+    const NewMesPonto = async (e) => {
       e.preventDefault();
       setLoading(true);
 
       try {
-        const resp = await api.post('https://vetor-api.micaelfarias.com/api/mes-ponto/', {
-          author: 1,
-          mes,
-          ano,
-          obra,
-        });
-        window.location.href = `ponto/${resp.data.id}`
-
-        // window.location.reload();
+        const resp = await api.post(
+          'https://vetor-api.micaelfarias.com/api/mes-ponto/',
+          {
+            author: 1,
+            mes,
+            ano,
+            obra,
+          }
+        );
+        window.location.href = `ponto/${resp.data.id}`;
+        topNotice({ success: `Cadastro criado com sucesso!` });
       } catch (error) {
-        console.error(error);
-        setError('Não foi possível criar. Verifique os dados.');
+        topNotice({
+          success: `Não foi possível criar. Verifique os dados!. ${error}`,
+        });
       } finally {
         setLoading(false);
       }
@@ -121,12 +118,7 @@ export function Ponto() {
 
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-        {!loading && (
+   
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
               <h1 className="block text-lg font-semibold text-gray-700">
@@ -138,7 +130,7 @@ export function Ponto() {
               />
             </div>
             <form
-              onSubmit={NewFuncionario}
+              onSubmit={NewMesPonto}
               className="grid grid-cols-2 gap-5 gap-x-4"
             >
               <FormControl fullWidth>
@@ -193,7 +185,7 @@ export function Ponto() {
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
-        )}
+     
       </Dialog>
     );
   }
@@ -206,7 +198,7 @@ export function Ponto() {
         setData(response.data);
       })
       .catch((error) => {
-        console.error("Erro ao buscar os dados:", error);
+        console.error('Erro ao buscar os dados:', error);
       })
       .finally(() => {
         setLoading(false); // ✅ Esta linha é executada APÓS a requisição ser concluída.
@@ -298,11 +290,7 @@ export function Ponto() {
   const paginationModel = { page: 0, pageSize: 10 };
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+
       {create && <CreateNew create={create} setCreate={setCreate} />}
 
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
@@ -349,4 +337,3 @@ export function Ponto() {
     </>
   );
 }
-

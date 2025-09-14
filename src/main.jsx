@@ -36,17 +36,6 @@ function App() {
                 <Route path="/funcionarios" element={<Comp.Funcionarios />} />
                 <Route path="/ponto" element={<Comp.Ponto />} />
                 <Route path="/ponto/:id" element={<Comp.PontoMes />} />
-
-                <Route path="/cronograma" element={<Comp.Cronograma />} />
-                <Route path="/desp-mes-mes" element={<Comp.DesMesMes />} />
-                <Route
-                  path="/desp-mes-mes/:id"
-                  element={<Comp.DesMesMesDetail />}
-                />
-                <Route
-                  path="/cronograma/:id"
-                  element={<Comp.CronogramaDetail />}
-                />
               </Routes>
             </div>
             <Comp.Footer />

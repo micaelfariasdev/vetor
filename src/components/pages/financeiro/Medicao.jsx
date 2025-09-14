@@ -16,13 +16,13 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
-import { DateField } from '@mui/x-date-pickers/DateField'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DateField } from '@mui/x-date-pickers/DateField';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import { useMemo } from 'react';
 import api from '../auth/auth';
-import { formatarDinheiro } from '../../utils';
+import { formatarDinheiro, topNotice } from '../../utils';
 
 export function Medicao() {
   const [data, setData] = useState([]);
@@ -38,13 +38,12 @@ export function Medicao() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       try {
-        const response = await api.delete(
-          `medicao/${IdItem}/`
-        );
+        const response = await api.delete(`medicao/${IdItem}/`);
         setDelete(false);
         setLoading(false);
+        topNotice({ success: 'Medição excluída com sucesso!' });
       } catch (error) {
-        console.error(error);
+        topNotice({ error: `Erro ao excluir a medição. Tente novamente. ${error}` });
         setLoading(false);
       }
     };
@@ -52,12 +51,7 @@ export function Medicao() {
     return (
       <>
         <Dialog open={del} onClose={() => setDelete(false)}>
-          {loading && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-            </div>
-          )}
-
+     
           <DialogTitle>Confirmar Exclusão</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -82,49 +76,46 @@ export function Medicao() {
   }
 
   function CreateNew({ create, setCreate }) {
-    const [obra, setObra] = useState('')
-    const [pagamento, setPagamento] = useState(null)
-    const [arrayObra, setArrayObra] = useState([])
+    const [obra, setObra] = useState('');
+    const [pagamento, setPagamento] = useState(null);
+    const [arrayObra, setArrayObra] = useState([]);
 
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
       api.get('obras/').then((response) => {
-        setArrayObra(response.data)
-      })
-    }, [])
+        setArrayObra(response.data);
+      });
+    }, []);
 
-    const NewObra = async (e) => {
-      e.preventDefault()
-      setLoading(true)
+    const NewMedico = async (e) => {
+      e.preventDefault();
+      setLoading(true);
 
       try {
         await api.post('medicao/', {
           obra,
           data_pagamento: pagamento ? pagamento.format('YYYY-MM-DD') : null,
-        })
-        setCreate(false)
+        });
+        topNotice({ success: `Medição criada com sucesso!` });
+        setCreate(false);
       } catch (error) {
-        console.error(error)
-        setError('Não foi possível criar. Verifique os dados.')
+        topNotice({
+          error: `Não foi possível criar. Verifique os dados!. ${error}`,
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     const handleClose = () => {
-      setCreate(false)
-    }
+      setCreate(false);
+    };
 
     return (
       <Dialog open={create} onClose={handleClose} keepMounted>
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-        {!loading && (
+   
           <div className="p-5 gap-4 flex flex-col w-100">
             <div className="w-full flex flex-row justify-between text-3xl">
               <h1 className="block text-lg font-semibold text-gray-700">
@@ -135,7 +126,7 @@ export function Medicao() {
                 onClick={handleClose}
               />
             </div>
-            <form onSubmit={NewObra} className="flex flex-col gap-5 gap-x-4">
+            <form onSubmit={NewMedico} className="flex flex-col gap-5 gap-x-4">
               <FormControl fullWidth>
                 <InputLabel id="obra-label">Obra</InputLabel>
                 <Select
@@ -172,13 +163,10 @@ export function Medicao() {
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
-        )}
+ 
       </Dialog>
-    )
+    );
   }
-
-
-
 
   useEffect(() => {
     setLoading(true);
@@ -197,7 +185,13 @@ export function Medicao() {
 
   const columns = [
     { field: 'str', headerName: 'Medição', minWidth: 250, flex: 1 },
-    { field: 'valor_total', headerName: 'Valor Total', minWidth: 250, flex: 1, valueFormatter: (params) => formatarDinheiro(params), },
+    {
+      field: 'valor_total',
+      headerName: 'Valor Total',
+      minWidth: 250,
+      flex: 1,
+      valueFormatter: (params) => formatarDinheiro(params),
+    },
     {
       field: 'ano',
       headerName: 'Ano',
@@ -278,11 +272,7 @@ export function Medicao() {
 
   return (
     <>
-      {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+   
       {create && <CreateNew create={create} setCreate={setCreate} />}
       {del && <Delete IdItem={del.id} itemName={del.nome} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
