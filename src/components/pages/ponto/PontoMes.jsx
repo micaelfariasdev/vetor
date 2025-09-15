@@ -11,6 +11,7 @@ import {
   TableCell,
   TableRow,
 } from '@mui/material';
+import { FaCloudUploadAlt } from 'react-icons/fa';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -21,7 +22,7 @@ import { useMemo } from 'react';
 import { FaFileDownload } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import api from '../auth/auth';
-import { ConvertMes, topNotice } from '../../utils';
+import { ConvertMes, iniciarDownload, topNotice } from '../../utils';
 import axios from 'axios';
 
 function gerarMesCompleto(mes, ano) {
@@ -63,6 +64,7 @@ function gerarMesCompleto(mes, ano) {
 
 export function PontoMes() {
   const { id } = useParams();
+  const [down, setdown] = useState(false);
   const [data, setData] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -228,8 +230,30 @@ export function PontoMes() {
         <DialogTitle>
           <Grid container>
             <Grid size={{ xs: 12 }}>
-              <Typography variant="h4">
+              <Typography variant="h4" className="flex justify-between align-middle items-center pb-5">
                 {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
+                <IconButton
+                  sx={{
+                    padding: 1,
+                    backgroundColor: 'success.main',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'success.dark',
+                    },
+                  }}
+                  aria-label="deletar"
+                  size="small"
+                  onClick={() =>
+                    BaixaPontoCol(
+                      data.ano,
+                      data.mes,
+                      colaborador.id,
+                      colaborador.nome
+                    )
+                  }
+                >
+                  <FaCloudUploadAlt />
+                </IconButton>
               </Typography>
             </Grid>
             <Grid size={{ xs: 12 }}>
@@ -548,9 +572,20 @@ export function PontoMes() {
       const primeiraResposta = await api.get(`ponto/pdf/${id}/`);
       console.log('Primeira requisição bem-sucedida:', primeiraResposta.status);
 
-       const url_download = `https://64.181.171.161/pontos/${ano}/${mes}/zip`;
-      window.open(url_download, '_blank');
+      setdown(true);
+    } catch (error) {
+      console.error('Ocorreu um erro nas requisições:', error.message);
 
+      alert('Ocorreu um erro ao baixar os arquivos.');
+    }
+  }
+
+  async function BaixaPontoCol(ano, mes, col, nome) {
+    try {
+      const primeiraResposta = await api.get(`ponto/pdf/${id}/${col}`);
+      console.log('Primeira requisição bem-sucedida:', primeiraResposta.status);
+
+      iniciarDownload(`http://64.181.171.161/pontos/${ano}/${mes}/${nome}.pdf`);
     } catch (error) {
       console.error('Ocorreu um erro nas requisições:', error.message);
 
@@ -575,21 +610,44 @@ export function PontoMes() {
           <h1 className="font-bold text-3xl">{`${data.obra_name} - ${ConvertMes(
             data.mes
           )} / ${data.ano}`}</h1>
-          <IconButton
-            sx={{
-              padding: 1,
-              backgroundColor: 'success.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'success.dark',
-              },
-            }}
-            aria-label="deletar"
-            size="small"
-            onClick={() => BaixaPonto(data.ano, data.mes)}
-          >
-            <FaFileDownload />
-          </IconButton>
+          <div className="flex gap-5 items-center ">
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: 'success.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'success.dark',
+                },
+              }}
+              aria-label="deletar"
+              size="small"
+              onClick={() => BaixaPonto(data.ano, data.mes)}
+            >
+              <FaCloudUploadAlt />
+            </IconButton>
+            {!down && (
+              <IconButton
+                sx={{
+                  padding: 1,
+                  backgroundColor: 'success.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'success.dark',
+                  },
+                }}
+                aria-label="deletar"
+                size="small"
+                onClick={() =>
+                  iniciarDownload(
+                    `http://64.181.171.161/pontos/${data.ano}/${data.mes}/pdf`
+                  )
+                }
+              >
+                <FaFileDownload />
+              </IconButton>
+            )}
+          </div>
         </div>
 
         <hr className="col-span-2" />

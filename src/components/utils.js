@@ -185,3 +185,19 @@ export function toggleLoading(status) {
     loader.remove();
   }
 }
+
+export function iniciarDownload(url) {
+  const linkTemporario = document.createElement('a');
+
+  // Configura o link com a URL e o atributo para abrir em uma nova aba
+  linkTemporario.href = url;
+  linkTemporario.target = '_blank'; // Isso faz com que o link abra em uma nova aba
+
+  // O link não será visível para o usuário
+  linkTemporario.style.display = 'none';
+
+  // Adiciona o link ao corpo da página, simula um clique e o remove
+  document.body.appendChild(linkTemporario);
+  linkTemporario.click();
+  document.body.removeChild(linkTemporario);
+}
