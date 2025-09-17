@@ -220,16 +220,13 @@ export function Obras_detail() {
     useEffect(() => {
       async function fetchData() {
         try {
-          const response = await api.get('servico-unidade/get-servicos',
+          const response = await api.post('servico-unidade/get-servicos/',
             {
-              
+              unidade_id: idUni
             }
           );
-          const filterServ = response.data.filter(
-            (item) => item.unidade === idUni
-          );
-          setEditServ(filterServ);
-          console.log('filterServ', filterServ);
+          
+          setEditServ(response.data);
         } catch (err) {
           console.error('Erro ao carregar serviço:', err);
         }
