@@ -2,7 +2,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import { useState, useEffect } from 'react';
 import { FaCirclePlus } from 'react-icons/fa6';
-import { FaEdit } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaEdit } from 'react-icons/fa';
 import { IoIosCloseCircle } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
 import Dialog from '@mui/material/Dialog';
@@ -30,10 +30,42 @@ export function MedicaoDetail() {
   var [loading, setLoading] = useState(false);
   var [att, setAtt] = useState(false);
 
+
   const [error, setError] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
+
+ const urlDestino = 'http://64.181.171.161/relatorio/medicao';
+
+const gerarRelatorio = async () => {
+    try {
+        // Envia a requisição POST com Content-Type: application/json
+        const response = await fetch(urlDestino, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao gerar relatório no servidor.');
+        }
+
+        // O servidor deve retornar o arquivo (por exemplo, um PDF)
+        // Se o Flask retornar um PDF com o Content-Type correto, você pode abrir:
+        const blob = await response.blob();
+        const fileURL = URL.createObjectURL(blob);
+        
+        // Abre o relatório na nova aba
+        window.open(fileURL, '_blank');
+        
+    } catch (error) {
+        console.error("Falha ao gerar e abrir relatório:", error);
+        alert("Não foi possível gerar o relatório. Verifique o console.");
+    }
+};
 
   function Delete({ IdItem, itemName }) {
     const deleteAPi = async (IdItem) => {
@@ -580,6 +612,22 @@ export function MedicaoDetail() {
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">{data.str}</h1>
+          <div class='flex gap-4 '>
+<IconButton
+            sx={{
+              padding: 1,
+              backgroundColor: 'success.main',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'success.dark',
+              },
+            }}
+            aria-label="deletar"
+            size="small"
+            onClick={gerarRelatorio}
+            >
+              <FaCloudUploadAlt />
+            </IconButton>
           <IconButton
             sx={{
               padding: 1,
@@ -592,9 +640,10 @@ export function MedicaoDetail() {
             aria-label="deletar"
             size="small"
             onClick={() => setCreate(true)}
-          >
+            >
             <FaCirclePlus />
           </IconButton>
+            </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2 flex gap-2 ">
