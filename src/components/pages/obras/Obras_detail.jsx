@@ -220,7 +220,11 @@ export function Obras_detail() {
     useEffect(() => {
       async function fetchData() {
         try {
-          const response = await api.get('servico-unidade/');
+          const response = await api.get('servico-unidade/get-servicos',
+            {
+              
+            }
+          );
           const filterServ = response.data.filter(
             (item) => item.unidade === idUni
           );
