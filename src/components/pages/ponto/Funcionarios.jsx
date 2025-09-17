@@ -83,6 +83,7 @@ export function Funcionarios() {
   function Edit({ IdItem }) {
     const [nome, setNome] = useState('');
     const [cargo, setCargo] = useState('');
+    const [dados, setDados] = useState('');
     const [situacao, setSituacao] = useState('');
     const [obra, setObra] = useState('');
     const [arrayobra, setArrayObra] = useState([]);
@@ -134,6 +135,7 @@ export function Funcionarios() {
           setCargo(response.data.cargo);
           setSituacao(response.data.situacao);
           setObra(response.data.obra);
+          setDados(response.data.dados);
         });
     }, []);
 
@@ -187,12 +189,22 @@ export function Funcionarios() {
                   id="obra-select"
                   label="Situação"
                   value={situacao}
-                  onChange={(e) => setSituacao(e.target.value)}
+                  onChange={(e) => {
+                    console.log(e.target.valu)
+                    setSituacao(e.target.value);
+                    if (e.target.value === 'PJ') {
+                      setCargo('Empreiteiro')
+                    }else  if (e.target.value === 'FREE') {
+                      setCargo('Diarista')
+                    }
+                  }}
                 >
                   <MenuItem value="ASSINADO">Carteira</MenuItem>
-                  <MenuItem value="FREE">Freelancer</MenuItem>
+                  <MenuItem value="FREE">Diarista</MenuItem>
+                  <MenuItem value="PJ">Empreiteiro</MenuItem>
                 </Select>
               </FormControl>
+              {situacao == 'ASSINADO' ? 
               <FormControl fullWidth className="col-span-2">
                 <TextField
                   id="cargo"
@@ -200,8 +212,19 @@ export function Funcionarios() {
                   variant="outlined"
                   value={cargo}
                   onChange={(e) => setCargo(e.target.value)}
-                />
+                  />
               </FormControl>
+                  :
+              <FormControl fullWidth className="col-span-2">
+                <TextField
+                  id="dados"
+                  label="Dados"
+                  variant="outlined"
+                  value={dados}
+                  onChange={(e) => setDados(e.target.value)}
+                  />
+              </FormControl>
+                }
               <button
                 type="submit"
                 className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
@@ -220,6 +243,7 @@ export function Funcionarios() {
   function CreateNew({ create, setCreate }) {
     const [nome, setNome] = useState('');
     const [cargo, setCargo] = useState('');
+    const [dados, setDados] = useState('');
     const [situacao, setSituacao] = useState('');
     const [obra, setObra] = useState('');
     const [arrayobra, setArrayObra] = useState([]);
@@ -315,12 +339,22 @@ export function Funcionarios() {
                   id="obra-select"
                   label="Situação"
                   value={situacao}
-                  onChange={(e) => setSituacao(e.target.value)}
+                 onChange={(e) => {
+                    console.log(e.target.valu)
+                    setSituacao(e.target.value);
+                    if (e.target.value === 'PJ') {
+                      setCargo('Empreiteiro')
+                    }else  if (e.target.value === 'FREE') {
+                      setCargo('Diarista')
+                    }
+                  }}
                 >
                   <MenuItem value="ASSINADO">Carteira</MenuItem>
                   <MenuItem value="FREE">Freelancer</MenuItem>
+                  <MenuItem value="PJ">Empreiteiro</MenuItem>
                 </Select>
               </FormControl>
+              {situacao == 'ASSINADO' ? 
               <FormControl fullWidth className="col-span-2">
                 <TextField
                   id="cargo"
@@ -328,8 +362,19 @@ export function Funcionarios() {
                   variant="outlined"
                   value={cargo}
                   onChange={(e) => setCargo(e.target.value)}
-                />
+                  />
               </FormControl>
+                  :
+              <FormControl fullWidth className="col-span-2">
+                <TextField
+                  id="dados"
+                  label="Dados"
+                  variant="outlined"
+                  value={dados}
+                  onChange={(e) => setDados(e.target.value)}
+                  />
+              </FormControl>
+                }
               <button
                 type="submit"
                 className="bg-cyan-500 rounded-xl cursor-pointer text-white p-2 w-full col-span-2"
