@@ -112,6 +112,7 @@ export function Funcionarios() {
             cargo,
             situacao,
             obra,
+            dados
           }
         );
         setData((prev) =>
@@ -271,6 +272,7 @@ export function Funcionarios() {
             cargo,
             situacao,
             obra,
+            dados
           }
         );
         setData((prev) => [...prev, response.data]);
