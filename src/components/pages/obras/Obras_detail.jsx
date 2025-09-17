@@ -277,7 +277,7 @@ export function Obras_detail() {
                   <TextField
                     label="Progresso (%)"
                     type="number"
-                    value={found.progresso ?? ''}
+                    value={found?.progresso ?? 0.00}
                     inputProps={{
                       min: 0,
                       max: 100,

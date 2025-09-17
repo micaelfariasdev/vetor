@@ -36,9 +36,9 @@ export function MedicaoDetail() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
 
- const urlDestino = 'http://64.181.171.161/relatorio/medicao';
-
-const gerarRelatorio = async () => {
+  
+  const gerarRelatorio = async () => {
+  const urlDestino = '/apiv2/relatorio/medicao';
     try {
         // Envia a requisição POST com Content-Type: application/json
         const response = await fetch(urlDestino, {
