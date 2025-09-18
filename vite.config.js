@@ -12,6 +12,12 @@ export default defineConfig({
         secure: true,
         ws: true,
       },
+      '/apiv2/': {
+        target: 'https://vetor.micaelfarias.com',
+        changeOrigin: true,
+        secure: true,
+        ws: true,
+      },
     },
   },
 })

@@ -32,6 +32,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import api from '../auth/auth';
 import { topNotice } from '../../utils';
+import { FaCloudUploadAlt } from 'react-icons/fa';
+import axios from 'axios';
 
 function a11yProps(index) {
   return {
@@ -54,6 +56,36 @@ export function Obras_detail() {
   const [unidades, setUnidades] = useState([]);
   const [openAndar, setOpenAndar] = useState('');
   const [search, setSearch] = useState(false);
+
+  const gerarRelatorio = async () => {
+    try {
+      const responseAPI = await api.get(`/obras/${id}/servicos/`);
+      const jsonData = responseAPI.data;
+      console.log(jsonData)
+      const urlDestino = 'https://vetor.micaelfarias.com/apiv2/relatorio/servicos';
+      const response = await fetch(urlDestino, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao gerar relatório no servidor.');
+      }
+
+      const blob = await response.blob();
+      const fileURL = URL.createObjectURL(blob);
+
+      window.open(fileURL, '_blank');
+
+    } catch (error) {
+      console.error("Falha ao gerar e abrir relatório:", error);
+      alert("Não foi possível gerar o relatório. Verifique o console.");
+    }
+  };
+
 
   useEffect(() => {
     setLoading(true);
@@ -225,7 +257,7 @@ export function Obras_detail() {
               unidade_id: idUni
             }
           );
-          
+
           setEditServ(response.data);
         } catch (err) {
           console.error('Erro ao carregar serviço:', err);
@@ -302,12 +334,28 @@ export function Obras_detail() {
 
   return (
     <>
-    
+
       {search && <SearchServ search={search} setSearch={setSearch} />}
       {edit && <EditServicosUnidades idUni={edit} obra={id} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Obras</h1>
+          <div className="flex flex-row-reverse " hidden={value !== 2}>
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: 'success.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'success.dark',
+                },
+              }}
+              size="small"
+              onClick={gerarRelatorio}
+            >
+              <FaCloudUploadAlt />
+            </IconButton>
+          </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2 flex gap-2 ">
@@ -417,6 +465,7 @@ export function Obras_detail() {
 
         <Paper hidden={value !== 2}>
           <TableContainer component={Paper}>
+
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
