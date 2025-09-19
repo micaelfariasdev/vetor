@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { data, useParams } from 'react-router-dom';
 import { IoIosCloseCircle } from 'react-icons/io';
 
 import Paper from '@mui/material/Paper';
@@ -28,12 +28,14 @@ import TableRow from '@mui/material/TableRow';
 import Collapse from '@mui/material/Collapse';
 import { ThemeProvider } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
+import { FaEdit } from 'react-icons/fa';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import api from '../auth/auth';
 import { topNotice } from '../../utils';
 import { FaCloudUploadAlt } from 'react-icons/fa';
-import axios from 'axios';
+import { ServicoEdit } from './servicos/ServicoEdit';
 
 function a11yProps(index) {
   return {
@@ -43,6 +45,7 @@ function a11yProps(index) {
 }
 
 export function Obras_detail() {
+
   const { id } = useParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -56,6 +59,7 @@ export function Obras_detail() {
   const [unidades, setUnidades] = useState([]);
   const [openAndar, setOpenAndar] = useState('');
   const [search, setSearch] = useState(false);
+  const [servIdEdit, setServIdEdit] = useState('')
 
   const gerarRelatorio = async () => {
     try {
@@ -166,6 +170,7 @@ export function Obras_detail() {
       topNotice({ error: 'Erro ao remover serviço. Tente novamente.' });
     }
   };
+
   const handleAddItem = (idToAdd, name) => {
     try {
       api
@@ -273,56 +278,18 @@ export function Obras_detail() {
       setEdit(false);
     };
 
-    const handleChange = ({ ServId, Value }) => {
-      setEditServ((prev) =>
-        prev.map((item) =>
-          item.servico === ServId ? { ...item, progresso: Value } : item
-        )
-      );
-    };
 
-    const handleBlur = async ({ ServId, Value }) => {
-      const payload = {
-        [ServId]: {
-          unidade: Number(idUni),
-          valor: Number(Value),
-        },
-      };
-
-      try {
-        await api.post('servico-unidade/salvar-servicos/', payload);
-        topNotice({ success: 'Serviço salvo com sucesso!' });
-      } catch (err) {
-        topNotice({ error: `Erro ao salvar serviço. ${err}` });
-        console.error('Erro ao salvar serviço:', err);
-      }
-    };
 
     return (
       <Dialog open={edit} onClose={handleClose} keepMounted>
-        <Box className="w-full h-full min-h-150 min-w-150 p-5">
-          <List>
+        <Box className="w-full h-full min-h-150 p-5">
+          <List className='w-100'>
             {serv.map((item) => {
               const found = editServ.find((i) => i.servico === item.id) || {};
               return (
-                <ListItem key={item.id} divider>
+                <ListItem key={item.id} divider className='flex justify-between '>
                   <ListItemText primary={item.titulo} />
-                  <TextField
-                    label="Progresso (%)"
-                    type="number"
-                    value={found?.progresso ?? 0.00}
-                    inputProps={{
-                      min: 0,
-                      max: 100,
-                    }}
-                    onChange={(e) =>
-                      handleChange({ ServId: item.id, Value: e.target.value })
-                    }
-                    onBlur={(e) =>
-                      handleBlur({ ServId: item.id, Value: e.target.value })
-                    }
-                    helperText="Digite um valor de 0 a 100"
-                  />
+                  <ListItemText primary={found?.status ?? 0.00} className='text-right'/>
                 </ListItem>
               );
             })}
@@ -331,12 +298,15 @@ export function Obras_detail() {
       </Dialog>
     );
   }
+  const handleCloseedit = () => {
+    setServIdEdit(null)
+  }
 
   return (
     <>
-
       {search && <SearchServ search={search} setSearch={setSearch} />}
       {edit && <EditServicosUnidades idUni={edit} obra={id} />}
+      {servIdEdit && <ServicoEdit unidades={unidades} serv={servIdEdit} open={!!servIdEdit} onClose={handleCloseedit} servico={serv} />}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">Obras</h1>
@@ -438,6 +408,13 @@ export function Obras_detail() {
               serv.map((item, index) => (
                 <ListItem key={index} divider>
                   <ListItemText primary={item.titulo} />
+                  <IconButton
+                    edge="end"
+                    aria-label="remover"
+                    onClick={() => setServIdEdit(item.id)}
+                  >
+                    <FaEdit />
+                  </IconButton>
                   <IconButton
                     edge="end"
                     aria-label="remover"

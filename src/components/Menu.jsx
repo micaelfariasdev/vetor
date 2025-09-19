@@ -231,13 +231,12 @@ export function Menu({ onNavigate }) {
   );
 }
 
-import { default as api } from './pages/auth/auth';
+import { useAuth } from './pages/auth/useAuth';
 
 // O componente do menu superior
 export function MenuTop() {
-  const [loading, setLoading] = useState(false);
 
-  const [user, setUser] = useState(null);
+  const { user, loading, sair } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -248,35 +247,11 @@ export function MenuTop() {
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    setLoading(true);
-    async function fetchUser() {
-      try {
-        const userResp = await api.get('me/').then((res) => {
-          localStorage.setItem(
-            'auth',
-            res.data ? JSON.stringify(res.data) : null
-          );
-          setUser(res.data);
-          return res; // mantém compatibilidade com o await
-        });
-        setLoading(false);
-      } catch {
-        setLoading(false);
-        console.error('Faça o login novamente');
-        window.location.href = '/login';
-        setUser(null);
-      }
-    }
-    fetchUser();
-  }, []);
-
+  
+  console.log(user)
   let username = `Sem usuário`;
   if (user) {
     username = `${user.first_name} ${user.last_name}`;
-    if (window.location.pathname === '/login') {
-      window.location.href = '/home';
-    }
   }
 
   function stringAvatar(name) {
