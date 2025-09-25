@@ -102,7 +102,6 @@ export function PontoMes() {
           .catch((error) => {
             console.error('Erro ao buscar dados do colaborador:', error);
           });
-        console.log('ok');
       }
     }, [IdItem, id]); // Dependências corrigidas
 
@@ -230,7 +229,10 @@ export function PontoMes() {
         <DialogTitle>
           <Grid container>
             <Grid size={{ xs: 12 }}>
-              <Typography variant="h4" className="flex justify-between align-middle items-center pb-5">
+              <Typography
+                variant="h4"
+                className="flex justify-between align-middle items-center pb-5"
+              >
                 {colaborador.nome} • {ConvertMes(data.mes)} / {data.ano}
                 <IconButton
                   sx={{
@@ -337,10 +339,7 @@ export function PontoMes() {
               '0'
             )}:${String(minutos).padStart(2, '0')}`;
 
-            console.log(
-              `Total de horas trabalhadas no dia: ${horasFormatadas}`
-            );
-
+          
             const diaObj = diasDoMes[index];
             const isDelete = item.valores[6];
             const isSabado = ['sábado', 'domingo'].includes(
@@ -570,9 +569,11 @@ export function PontoMes() {
   async function BaixaPonto(ano, mes) {
     try {
       const primeiraResposta = await api.get(`ponto/pdf/${id}/`);
-      console.log('Primeira requisição bem-sucedida:', primeiraResposta.status);
+      const blob = new Blob([primeiraResposta.data], { type: 'text/html' });
+      const fileURL = URL.createObjectURL(blob);
 
-      setdown(true);
+      // Abre o relatório na nova aba
+      window.open(fileURL, '_blank');
     } catch (error) {
       console.error('Ocorreu um erro nas requisições:', error.message);
 
@@ -583,9 +584,12 @@ export function PontoMes() {
   async function BaixaPontoCol(ano, mes, col, nome) {
     try {
       const primeiraResposta = await api.get(`ponto/pdf/${id}/${col}`);
-      console.log('Primeira requisição bem-sucedida:', primeiraResposta.status);
 
-      iniciarDownload(`http://64.181.171.161/pontos/${ano}/${mes}/${nome}.pdf`);
+      const blob = new Blob([primeiraResposta.data], { type: 'text/html' });
+      const fileURL = URL.createObjectURL(blob);
+
+      // Abre o relatório na nova aba
+      window.open(fileURL, '_blank');
     } catch (error) {
       console.error('Ocorreu um erro nas requisições:', error.message);
 
@@ -626,27 +630,7 @@ export function PontoMes() {
             >
               <FaCloudUploadAlt />
             </IconButton>
-            {!down && (
-              <IconButton
-                sx={{
-                  padding: 1,
-                  backgroundColor: 'success.main',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'success.dark',
-                  },
-                }}
-                aria-label="deletar"
-                size="small"
-                onClick={() =>
-                  iniciarDownload(
-                    `http://64.181.171.161/pontos/${data.ano}/${data.mes}/pdf`
-                  )
-                }
-              >
-                <FaFileDownload />
-              </IconButton>
-            )}
+              
           </div>
         </div>
 
