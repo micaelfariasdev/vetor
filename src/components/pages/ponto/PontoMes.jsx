@@ -339,7 +339,6 @@ export function PontoMes() {
               '0'
             )}:${String(minutos).padStart(2, '0')}`;
 
-          
             const diaObj = diasDoMes[index];
             const isDelete = item.valores[6];
             const isSabado = ['sábado', 'domingo'].includes(
@@ -630,7 +629,6 @@ export function PontoMes() {
             >
               <FaCloudUploadAlt />
             </IconButton>
-              
           </div>
         </div>
 
