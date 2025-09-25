@@ -174,8 +174,6 @@ export function PontoMes() {
             data: item.data.split('-')[2],
             mes: item.data.split('-')[1],
           }));
-        console.log(registros);
-        console.log(registrosPreenchidos);
 
         const payload = {
           author: 1,
