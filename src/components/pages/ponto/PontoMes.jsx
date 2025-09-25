@@ -155,7 +155,6 @@ export function PontoMes() {
         if (indiceCampo !== undefined) {
           copia[index].valores[indiceCampo] = valor;
         }
-
         return copia;
       });
     }
@@ -167,7 +166,7 @@ export function PontoMes() {
         const registrosPreenchidos = registros
           .filter(
             (item) =>
-              item.valores.slice(0, 3).some((valor) => valor !== '') ||
+              item.valores.slice(0, 4).some((valor) => valor !== '') ||
               item.valores.slice(4, 9).some((valor) => valor !== false)
           )
           .map((item) => ({
@@ -175,6 +174,9 @@ export function PontoMes() {
             data: item.data.split('-')[2],
             mes: item.data.split('-')[1],
           }));
+        console.log(registros);
+        console.log(registrosPreenchidos);
+
         const payload = {
           author: 1,
           colaborador_id: IdItem,
@@ -564,9 +566,9 @@ export function PontoMes() {
       ),
     },
   ];
-const [progress, setProgress] = useState(0);
-const [progressuser, setProgressuser] = useState('');
- async function BaixaPonto(ano, mes) {
+  const [progress, setProgress] = useState(0);
+  const [progressuser, setProgressuser] = useState('');
+  async function BaixaPonto(ano, mes) {
     try {
       const primeiraResposta = await api.get(`ponto/pdf/${id}/`);
       const blob = new Blob([primeiraResposta.data], { type: 'text/html' });
@@ -575,15 +577,14 @@ const [progressuser, setProgressuser] = useState('');
       // Abre o relatório na nova aba
       window.open(fileURL, '_blank');
     } catch (error) {
-      console.error("Ocorreu um erro nas requisições:", error.message);
-      alert("Ocorreu um erro ao baixar os arquivos.");
-      setProgress(0)
+      console.error('Ocorreu um erro nas requisições:', error.message);
+      alert('Ocorreu um erro ao baixar os arquivos.');
+      setProgress(0);
     } finally {
       setLoading(false);
-      setProgress(0)
+      setProgress(0);
     }
   }
-
 
   async function BaixaPontoCol(ano, mes, col, nome) {
     try {
@@ -613,33 +614,34 @@ const [progressuser, setProgressuser] = useState('');
   return (
     <>
       {editPonto && <EditarPonto IdItem={editPonto.id} />}
-     {progress > 0 &&
-     <div
-    style={{
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '300px',
-      padding: '10px',
-      backgroundColor: '#fff',
-      border: '1px solid #000',
-      boxShadow: '0 0 10px rgba(0,0,0,0.3)',
-      textAlign: 'center',
-      zIndex: 999999999999
-    }}
-  >
-    <div
-      style={{
-        width: `${progress}%`,
-        height: '20px',
-        backgroundColor: '#4caf50',
-        transition: 'width 0.3s'
-      }}
-    />
-    <p>{progress}% concluído</p>
-    <p>Salvando {progressuser}</p>
-  </div>}
+      {progress > 0 && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '300px',
+            padding: '10px',
+            backgroundColor: '#fff',
+            border: '1px solid #000',
+            boxShadow: '0 0 10px rgba(0,0,0,0.3)',
+            textAlign: 'center',
+            zIndex: 999999999999,
+          }}
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              height: '20px',
+              backgroundColor: '#4caf50',
+              transition: 'width 0.3s',
+            }}
+          />
+          <p>{progress}% concluído</p>
+          <p>Salvando {progressuser}</p>
+        </div>
+      )}
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">{`${data.obra_name} - ${ConvertMes(
