@@ -36,36 +36,32 @@ export function MedicaoDetail() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchObraQuery, setSearchObraQuery] = useState('');
 
-  
+
   const gerarRelatorio = async () => {
-  const urlDestino = '/apiv2/relatorio/medicao';
+    const urlDestino = 'https://vetor.micaelfarias.com/apiv2/relatorio/medicao';
     try {
-        // Envia a requisição POST com Content-Type: application/json
-        const response = await fetch(urlDestino, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
+      const response = await fetch(urlDestino, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-        if (!response.ok) {
-            throw new Error('Erro ao gerar relatório no servidor.');
-        }
+      if (!response.ok) {
+        throw new Error('Erro ao gerar relatório no servidor.');
+      }
 
-        // O servidor deve retornar o arquivo (por exemplo, um PDF)
-        // Se o Flask retornar um PDF com o Content-Type correto, você pode abrir:
-        const blob = await response.blob();
-        const fileURL = URL.createObjectURL(blob);
-        
-        // Abre o relatório na nova aba
-        window.open(fileURL, '_blank');
-        
+      const blob = await response.blob();
+      const fileURL = URL.createObjectURL(blob);
+
+      window.open(fileURL, '_blank');
+
     } catch (error) {
-        console.error("Falha ao gerar e abrir relatório:", error);
-        alert("Não foi possível gerar o relatório. Verifique o console.");
+      console.error("Falha ao gerar e abrir relatório:", error);
+      alert("Não foi possível gerar o relatório. Verifique o console.");
     }
-};
+  };
 
   function Delete({ IdItem, itemName }) {
     const deleteAPi = async (IdItem) => {
@@ -613,37 +609,37 @@ export function MedicaoDetail() {
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">{data.str}</h1>
           <div class='flex gap-4 '>
-<IconButton
-            sx={{
-              padding: 1,
-              backgroundColor: 'success.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'success.dark',
-              },
-            }}
-            aria-label="deletar"
-            size="small"
-            onClick={gerarRelatorio}
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: 'success.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'success.dark',
+                },
+              }}
+              aria-label="deletar"
+              size="small"
+              onClick={gerarRelatorio}
             >
               <FaCloudUploadAlt />
             </IconButton>
-          <IconButton
-            sx={{
-              padding: 1,
-              backgroundColor: 'info.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'info.dark',
-              },
-            }}
-            aria-label="deletar"
-            size="small"
-            onClick={() => setCreate(true)}
+            <IconButton
+              sx={{
+                padding: 1,
+                backgroundColor: 'info.main',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'info.dark',
+                },
+              }}
+              aria-label="deletar"
+              size="small"
+              onClick={() => setCreate(true)}
             >
-            <FaCirclePlus />
-          </IconButton>
-            </div>
+              <FaCirclePlus />
+            </IconButton>
+          </div>
         </div>
         <hr className="col-span-2" />
         <div className="col-span-2 flex gap-2 ">

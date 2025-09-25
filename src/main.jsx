@@ -4,6 +4,7 @@ import * as Comp from './components';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { AuthProvider } from './components/pages/auth/useAuth';
 
 function App() {
   const [pagina, setPagina] = useState('home');
@@ -14,7 +15,9 @@ function App() {
         {window.location.pathname !== '/login' && (
           <>
             <Comp.Menu onNavigate={setPagina} />
-            <Comp.MenuTop />
+            <AuthProvider>
+              <Comp.MenuTop />
+            </AuthProvider>
           </>
         )}
         {window.location.pathname !== '/test' && (

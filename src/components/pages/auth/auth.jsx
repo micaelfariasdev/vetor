@@ -69,6 +69,9 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = getCookie('refresh');
+        if (!refreshToken){
+          window.location.href('/login')
+        }
         const resp = await refreshApi.post('/token/refresh/', {
           refresh: refreshToken,
         });
