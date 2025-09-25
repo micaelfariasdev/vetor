@@ -564,8 +564,7 @@ export function PontoMes() {
       ),
     },
   ];
-  const [progress, setProgress] = useState(0);
-  const [progressuser, setProgressuser] = useState('');
+
   async function BaixaPonto(ano, mes) {
     try {
       const primeiraResposta = await api.get(`ponto/pdf/${id}/`);
@@ -577,10 +576,8 @@ export function PontoMes() {
     } catch (error) {
       console.error('Ocorreu um erro nas requisições:', error.message);
       alert('Ocorreu um erro ao baixar os arquivos.');
-      setProgress(0);
     } finally {
       setLoading(false);
-      setProgress(0);
     }
   }
 
@@ -612,34 +609,7 @@ export function PontoMes() {
   return (
     <>
       {editPonto && <EditarPonto IdItem={editPonto.id} />}
-      {progress > 0 && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '300px',
-            padding: '10px',
-            backgroundColor: '#fff',
-            border: '1px solid #000',
-            boxShadow: '0 0 10px rgba(0,0,0,0.3)',
-            textAlign: 'center',
-            zIndex: 999999999999,
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: '20px',
-              backgroundColor: '#4caf50',
-              transition: 'width 0.3s',
-            }}
-          />
-          <p>{progress}% concluído</p>
-          <p>Salvando {progressuser}</p>
-        </div>
-      )}
+
       <div className="w-full h-full grid grid-rows-[auto_auto_auto_1fr] gap-4 p-4 grid-cols-1">
         <div className="grid grid-cols-[1fr_auto] items-center ">
           <h1 className="font-bold text-3xl">{`${data.obra_name} - ${ConvertMes(
